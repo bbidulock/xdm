@@ -1,5 +1,5 @@
 /*
- * $XdotOrg: access.c,v 1.5 2001/02/09 02:05:40 xorgcvs Exp $
+ * $XdotOrg$
  * $Xorg: access.c,v 1.5 2001/02/09 02:05:40 xorgcvs Exp $
  *
 Copyright 1990, 1998  The Open Group
@@ -904,9 +904,9 @@ void ForEachListenAddr (
 	    h = d->hosts;
 	    if (h != NULL) {
 		(*listenfunction) (&h->entry.hostAddress, closure);
-	    }
-	    for (h = h->next; h != NULL; h = h->next) {
-		(*mcastfunction) (&h->entry.hostAddress, closure);
+		for (h = h->next; h != NULL; h = h->next) {
+		    (*mcastfunction) (&h->entry.hostAddress, closure);
+		}
 	    }
 	}
     }

@@ -1,5 +1,5 @@
 /*
- * $XdotOrg: xc/programs/xdm/chooser.c,v 1.1.4.4 2003/12/06 18:51:45 kaleb Exp $
+ * $XdotOrg$
  * $Xorg: chooser.c,v 1.4 2001/02/09 02:05:40 xorgcvs Exp $
  *
 Copyright 1990, 1998  The Open Group
@@ -857,6 +857,7 @@ InitXDMCP (char **argv)
     XtAddInput (socketFD, (XtPointer) XtInputReadMask, ReceivePacket,
 		(XtPointer) &socketFD);
 #if defined(IPv6) && defined(AF_INET6)
+    if (socket6FD != -1)
     XtAddInput (socket6FD, (XtPointer) XtInputReadMask, ReceivePacket,
 		(XtPointer) &socket6FD);
 #endif

@@ -1,4 +1,4 @@
-/* $XdotOrg: socket.c,v 1.4 2001/02/09 02:05:40 xorgcvs Exp $ */
+/* $XdotOrg$ */
 /* $Xorg: socket.c,v 1.4 2001/02/09 02:05:40 xorgcvs Exp $ */
 /*
 
@@ -69,9 +69,9 @@ CreateWellKnownSockets (void)
 
 #if defined(IPv6) && defined(AF_INET6)
     chooserFd = socket (AF_INET6, SOCK_STREAM, 0);
-#else
-    chooserFd = socket (AF_INET, SOCK_STREAM, 0);
+    if (chooserFd == -1)
 #endif
+    chooserFd = socket (AF_INET, SOCK_STREAM, 0);
     Debug ("Created chooser socket %d\n", chooserFd);
     if (chooserFd == -1)
     {
