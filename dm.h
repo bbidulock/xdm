@@ -1,3 +1,4 @@
+/* $XdotOrg: xc/programs/xdm/dm.h,v 1.1.4.3.4.1 2004/03/04 17:48:55 eich Exp $ */
 /* $Xorg: dm.h,v 1.4 2001/02/09 02:05:40 xorgcvs Exp $ */
 /*
 
@@ -508,11 +509,6 @@ extern void ProcessRequestSocket(int fd);
 #define Setjmp(e)   sigsetjmp(e,1)
 #define Longjmp(e,v)	siglongjmp(e,v)
 #define Jmp_buf		sigjmp_buf
-#endif
-
-#ifndef HAS_SNPRINTF
-#include <X11/Xmu/SysUtil.h>
-#define snprintf XmuSnprintf
 #endif
 
 typedef SIGVAL (*SIGFUNC)(int);

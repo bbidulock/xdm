@@ -1,3 +1,4 @@
+/* $XdotOrg: xc/programs/xdm/util.c,v 1.1.4.2.4.1 2004/03/04 17:48:55 eich Exp $ */
 /* $Xorg: util.c,v 1.4 2001/02/09 02:05:41 xorgcvs Exp $ */
 /*
 
@@ -55,7 +56,7 @@ from The Open Group.
 #undef _POSIX_SOURCE
 #endif
 #endif
-#if defined(__osf__) || defined(linux) || defined(__QNXNTO__) || defined(__GNU__)
+#if defined(__osf__) || defined(linux) || defined(__QNXNTO__) || defined(__GLIBC__)
 #define setpgrp setpgid
 #endif
 

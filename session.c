@@ -1,3 +1,4 @@
+/* $XdotOrg: xc/programs/xdm/session.c,v 1.1.4.5.2.1 2004/03/04 17:48:55 eich Exp $ */
 /* $Xorg: session.c,v 1.8 2001/02/09 02:05:40 xorgcvs Exp $ */
 /*
 
@@ -87,7 +88,7 @@ extern	struct spwd	*getspnam(GETSPNAM_ARGS);
 extern	void	endspent(void);
 # endif
 #endif
-#if defined(CSRG_BASED) || defined(__GLIBC__)
+#if defined(CSRG_BASED) || defined(__GLIBC__) || defined(USL)
 # include <pwd.h>
 # include <unistd.h>
 #else
@@ -588,7 +589,7 @@ StartClient (
 	    LogError ("initgroups for \"%s\" failed, errno=%d\n", name, errno);
 	    return (0);
 	}
-#endif	/* QNX4 doesn't support multi-groups, no initgroups() */
+#endif   /* QNX4 doesn't support multi-groups, no initgroups() */
 #ifdef USE_PAM
 	if (pamh) {
 	    pam_error = pam_setcred (pamh, PAM_ESTABLISH_CRED);

@@ -1,4 +1,5 @@
 /*
+ * $XdotOrg: xc/programs/xdm/chooser.c,v 1.1.4.6.2.2 2004/03/12 11:18:23 eich Exp $
  * $Xorg: chooser.c,v 1.4 2001/02/09 02:05:40 xorgcvs Exp $
  *
 Copyright 1990, 1998  The Open Group
@@ -130,9 +131,7 @@ in this Software without prior written authorization from The Open Group.
 # include <sync/queue.h>
 # include <sync/sema.h>
 #endif
-#ifndef __GNU__
-# include <net/if.h>
-#endif /* __GNU__ */
+#include <net/if.h>
 #endif /* hpux */
 
 #include    <netdb.h>
@@ -573,8 +572,6 @@ RegisterHostaddr (struct sockaddr *addr, int len, xdmOpCode type)
  *  addresses on the local host.
  */
 
-#if !defined(__GNU__)
-
 /* Handle variable length ifreq in BNR2 and later */
 #ifdef VARIABLE_IFREQ
 #define ifr_size(p) (sizeof (struct ifreq) + \
@@ -768,69 +765,6 @@ RegisterHostname (char *name)
 #endif /* IPv6 */
     }
 }
-#else /* __GNU__ */
-static void
-RegisterHostname (char *name)
-{
-    struct hostent	*hostent;
-    struct sockaddr_in	in_addr;
-
-    if (!strcmp (name, BROADCAST_HOSTNAME))
-    {
-	    in_addr.sin_addr.s_addr= htonl(0xFFFFFFFF);
-	    in_addr.sin_port = htons (XDM_UDP_PORT);
-	    RegisterHostaddr ((struct sockaddr *)&in_addr, sizeof (in_addr),
-			      BROADCAST_QUERY);
-    }
-    else
-    {
-
-	/* address as hex string, e.g., "12180022" (deprecated) */
-	if (strlen(name) == 8 &&
-	    FromHex(name, (char *)&in_addr.sin_addr, strlen(name)) == 0)
-	{
-	    in_addr.sin_family = AF_INET;
-	    in_addr.sin_port = htons (XDM_UDP_PORT);
-	    RegisterHostaddr ((struct sockaddr *)&in_addr, sizeof (in_addr),
-				QUERY);
-	} else {
-#if defined(IPv6) && defined(AF_INET6)
-	    char sport[8];
-	    struct addrinfo *ai, *nai, hints;
-	    bzero(&hints,sizeof(hints));
-	    hints.ai_socktype = SOCK_DGRAM;
-	    sprintf(sport, "%d", XDM_UDP_PORT);
-	    if (getaddrinfo(name, sport, &hints, &ai) == 0) {
-		for (nai = ai ; nai != NULL ; nai = nai->ai_next) {
-		    if ((nai->ai_family == AF_INET) || 
-		        (nai->ai_family == AF_INET6)) {
-			RegisterHostaddr(nai->ai_addr, nai->ai_addrlen, QUERY);
-		    }
-		}
-	    }
-#else
-	/* Per RFC 1123, check first for IP address in dotted-decimal form */
-	else if ((in_addr.sin_addr.s_addr = inet_addr(name)) != -1)
-	    in_addr.sin_family = AF_INET;
-	else
-	{
-	    hostent = gethostbyname (name);
-	    if (!hostent)
-		return;
-	    if (hostent->h_addrtype != AF_INET || hostent->h_length != 4)
-	    	return;
-	    in_addr.sin_family = hostent->h_addrtype;
-	    memmove( &in_addr.sin_addr, hostent->h_addr, 4);
-	}
-	in_addr.sin_port = htons (XDM_UDP_PORT);
-	RegisterHostaddr ((struct sockaddr *)&in_addr, sizeof (in_addr),
-			  QUERY);
-#endif
-	}
-
-    }
-}
-#endif /* __GNU__ */
 
 static ARRAYofARRAY8	AuthenticationNames;
 
@@ -923,6 +857,7 @@ InitXDMCP (char **argv)
     XtAddInput (socketFD, (XtPointer) XtInputReadMask, ReceivePacket,
 		(XtPointer) &socketFD);
 #if defined(IPv6) && defined(AF_INET6)
+    if (socket6FD != -1)
     XtAddInput (socket6FD, (XtPointer) XtInputReadMask, ReceivePacket,
 		(XtPointer) &socket6FD);
 #endif

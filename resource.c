@@ -1,3 +1,4 @@
+/* $XdotOrg: xc/programs/xdm/resource.c,v 1.1.4.3.4.1 2004/03/04 17:48:55 eich Exp $ */
 /* $Xorg: resource.c,v 1.4 2001/02/09 02:05:40 xorgcvs Exp $ */
 /*
 
@@ -26,7 +27,7 @@ other dealings in this Software without prior written authorization
 from The Open Group.
 
 */
-/* $XFree86: xc/programs/xdm/resource.c,v 3.12 2003/09/17 05:48:32 herrb Exp $ */
+/* $XFree86: xc/programs/xdm/resource.c,v 3.11 2003/07/09 15:27:39 tsi Exp $ */
 
 /*
  * xdm - display manager daemon
@@ -130,11 +131,7 @@ int	choiceTimeout;	/* chooser choice timeout */
 #define DEF_ACCESS_FILE	""
 #endif
 #ifndef DEF_RANDOM_FILE
-# ifdef linux
-#  define DEF_RANDOM_FILE "/dev/urandom"
-# else
-#  define DEF_RANDOM_FILE "/dev/mem"
-# endif
+#define DEF_RANDOM_FILE "/dev/mem"
 #endif
 #ifndef DEF_PRNGD_SOCKET 
 #define DEF_PRNGD_SOCKET "/tmp/entropy"

@@ -26,7 +26,7 @@ other dealings in this Software without prior written authorization
 from The Open Group.
 
 */
-/* $XFree86: xc/programs/xdm/greet.h,v 1.10 2003/09/21 13:03:03 herrb Exp $ */
+/* $XFree86: xc/programs/xdm/greet.h,v 1.9 2003/07/09 15:27:38 tsi Exp $ */
 
 /*
  * greet.h - interface to xdm's dynamically-loadable modular greeter

@@ -1,3 +1,4 @@
+/* $XdotOrg: xc/programs/xdm/socket.c,v 1.1.4.3.4.2 2004/03/12 11:18:23 eich Exp $ */
 /* $Xorg: socket.c,v 1.4 2001/02/09 02:05:40 xorgcvs Exp $ */
 /*
 
@@ -68,9 +69,9 @@ CreateWellKnownSockets (void)
 
 #if defined(IPv6) && defined(AF_INET6)
     chooserFd = socket (AF_INET6, SOCK_STREAM, 0);
-#else
-    chooserFd = socket (AF_INET, SOCK_STREAM, 0);
+    if (chooserFd == -1)
 #endif
+    chooserFd = socket (AF_INET, SOCK_STREAM, 0);
     Debug ("Created chooser socket %d\n", chooserFd);
     if (chooserFd == -1)
     {
@@ -430,7 +431,10 @@ UpdateMcastGroup(ARRAY8Ptr addr, void **closure)
 {
     struct socklist *s = (struct socklist *) *closure;
     struct socklist *g;
-	
+
+    if (s == NULL) 
+	    return;
+
     g = FindInList(s->mcastgroups, addr);
 
     if (g) { /* Already in the group, mark & continue */

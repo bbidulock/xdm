@@ -41,14 +41,17 @@ from The Open Group.
 #include	"dm_error.h"
 
 #include	<pwd.h>
-#ifdef USE_PAM
+
+#if defined(USE_PAM)
 # include	<security/pam_appl.h>
 # include	<stdlib.h>
-#else
-# ifdef USESHADOW
-#  include	<shadow.h>
-#  include	<errno.h>
-# endif
+#elif defined(USESHADOW)
+# include	<shadow.h>
+# include	<errno.h>
+#elif defined(USE_BSDAUTH)
+# include	<login_cap.h>
+# include	<varargs.h>
+# include	<bsd_auth.h>
 #endif
 
 # include	"greet.h"
