@@ -1,4 +1,5 @@
 /* $Xorg: verify.c,v 1.4 2001/02/09 02:05:41 xorgcvs Exp $ */
+/* $XdotOrg: $ */
 /*
 
 Copyright 1988, 1998  The Open Group
@@ -343,7 +344,7 @@ Verify (struct display *d, struct greet_info *greet, struct verify_info *verify)
              		XFree(console); 
 	                return 0;
                 }
-		Xfree(console);	
+		XFree(console);	
 	    }
 	    else
 	    {
