@@ -181,8 +181,8 @@ InitGreet (struct display *d)
     static char	*argv[] = { "xlogin", 0 };
     Display		*dpy;
 #ifdef USE_XINERAMA
-    XRectangle *screens;
-    int		s_num;
+    XineramaScreenInfo *screens;
+    int                 s_num;
 #endif
 
     Debug ("greet %s\n", d->name);
@@ -230,13 +230,14 @@ InitGreet (struct display *d)
 
 #ifdef USE_XINERAMA
     if (
-	XineramaActive(dpy, XtWindow(login)) &&
-	    XineramaGetData(dpy, XtWindow(login), &screens, &s_num))
+	XineramaIsActive(dpy) &&
+	(screens = XineramaQueryScreens(dpy, &s_num)) != NULL
+       )
     {
 	XWarpPointer(dpy, None, XRootWindowOfScreen (scrn),
 			0, 0, 0, 0,
-			screens[0].x + screens[0].width / 2,
-			screens[0].y + screens[0].height / 2);
+			screens[0].x_org + screens[0].width / 2,
+			screens[0].y_org + screens[0].height / 2);
 
 	XFree(screens);
     }

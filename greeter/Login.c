@@ -1025,8 +1025,8 @@ static void Initialize (
     Arg		position[2];
     Position	x, y;
 #ifdef USE_XINERAMA
-    XRectangle *screens;
-    int		s_num;
+    XineramaScreenInfo *screens;
+    int                 s_num;
 #endif
 
 #ifdef XPM
@@ -1167,13 +1167,14 @@ SkipXpmLoad:
     }
 #ifdef USE_XINERAMA
     if (
-	XineramaActive(XtDisplay(w), XtWindow(w)) &&
-	    XineramaGetData(XtDisplay(w), XtWindow(w), &screens, &s_num))
+	XineramaIsActive(XtDisplay(w)) &&
+	(screens = XineramaQueryScreens(XtDisplay(w), &s_num)) != NULL
+       )
     {
 	if ((x = w->core.x) == -1)
-	    x = screens[0].x + (int)(screens[0].width - w->core.width) / 2;
+	    x = screens[0].x_org + (int)(screens[0].width - w->core.width) / 2;
 	if ((y = w->core.y) == -1)
-	    y = screens[0].y + (int)(screens[0].height - w->core.height) / 3;
+	    y = screens[0].y_org + (int)(screens[0].height - w->core.height) / 3;
 	
 	XFree(screens);
     }

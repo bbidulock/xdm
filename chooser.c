@@ -1066,8 +1066,8 @@ main (int argc, char **argv)
     Dimension   width, height;
     Position	x, y;
 #ifdef USE_XINERAMA
-    XRectangle *screens;
-    int		s_num;
+    XineramaScreenInfo *screens;
+    int                 s_num;
 #endif
 
 
@@ -1099,11 +1099,12 @@ main (int argc, char **argv)
     XtGetValues (toplevel, position, (Cardinal) 2);
 #ifdef USE_XINERAMA
     if (
-	XineramaActive(XtDisplay(toplevel),  XtWindow(toplevel)) &&
-	    XineramaGetData(XtDisplay(toplevel), XtWindow(toplevel), &screens, &s_num))
+	XineramaIsActive(XtDisplay(toplevel)) &&
+	(screens = XineramaQueryScreens(XtDisplay(toplevel), &s_num)) != NULL
+       )
     {
-	x = (Position)(screens[0].x + (screens[0].width - width) / 2);
-	y = (Position)(screens[0].y + (screens[0].height - height) / 3);
+	x = (Position)(screens[0].x_org + (screens[0].width - width) / 2);
+	y = (Position)(screens[0].y_org + (screens[0].height - height) / 3);
 	
 	XFree(screens);
     }
