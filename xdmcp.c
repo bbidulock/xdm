@@ -1,4 +1,4 @@
-/* $XdotOrg: xdmcp.c,v 1.4 2001/02/09 02:05:41 xorgcvs Exp $ */
+/* $XdotOrg: xc/programs/xdm/xdmcp.c,v 1.1.4.4 2003/12/06 13:24:29 kaleb Exp $ */
 /* $Xorg: xdmcp.c,v 1.4 2001/02/09 02:05:41 xorgcvs Exp $ */
 /*
 
@@ -27,7 +27,7 @@ other dealings in this Software without prior written authorization
 from The Open Group.
 
 */
-/* $XFree86: xc/programs/xdm/xdmcp.c,v 3.25 2003/11/23 22:36:03 herrb Exp $ */
+/* $XFree86: xc/programs/xdm/xdmcp.c,v 3.26 2004/01/07 04:28:06 dawes Exp $ */
 
 /*
  * xdm - display manager daemon
@@ -417,7 +417,7 @@ WaitForSomething (void)
 	{
 #ifdef STREAMSCONN
 	    if (xdmcpFd >= 0 && FD_ISSET (xdmcpFd, &reads))
-		ProcessRequestSocket ();
+		ProcessRequestSocket (xdmcpFd);
 #endif
 	    if (chooserFd >= 0 && FD_ISSET (chooserFd, &reads))
 	    {

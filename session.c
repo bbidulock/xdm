@@ -1,4 +1,4 @@
-/* $XdotOrg: session.c,v 1.8 2001/02/09 02:05:40 xorgcvs Exp $ */
+/* $XdotOrg: xc/programs/xdm/session.c,v 1.1.4.4 2003/12/06 13:24:29 kaleb Exp $ */
 /* $Xorg: session.c,v 1.8 2001/02/09 02:05:40 xorgcvs Exp $ */
 /*
 
@@ -27,7 +27,7 @@ other dealings in this Software without prior written authorization
 from The Open Group.
 
 */
-/* $XFree86: xc/programs/xdm/session.c,v 3.36 2003/09/29 21:00:08 herrb Exp $ */
+/* $XFree86: xc/programs/xdm/session.c,v 3.37 2004/01/07 04:28:06 dawes Exp $ */
 
 /*
  * xdm - display manager daemon
@@ -88,7 +88,7 @@ extern	struct spwd	*getspnam(GETSPNAM_ARGS);
 extern	void	endspent(void);
 # endif
 #endif
-#if defined(CSRG_BASED) || defined(__GLIBC__)
+#if defined(CSRG_BASED) || defined(__GLIBC__) || defined(USL)
 # include <pwd.h>
 # include <unistd.h>
 #else

@@ -26,7 +26,7 @@ other dealings in this Software without prior written authorization
 from The Open Group.
 
 */
-/* $XFree86: xc/programs/xdm/greeter/verify.c,v 3.26 2003/11/19 04:44:00 dawes Exp $ */
+/* $XFree86: xc/programs/xdm/greeter/verify.c,v 3.27 2004/01/25 01:12:25 dawes Exp $ */
 
 /*
  * xdm - display manager daemon
@@ -41,14 +41,17 @@ from The Open Group.
 #include	"dm_error.h"
 
 #include	<pwd.h>
-#ifdef USE_PAM
+
+#if defined(USE_PAM)
 # include	<security/pam_appl.h>
 # include	<stdlib.h>
-#else
-# ifdef USESHADOW
-#  include	<shadow.h>
-#  include	<errno.h>
-# endif
+#elif defined(USESHADOW)
+# include	<shadow.h>
+# include	<errno.h>
+#elif defined(USE_BSDAUTH)
+# include	<login_cap.h>
+# include	<varargs.h>
+# include	<bsd_auth.h>
 #endif
 
 # include	"greet.h"
