@@ -1,3 +1,4 @@
+/* $XdotOrg: socket.c,v 1.4 2001/02/09 02:05:40 xorgcvs Exp $ */
 /* $Xorg: socket.c,v 1.4 2001/02/09 02:05:40 xorgcvs Exp $ */
 /*
 
@@ -27,7 +28,7 @@ other dealings in this Software without prior written authorization
 from the copyright holder.
 
 */
-/* $XFree86: xc/programs/xdm/socket.c,v 3.13 2003/07/18 15:39:52 tsi Exp $ */
+/* $XFree86: xc/programs/xdm/socket.c,v 3.14 2003/11/25 22:21:08 herrb Exp $ */
 
 /*
  * xdm - display manager daemon
@@ -430,7 +431,10 @@ UpdateMcastGroup(ARRAY8Ptr addr, void **closure)
 {
     struct socklist *s = (struct socklist *) *closure;
     struct socklist *g;
-	
+
+    if (s == NULL) 
+	    return;
+
     g = FindInList(s->mcastgroups, addr);
 
     if (g) { /* Already in the group, mark & continue */

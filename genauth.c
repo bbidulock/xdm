@@ -1,3 +1,4 @@
+/* $XdotOrg: genauth.c,v 1.5 2001/02/09 02:05:40 xorgcvs Exp $ */
 /* $Xorg: genauth.c,v 1.5 2001/02/09 02:05:40 xorgcvs Exp $ */
 /*
 
@@ -26,7 +27,7 @@ other dealings in this Software without prior written authorization
 from The Open Group.
 
 */
-/* $XFree86: xc/programs/xdm/genauth.c,v 3.20 2003/10/17 20:20:02 herrb Exp $ */
+/* $XFree86: xc/programs/xdm/genauth.c,v 3.21 2003/11/26 07:33:10 herrb Exp $ */
 
 /*
  * xdm - display manager daemon
@@ -437,6 +438,7 @@ GenerateAuthData (char *auth, int len)
 		auth[i] |= bit;
 	}
     }
+    return 1;
 #else /* !XDMAUTH */
 #ifdef ARC4_RANDOM
     unsigned int *rnd = (unsigned*)auth;

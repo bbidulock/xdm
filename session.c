@@ -1,3 +1,4 @@
+/* $XdotOrg: session.c,v 1.8 2001/02/09 02:05:40 xorgcvs Exp $ */
 /* $Xorg: session.c,v 1.8 2001/02/09 02:05:40 xorgcvs Exp $ */
 /*
 
@@ -588,7 +589,7 @@ StartClient (
 	    LogError ("initgroups for \"%s\" failed, errno=%d\n", name, errno);
 	    return (0);
 	}
-#endif	/* QNX4 doesn't support multi-groups, no initgroups() */
+#endif   /* QNX4 doesn't support multi-groups, no initgroups() */
 #ifdef USE_PAM
 	if (pamh) {
 	    pam_error = pam_setcred (pamh, PAM_ESTABLISH_CRED);

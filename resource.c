@@ -1,3 +1,4 @@
+/* $XdotOrg: resource.c,v 1.4 2001/02/09 02:05:40 xorgcvs Exp $ */
 /* $Xorg: resource.c,v 1.4 2001/02/09 02:05:40 xorgcvs Exp $ */
 /*
 
@@ -130,11 +131,7 @@ int	choiceTimeout;	/* chooser choice timeout */
 #define DEF_ACCESS_FILE	""
 #endif
 #ifndef DEF_RANDOM_FILE
-# ifdef linux
-#  define DEF_RANDOM_FILE "/dev/urandom"
-# else
-#  define DEF_RANDOM_FILE "/dev/mem"
-# endif
+#define DEF_RANDOM_FILE "/dev/mem"
 #endif
 #ifndef DEF_PRNGD_SOCKET 
 #define DEF_PRNGD_SOCKET "/tmp/entropy"
