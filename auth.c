@@ -26,7 +26,7 @@ other dealings in this Software without prior written authorization
 from The Open Group.
 
 */
-/* $XFree86: xc/programs/xdm/auth.c,v 3.31 2003/12/02 22:55:05 herrb Exp $ */
+/* $XFree86: xc/programs/xdm/auth.c,v 3.33 2004/01/16 00:03:54 herrb Exp $ */
 
 /*
  * xdm - display manager daemon
@@ -281,7 +281,7 @@ static char authdir1[] = "authdir";
 static char authdir2[] = "authfiles";
 
 static int
-MakeServerAuthFile (struct display *d)
+MakeServerAuthFile (struct display *d, FILE ** file)
 {
     int len;
 #if defined(SYSV) && !defined(SVR4)
@@ -291,52 +291,74 @@ MakeServerAuthFile (struct display *d)
 #endif
     char    cleanname[NAMELEN];
     int r;
+#ifdef HAS_MKSTEMP
+    int fd;
+#endif
     struct stat	statb;
 
-    if (d->clientAuthFile && *d->clientAuthFile)
-	len = strlen (d->clientAuthFile) + 1;
-    else
-    {
-    	CleanUpFileName (d->name, cleanname, NAMELEN - 8);
-    	len = strlen (authDir) + strlen (authdir1) + strlen (authdir2)
-	    + strlen (cleanname) + 14;
-    }
-    if (d->authFile)
-	free (d->authFile);
-    d->authFile = malloc ((unsigned) len);
-    if (!d->authFile)
-	return FALSE;
-    if (d->clientAuthFile && *d->clientAuthFile)
-	strcpy (d->authFile, d->clientAuthFile);
-    else
-    {
-	sprintf (d->authFile, "%s/%s", authDir, authdir1);
-	r = stat(d->authFile, &statb);
-	if (r == 0) {
-	    if (statb.st_uid != 0)
-		(void) chown(d->authFile, 0, statb.st_gid);
-	    if ((statb.st_mode & 0077) != 0)
-		(void) chmod(d->authFile, statb.st_mode & 0700);
-	} else {
-	    if (errno == ENOENT)
-		r = mkdir(d->authFile, 0700);
-	    if (r < 0) {
+    *file = NULL;
+
+    if (!d->authFile) {
+	if (d->clientAuthFile && *d->clientAuthFile)
+	    len = strlen (d->clientAuthFile) + 1;
+	else
+	{
+	    CleanUpFileName (d->name, cleanname, NAMELEN - 8);
+	    len = strlen (authDir) + strlen (authdir1) + strlen (authdir2)
+		+ strlen (cleanname) + 14;
+	}
+	d->authFile = malloc (len);
+	if (!d->authFile)
+	    return FALSE;
+	if (d->clientAuthFile && *d->clientAuthFile)
+	    strcpy (d->authFile, d->clientAuthFile);
+	else
+	{
+	    sprintf (d->authFile, "%s/%s", authDir, authdir1);
+	    r = stat(d->authFile, &statb);
+	    if (r == 0) {
+		if (statb.st_uid != 0)
+		    (void) chown(d->authFile, 0, statb.st_gid);
+		if ((statb.st_mode & 0077) != 0)
+		    (void) chmod(d->authFile, statb.st_mode & 0700);
+	    } else {
+		if (errno == ENOENT)
+		    r = mkdir(d->authFile, 0700);
+		if (r < 0) {
+		    free (d->authFile);
+		    d->authFile = NULL;
+		    return FALSE;
+		}
+	    }
+	    sprintf (d->authFile, "%s/%s/%s", authDir, authdir1, authdir2);
+	    r = mkdir(d->authFile, 0700);
+	    if (r < 0  &&  errno != EEXIST) {
 		free (d->authFile);
 		d->authFile = NULL;
 		return FALSE;
 	    }
+	    sprintf (d->authFile, "%s/%s/%s/A%s-XXXXXX",
+		     authDir, authdir1, authdir2, cleanname);
+#ifdef HAS_MKSTEMP
+	    fd = mkstemp (d->authFile);
+	    if (fd < 0) {
+		free (d->authFile);
+		d->authFile = NULL;
+		return FALSE;
+	    }
+
+	    *file = fdopen(fd, "w");
+	    if (!*file)
+		(void) close (fd);
+	    return TRUE;
+#else
+	    (void) mktemp (d->authFile);
+#endif
 	}
-	sprintf (d->authFile, "%s/%s/%s", authDir, authdir1, authdir2);
-	r = mkdir(d->authFile, 0700);
-	if (r < 0  &&  errno != EEXIST) {
-	    free (d->authFile);
-	    d->authFile = NULL;
-	    return FALSE;
-	}
-    	sprintf (d->authFile, "%s/%s/%s/A%s-XXXXXX",
-		 authDir, authdir1, authdir2, cleanname);
-    	(void) mktemp (d->authFile);
     }
+
+    (void) unlink (d->authFile);
+    *file = fopen (d->authFile, "w");
     return TRUE;
 }
 
@@ -352,11 +374,10 @@ SaveServerAuthorizations (
     int		i;
 
     mask = umask (0077);
-    if (!d->authFile && !MakeServerAuthFile (d))
-	return FALSE;
-    (void) unlink (d->authFile);
-    auth_file = fopen (d->authFile, "w");
+    ret = MakeServerAuthFile(d, &auth_file);
     umask (mask);
+    if (!ret)
+	return FALSE;
     if (!auth_file) {
 	Debug ("Can't creat auth file %s\n", d->authFile);
 	LogError ("Cannot open server authorization file %s\n", d->authFile);
@@ -483,7 +504,8 @@ openFiles (char *name, char *new_name, FILE **oldp, FILE **newp)
 		Debug ("can't open new file %s\n", new_name);
 		return 0;
 	}
-	*oldp = fopen (name, "r");
+	if (!*oldp)
+	    *oldp = fopen (name, "r");
 	Debug ("opens succeeded %s %s\n", name, new_name);
 	return 1;
 }
@@ -1205,7 +1227,7 @@ writeRemoteAuth (FILE *file, Xauth *auth, XdmcpNetaddr peer, int peerlen, char *
 void
 SetUserAuthorization (struct display *d, struct verify_info *verify)
 {
-    FILE	*old, *new;
+    FILE	*old = NULL, *new;
     char	home_name[1024], backup_name[1024], new_name[1024];
     char	*name = 0;
     char	*home;
@@ -1217,6 +1239,9 @@ SetUserAuthorization (struct display *d, struct verify_info *verify)
     int		i;
     int		magicCookie;
     int		data_len;
+#ifdef HAS_MKSTEMP
+    int		fd;
+#endif
 
     Debug ("SetUserAuthorization\n");
     auths = d->authorizations;
@@ -1229,29 +1254,61 @@ SetUserAuthorization (struct display *d, struct verify_info *verify)
 	    lockStatus = XauLockAuth (home_name, 1, 2, 10);
 	    Debug ("Lock is %d\n", lockStatus);
 	    if (lockStatus == LOCK_SUCCESS) {
-		if (openFiles (home_name, new_name, &old, &new)) {
+		if (openFiles (home_name, new_name, &old, &new)
+		    && (old != NULL) && (new != NULL)) {
 		    name = home_name;
 		    setenv = 0;
 		} else {
 		    Debug ("openFiles failed\n");
 		    XauUnlockAuth (home_name);
 		    lockStatus = LOCK_ERROR;
+		    if (old != NULL) {
+			(void) fclose (old);
+			old = NULL;
+		    }
+		    if (new != NULL)
+			(void) fclose (new);
 		}	
 	    }
 	}
 	if (lockStatus != LOCK_SUCCESS) {
-	    snprintf (backup_name, sizeof(backup_name), "%s/.XauthXXXXXX", d->userAuthDir);
+	    snprintf (backup_name, sizeof(backup_name),
+		      "%s/.XauthXXXXXX", d->userAuthDir);
+#ifdef HAS_MKSTEMP
+	    fd = mkstemp (backup_name);
+	    if (fd >= 0) {
+		old = fdopen (fd, "r");
+		if (old == NULL)
+		    (void) close(fd);
+	    }
+
+	    if (old != NULL)
+#else
 	    (void) mktemp (backup_name);
-	    lockStatus = XauLockAuth (backup_name, 1, 2, 10);
-	    Debug ("backup lock is %d\n", lockStatus);
-	    if (lockStatus == LOCK_SUCCESS) {
-		if (openFiles (backup_name, new_name, &old, &new)) {
-		    name = backup_name;
-		    setenv = 1;
+#endif
+	    {
+		lockStatus = XauLockAuth (backup_name, 1, 2, 10);
+		Debug ("backup lock is %d\n", lockStatus);
+		if (lockStatus == LOCK_SUCCESS) {
+		    if (openFiles (backup_name, new_name, &old, &new)
+			&& (old != NULL) && (new != NULL)) {
+			name = backup_name;
+			setenv = 1;
+		    } else {
+			XauUnlockAuth (backup_name);
+			lockStatus = LOCK_ERROR;
+			if (old != NULL) {
+			    (void) fclose (old);
+			    old = NULL;
+			}
+			if (new != NULL)
+			    (void) fclose (new);
+		    }
+#ifdef HAS_MKSTEMP
 		} else {
-		    XauUnlockAuth (backup_name);
-		    lockStatus = LOCK_ERROR;
-		}	
+		    (void) fclose (old);
+#endif
+		}
 	    }
 	}
 	if (lockStatus != LOCK_SUCCESS) {
@@ -1370,6 +1427,7 @@ RemoveUserAuthorization (struct display *d, struct verify_info *verify)
     Debug ("Lock is %d\n", lockStatus);
     if (lockStatus != LOCK_SUCCESS)
 	return;
+    old = NULL;
     if (openFiles (name, new_name, &old, &new))
     {
 	initAddrs ();

@@ -23,7 +23,7 @@
 .\" other dealings in this Software without prior written authorization
 .\" from The Open Group.
 .\"
-.\" $XFree86: xc/programs/xdm/xdm.man,v 3.27 2003/11/22 04:51:02 dawes Exp $
+.\" $XFree86: xc/programs/xdm/xdm.man,v 3.29 2004/01/12 21:43:19 herrb Exp $
 .\"
 .TH XDM 1 __xorgversion__
 .SH NAME
@@ -84,13 +84,6 @@ on behalf of the display and
 offer a menu of possible hosts that offer XDMCP display management.
 This feature is useful with X terminals that do not offer a host
 menu themselves.
-.PP
-.I Xdm
-can be configured to ignore BroadcastQuery messages from selected hosts.
-This is useful when you don't want the host to appear in menus produced
-by
-.I chooser
-or X terminals themselves.
 .PP
 .I Xdm
 can be configured to ignore BroadcastQuery messages from selected hosts.
@@ -417,7 +410,7 @@ is the conventional name.
 .IP "\fBDisplayManager.\fP\fIDISPLAY\fP\fB.chooser\fP"
 Specifies the program run to offer a host menu for Indirect queries
 redirected to the special host name CHOOSER.
-\fI __projectroot__/lib/X11/xdm/chooser\fP is the default.
+\fI CHOOSERPATH \fP is the default.
 See the sections \fBXDMCP Access Control\fP and \fBChooser\fP.
 .IP "\fBDisplayManager.\fP\fIDISPLAY\fP\fB.xrdb\fP"
 Specifies the program used to load the resources.  By default,
@@ -654,11 +647,6 @@ aliases.
 Preceding either a host name or a pattern with a `!' character
 causes hosts which
 match that entry to be excluded.
-.PP
-To only respond to Direct queries for a host or pattern,
-it can be followed by the optional ``NOBROADCAST'' keyword.
-This can be used to prevent an xdm server from appearing on
-menus based on Broadcast queries.
 .PP
 To only respond to Direct queries for a host or pattern,
 it can be followed by the optional ``NOBROADCAST'' keyword.
@@ -921,15 +909,6 @@ the following environment variables are passed:
 	SHELL	the value of \fBDisplayManager.\fP\fIDISPLAY\fP\fB.systemShell\fP
 	XAUTHORITY	may be set to an authority file
 .fi
-.IP "\fBxlogin.Login.allowRootLogin\fP"
-If set to ``false'', don't allow root (and any other user with uid = 0) to
-log in directly.
-The default is ``true''.
-.IP "\fBxlogin.Login.allowNullPasswd\fP"
-If set to ``true'', allow an otherwise failing password match to succeed
-if the account does not require a password at all.
-The default is ``false'', so only users that have passwords assigned can
-log in.
 .PP
 Note that since \fIxdm\fP grabs the keyboard, any other windows will not be
 able to receive keyboard input.  They will be able to interact with
@@ -998,6 +977,15 @@ The color used to display the failure message.
 .IP "\fBxlogin.Login.failTimeout\fP"
 The number of seconds that the failure message is displayed.
 The default is 30.
+.IP "\fBxlogin.Login.allowRootLogin\fP"
+If set to ``false'', don't allow root (and any other user with uid = 0) to
+log in directly.
+The default is ``true''.
+.IP "\fBxlogin.Login.allowNullPasswd\fP"
+If set to ``true'', allow an otherwise failing password match to succeed
+if the account does not require a password at all.
+The default is ``false'', so only users that have passwords assigned can
+log in.
 .IP "\fBxlogin.Login.translations\fP"
 This specifies the translations used for the login widget.  Refer to the X
 Toolkit documentation for a complete discussion on translations.  The default
@@ -1022,15 +1010,6 @@ translation table is:
 	<Key>:	insert-char() \\
 
 .fi
-.IP "\fBxlogin.Login.allowRootLogin\fP"
-If set to ``false'', don't allow root (and any other user with uid = 0) to
-log in directly.
-The default is ``true''.
-.IP "\fBxlogin.Login.allowNullPasswd\fP"
-If set to ``true'', allow an otherwise failing password match to succeed
-if the account does not require a password at all.
-The default is ``false'', so only users that have passwords assigned can
-log in.
 .PP
 The actions which are supported by the widget are:
 .IP "delete-previous-character"
@@ -1351,7 +1330,7 @@ This directs
 to manage sessions on all three of these terminals.  See the section
 \fBControlling Xdm\fP for a description of using signals to enable
 and disable these terminals in a manner reminiscent of
-.IR init (8).
+.IR init (__adminmansuffix__).
 .SH LIMITATIONS
 One thing that
 .I xdm
@@ -1367,7 +1346,7 @@ the default configuration file
 .I $HOME/.Xauthority
 user authorization file where \fIxdm\fP stores keys for clients to read
 .TP 20
-.I __projectroot__/lib/X11/xdm/chooser
+.I CHOOSERPATH
 the default chooser
 .TP 20
 .I __projectroot__/bin/xrdb
