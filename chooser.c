@@ -857,6 +857,7 @@ InitXDMCP (char **argv)
     XtAddInput (socketFD, (XtPointer) XtInputReadMask, ReceivePacket,
 		(XtPointer) &socketFD);
 #if defined(IPv6) && defined(AF_INET6)
+    if (socket6FD != -1)
     XtAddInput (socket6FD, (XtPointer) XtInputReadMask, ReceivePacket,
 		(XtPointer) &socket6FD);
 #endif
