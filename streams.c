@@ -26,7 +26,7 @@ other dealings in this Software without prior written authorization
 from The Open Group.
 
 */
-/* $XFree86$ */
+/* $XFree86: xc/programs/xdm/streams.c,v 3.8 2003/10/27 21:39:08 herrb Exp $ */
 
 /*
  * xdm - display manager daemon

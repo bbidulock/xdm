@@ -26,7 +26,7 @@ other dealings in this Software without prior written authorization
 from The Open Group.
 
 */
-/* $XFree86$ */
+/* $XFree86: xc/programs/xdm/dm.h,v 3.34 2003/12/12 03:20:45 dawes Exp $ */
 
 /*
  * xdm - display manager daemon

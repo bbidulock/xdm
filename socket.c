@@ -27,7 +27,7 @@ other dealings in this Software without prior written authorization
 from the copyright holder.
 
 */
-/* $XFree86$ */
+/* $XFree86: xc/programs/xdm/socket.c,v 3.14 2003/11/25 22:21:08 herrb Exp $ */
 
 /*
  * xdm - display manager daemon
