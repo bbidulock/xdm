@@ -904,9 +904,9 @@ void ForEachListenAddr (
 	    h = d->hosts;
 	    if (h != NULL) {
 		(*listenfunction) (&h->entry.hostAddress, closure);
-	    }
-	    for (h = h->next; h != NULL; h = h->next) {
-		(*mcastfunction) (&h->entry.hostAddress, closure);
+		for (h = h->next; h != NULL; h = h->next) {
+		    (*mcastfunction) (&h->entry.hostAddress, closure);
+		}
 	    }
 	}
     }
