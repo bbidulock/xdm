@@ -36,7 +36,7 @@ in this Software without prior written authorization from The Open Group.
  * bring down X when you are finished.
  */
 
-/* $XFree86: xc/programs/xdm/xdmshell.c,v 3.7 2001/12/14 20:01:26 dawes Exp $ */
+/* $XFree86: xc/programs/xdm/xdmshell.c,v 3.6 2001/07/25 15:05:19 dawes Exp $ */
 
 #include <stdio.h>
 #include "dm.h"

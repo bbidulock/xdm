@@ -25,7 +25,7 @@ in this Software without prior written authorization from The Open Group.
  *
  * Author:  Keith Packard, MIT X Consortium
  */
-/* $XFree86: xc/programs/xdm/protodpy.c,v 1.5 2001/12/14 20:01:23 dawes Exp $ */
+/* $XFree86: xc/programs/xdm/protodpy.c,v 1.4 2001/07/25 15:05:19 dawes Exp $ */
 
 /*
  * protodpy.c

@@ -26,7 +26,7 @@ other dealings in this Software without prior written authorization
 from The Open Group.
 
 */
-/* $XFree86: xc/programs/xdm/greeter/verify.c,v 3.27 2004/01/25 01:12:25 dawes Exp $ */
+/* $XFree86: xc/programs/xdm/greeter/verify.c,v 3.26 2003/11/19 04:44:00 dawes Exp $ */
 
 /*
  * xdm - display manager daemon
