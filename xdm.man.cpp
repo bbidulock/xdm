@@ -23,7 +23,7 @@
 .\" other dealings in this Software without prior written authorization
 .\" from The Open Group.
 .\"
-.\" $XFree86: xc/programs/xdm/xdm.man,v 3.26 2003/10/24 20:38:15 tsi Exp $
+.\" $XFree86: xc/programs/xdm/xdm.man,v 3.27 2003/11/22 04:51:02 dawes Exp $
 .\"
 .TH XDM 1 __xorgversion__
 .SH NAME
@@ -806,6 +806,16 @@ LISTEN 10.11.12.13	# Listen only on this interface, as long
 \&	# as no other listen directives appear in
 \&	# file.
 .fi
+.SH "IPv6 MULTICAST ADDRESS SPECIFICATION"
+.PP
+The Internet Assigned Numbers Authority has has assigned 
+ff0\fIX\fP:0:0:0:0:0:0:12b as the permanently assigned range of 
+multicast addresses for XDMCP. The \fIX\fP in the prefix may be replaced
+by any valid scope identifier, such as 1 for Node-Local, 2 for Link-Local,
+5 for Site-Local, and so on.  (See IETF RFC 2373 or its replacement for 
+further details and scope definitions.)  xdm defaults to listening on the
+Link-Local scope address ff02:0:0:0:0:0:0:12b to most closely match the 
+old IPv4 subnet broadcast behavior.
 .SH "LOCAL SERVER SPECIFICATION"
 .PP
 The resource \fBDisplayManager.servers\fP gives a server specification

@@ -26,7 +26,7 @@ other dealings in this Software without prior written authorization
 from The Open Group.
 
 */
-/* $XFree86: xc/programs/xdm/auth.c,v 3.30 2003/11/16 16:35:02 herrb Exp $ */
+/* $XFree86: xc/programs/xdm/auth.c,v 3.31 2003/12/02 22:55:05 herrb Exp $ */
 
 /*
  * xdm - display manager daemon
@@ -752,6 +752,12 @@ DefineSelf(int fd, FILE *file, Xauth *auth)
 		Debug ("Skipping IPv6 localhost address\n");
 		continue;
 	    }
+	    /* Also skip XDM-AUTHORIZATION-1 */
+	    if (auth->name_length == 19 && 
+		strcmp(auth->name, "XDM-AUTHORIZATION-1") == 0) {
+		Debug ("Skipping IPv6 XDM-AUTHORIZATION-1\n");
+		continue;
+	    }
 	}
 #endif
 	writeAddr(family, len, addr, file, auth);
@@ -1044,6 +1050,12 @@ DefineSelf (int fd, FILE *file, Xauth *auth)
 	    if(family == FamilyInternet6) {
 		if (IN6_IS_ADDR_LOOPBACK(((struct in6_addr *)addr))) {
 		    Debug ("Skipping IPv6 localhost address\n");
+		    continue;
+		}
+		/* Also skip XDM-AUTHORIZATION-1 */
+		if (auth->name_length == 19 && 
+		    strcmp(auth->name, "XDM-AUTHORIZATION-1") == 0) {
+		    Debug ("Skipping IPv6 XDM-AUTHORIZATION-1\n");
 		    continue;
 		}
 	    }

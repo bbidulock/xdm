@@ -26,7 +26,7 @@ other dealings in this Software without prior written authorization
 from The Open Group.
 
 */
-/* $XFree86: xc/programs/xdm/xdmcp.c,v 3.24 2003/11/16 15:50:38 herrb Exp $ */
+/* $XFree86: xc/programs/xdm/xdmcp.c,v 3.25 2003/11/23 22:36:03 herrb Exp $ */
 
 /*
  * xdm - display manager daemon
@@ -56,9 +56,7 @@ from The Open Group.
 #endif
 #endif
 #include	<netdb.h>
-#if defined(IPv6) && defined(AF_INET6)
 #include	<arpa/inet.h>
-#endif
 
 #include <time.h>
 #define Time_t time_t
@@ -253,11 +251,28 @@ all_query_respond (
     CARD16	connectionType;
     int		family;
     int		length;
+    const char	*addrstring;
+#if defined(IPv6) && defined(AF_INET6) 
+    char	addrbuf[INET6_ADDRSTRLEN] = "";
+#endif
 
     family = ConvertAddr((XdmcpNetaddr) from, &length, (char **)&(addr.data));
     addr.length = length;	/* convert int to short */
-    Debug ("all_query_respond: conntype=%d, addr=%lx, len=%d\n",
-	   family, (unsigned long) *(addr.data), addr.length);
+    if (debugLevel > 0) {
+#if defined(IPv6) && defined(AF_INET6) 
+	void *ipaddr;
+	if (family == AF_INET6) {
+	    ipaddr = & ((struct sockaddr_in6 *) from)->sin6_addr;
+	} else {
+	    ipaddr = & ((struct sockaddr_in *) from)->sin_addr;
+	}
+	addrstring = inet_ntop(family, ipaddr, addrbuf, sizeof(addrbuf));
+#else
+	addrstring = inet_ntoa(((struct sockaddr_in *)from)->sin_addr);
+#endif
+	Debug("all_query_respond: conntype=%d, addr=%s, len=%d\n",
+	    family, addrstring, addr.length);
+    }
     if (family < 0)
 	return;
     connectionType = family;

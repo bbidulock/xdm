@@ -27,7 +27,7 @@ in this Software without prior written authorization from the copyright holder.
  * Author:  Keith Packard, MIT X Consortium
  */
 
-/* $XFree86: xc/programs/xdm/access.c,v 3.12 2003/07/18 15:53:28 tsi Exp $ */
+/* $XFree86: xc/programs/xdm/access.c,v 3.14 2003/11/23 22:02:07 herrb Exp $ */
 
 /*
  * Access control for XDMCP - keep a database of allowable display addresses
@@ -48,6 +48,10 @@ in this Software without prior written authorization from the copyright holder.
 # include   "dm_socket.h"
 
 # include   <netdb.h>
+
+# if defined(IPv6) && defined(AF_INET6)
+#  include        <arpa/inet.h>
+# endif
 
 #define ALIAS_CHARACTER	    '%'
 #define NEGATE_CHARACTER    '!'
@@ -330,7 +334,7 @@ tryagain:
 	}
 #else
 	if (hostent) {
-	    addr = &(hostent->h_addr);
+	    addr = hostent->h_addr;
 	    addr_length = hostent->h_length;
 	}
 #endif
@@ -440,9 +444,10 @@ ReadDisplayEntry (FILE *file)
 #else
 	    struct hostent  *hostent;
 
-	    if ((hostent = gethostbyname (displayOrAlias)) == NULL)
+	    if ((hostent = gethostbyname (displayOrAlias)) != NULL)
 	    {
-		addr = &(hostent->h_addr);
+		Debug("ReadDisplayEntry: %s\n", displayOrAlias);
+		addr = hostent->h_addr;
 		addrtype = hostent->h_addrtype;
 		addr_length = hostent->h_length;
 	    }
@@ -906,6 +911,32 @@ void ForEachListenAddr (
     }
     if (!listenFound) {
 	(*listenfunction) (NULL, closure);
+#if defined(IPv6) && defined(AF_INET6) && defined(XDM_DEFAULT_MCAST_ADDR6)
+	{   /* Join default IPv6 Multicast Group */
+
+	    static ARRAY8	defaultMcastAddress;
+
+	    if (defaultMcastAddress.length == 0) {
+		struct in6_addr addr6;
+	    
+		if (inet_pton(AF_INET6,XDM_DEFAULT_MCAST_ADDR6,&addr6) == 1) {
+		    if (!XdmcpAllocARRAY8 (&defaultMcastAddress, 
+		      sizeof(struct in6_addr))) {
+			LogOutOfMem ("ReadHostEntry\n");
+			defaultMcastAddress.length = -1;
+		    } else {
+			memcpy(defaultMcastAddress.data, &addr6, 
+			  sizeof(struct in6_addr));
+		    }
+		} else {
+		    defaultMcastAddress.length = -1;
+		}
+	    }
+	    if ( defaultMcastAddress.length == sizeof(struct in6_addr) ) {
+		(*mcastfunction) (&defaultMcastAddress, closure);
+	    }
+	}
+#endif
     }
 }
 
