@@ -27,7 +27,7 @@ in this Software without prior written authorization from the copyright holder.
  * Author:  Keith Packard, MIT X Consortium
  */
 
-/* $XFree86: xc/programs/xdm/access.c,v 3.14 2003/11/23 22:02:07 herrb Exp $ */
+/* $XFree86$ */
 
 /*
  * Access control for XDMCP - keep a database of allowable display addresses

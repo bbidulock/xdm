@@ -26,7 +26,7 @@ other dealings in this Software without prior written authorization
 from The Open Group.
 
 */
-/* $XFree86: xc/programs/xdm/xdmauth.c,v 1.7 2003/10/27 21:39:02 herrb Exp $ */
+/* $XFree86$ */
 /*
  * xdm - display manager daemon
  * Author:  Keith Packard, MIT X Consortium

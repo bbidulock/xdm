@@ -3,7 +3,7 @@
 !
 !
 !
-! $XFree86: xc/programs/xdm/config/Xres.cpp,v 1.7 2003/11/15 03:25:22 dawes Exp $
+! $XFree86$
 !
 #define BS \ /* cpp can be trickier than m4 */
 #define NLBS \n\ /* don't remove these comments */

@@ -33,7 +33,7 @@ from The Open Group.
  *
  * policy.c.  Implement site-dependent policy for XDMCP connections
  */
-/* $XFree86: xc/programs/xdm/policy.c,v 3.9 2004/01/01 17:12:34 herrb Exp $ */
+/* $XFree86$ */
 
 # include "dm.h"
 # include "dm_auth.h"

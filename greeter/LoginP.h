@@ -26,7 +26,7 @@ other dealings in this Software without prior written authorization
 from The Open Group.
 
 */
-/* $XFree86: xc/programs/xdm/greeter/LoginP.h,v 3.8 2001/12/14 20:01:29 dawes Exp $ */
+/* $XFree86$ */
 
 /*
  * xdm - display manager daemon
