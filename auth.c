@@ -928,15 +928,6 @@ DefineSelf (int fd, FILE *file, Xauth *auth)
 #define ifr_size(p) (sizeof (ifr_type))
 #endif
 
-/* Handle variable length ifreq in BNR2 and later */
-#ifdef VARIABLE_IFREQ
-#define ifr_size(p) (sizeof (struct ifreq) + \
-		     (p->ifr_addr.sa_len > sizeof (p->ifr_addr) ? \
-		      p->ifr_addr.sa_len - sizeof (p->ifr_addr) : 0))
-#else
-#define ifr_size(p) (sizeof (struct ifreq))
-#endif
-
 /* Define this host for access control.  Find all the hosts the OS knows about 
  * for this fd and add them to the selfhosts list.
  */

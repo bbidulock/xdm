@@ -1470,7 +1470,7 @@ NetworkAddressToHostname (
 	break;
     }
     return name;
-    }
+}
 
 #if 0
 static int
