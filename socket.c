@@ -1,4 +1,4 @@
-/* $XdotOrg: xc/programs/xdm/socket.c,v 1.1.4.3.4.2 2004/03/12 11:18:23 eich Exp $ */
+/* $XdotOrg: xc/programs/xdm/socket.c,v 1.3 2004/07/06 00:44:39 anholt Exp $ */
 /* $Xorg: socket.c,v 1.4 2001/02/09 02:05:40 xorgcvs Exp $ */
 /*
 
@@ -66,6 +66,9 @@ CreateWellKnownSockets (void)
 {
     char *name = localHostname ();
     registerHostname (name, strlen (name));
+
+    if (request_port == 0)
+	return;
 
 #if defined(IPv6) && defined(AF_INET6)
     chooserFd = socket (AF_INET6, SOCK_STREAM, 0);

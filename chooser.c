@@ -1,5 +1,5 @@
 /*
- * $XdotOrg: xc/programs/xdm/chooser.c,v 1.1.4.6.2.2 2004/03/12 11:18:23 eich Exp $
+ * $XdotOrg: xc/programs/xdm/chooser.c,v 1.2 2004/04/23 19:54:42 eich Exp $
  * $Xorg: chooser.c,v 1.4 2001/02/09 02:05:40 xorgcvs Exp $
  *
 Copyright 1990, 1998  The Open Group

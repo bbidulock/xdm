@@ -1,4 +1,4 @@
-/* $XdotOrg: xc/programs/xdm/util.c,v 1.1.4.2.4.1 2004/03/04 17:48:55 eich Exp $ */
+/* $XdotOrg: xc/programs/xdm/util.c,v 1.2 2004/04/23 19:54:42 eich Exp $ */
 /* $Xorg: util.c,v 1.4 2001/02/09 02:05:41 xorgcvs Exp $ */
 /*
 

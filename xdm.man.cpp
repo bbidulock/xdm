@@ -1,4 +1,4 @@
-.\" $XdotOrg: xc/programs/xdm/xdm.man,v 1.1.4.4.2.1 2004/03/04 17:48:55 eich Exp $
+.\" $XdotOrg: xc/programs/xdm/xdm.man,v 1.3 2004/07/26 22:56:33 herrb Exp $
 .\" $Xorg: xdm.man,v 1.4 2001/02/09 02:05:41 xorgcvs Exp $
 .\" Copyright 1988, 1994, 1998  The Open Group
 .\"
@@ -145,7 +145,7 @@ When the \fIXsession\fP script exits, the session is over.
 At the end of the session, the \fIXreset\fP script is run to clean up,
 the X server is reset, and the cycle starts over.
 .PP
-The file \fI __projectroot__/lib/X11/xdm/xdm-errors\fP will contain error
+The file \fI XDMLOGDIR/xdm.log\fP will contain error
 messages from
 .I xdm
 and anything output to stderr by \fIXsetup, Xstartup, Xsession\fP
@@ -609,7 +609,7 @@ named \fIxdm-config\fP:
 .ta .5i 4i
 
 	DisplayManager.servers:	__projectroot__/lib/X11/xdm/Xservers
-	DisplayManager.errorLogFile:	__projectroot__/lib/X11/xdm/xdm-errors
+	DisplayManager.errorLogFile:	XDMLOGDIR/xdm.log
 	DisplayManager*resources:	__projectroot__/lib/X11/xdm/Xresources
 	DisplayManager*startup:	__projectroot__/lib/X11/xdm/Xstartup
 	DisplayManager*session:	__projectroot__/lib/X11/xdm/Xsession
