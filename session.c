@@ -27,7 +27,7 @@ other dealings in this Software without prior written authorization
 from The Open Group.
 
 */
-/* $XFree86: xc/programs/xdm/session.c,v 3.37 2004/01/07 04:28:06 dawes Exp $ */
+/* $XFree86: xc/programs/xdm/session.c,v 3.36 2003/09/29 21:00:08 herrb Exp $ */
 
 /*
  * xdm - display manager daemon
