@@ -1,5 +1,5 @@
 /*
- * $XdotOrg: chooser.c,v 1.4 2001/02/09 02:05:40 xorgcvs Exp $
+ * $XdotOrg: xc/programs/xdm/chooser.c,v 1.1.4.3 2003/12/06 13:24:29 kaleb Exp $
  * $Xorg: chooser.c,v 1.4 2001/02/09 02:05:40 xorgcvs Exp $
  *
 Copyright 1990, 1998  The Open Group
@@ -765,7 +765,6 @@ RegisterHostname (char *name)
 #endif /* IPv6 */
     }
 }
-#endif /* __GNU__ */
 
 static ARRAYofARRAY8	AuthenticationNames;
 
