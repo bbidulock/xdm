@@ -26,6 +26,7 @@ other dealings in this Software without prior written authorization
 from The Open Group.
 
 */
+/* $XFree86: xc/programs/xdm/streams.c,v 3.6 2001/12/14 20:01:24 dawes Exp $ */
 
 /*
  * xdm - display manager daemon
@@ -35,6 +36,7 @@ from The Open Group.
  */
 
 #include "dm.h"
+#include "dm_error.h"
 
 #ifdef XDMCP
 #ifdef STREAMSCONN
@@ -50,6 +52,7 @@ extern int	chooserFd;
 extern FD_TYPE	WellKnownSocketsMask;
 extern int	WellKnownSocketsMax;
 
+void
 CreateWellKnownSockets ()
 {
     struct t_bind bind_addr;

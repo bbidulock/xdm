@@ -26,6 +26,7 @@ other dealings in this Software without prior written authorization
 from The Open Group.
 
 */
+/* $XFree86: xc/programs/xdm/reset.c,v 1.4 2001/12/14 20:01:23 dawes Exp $ */
 
 /*
  * xdm - display manager daemon
@@ -37,16 +38,17 @@ from The Open Group.
  */
 
 # include	"dm.h"
+# include	"dm_error.h"
+
 # include	<X11/Xlib.h>
 # include	<signal.h>
 
 /*ARGSUSED*/
 static int
-ignoreErrors (dpy, event)
-Display	*dpy;
-XErrorEvent	*event;
+ignoreErrors (Display *dpy, XErrorEvent *event)
 {
 	Debug ("ignoring error\n");
+	return 0;
 }
 
 /*
@@ -55,10 +57,8 @@ XErrorEvent	*event;
  * this code wouldn't have to be this kludgy.
  */
 
-static
-killWindows (dpy, window)
-Display	*dpy;
-Window	window;
+static void
+killWindows (Display *dpy, Window window)
 {
 	Window	root, parent, *children;
 	int	child;
@@ -68,7 +68,7 @@ Window	window;
 	       && nchildren > 0)
 	{
 		for (child = 0; child < nchildren; child++) {
-			Debug ("XKillClient 0x%x\n", children[child]);
+			Debug ("XKillClient 0x%lx\n", (unsigned long)children[child]);
 			XKillClient (dpy, children[child]);
 		}
 		XFree ((char *)children);
@@ -79,8 +79,7 @@ static Jmp_buf	resetJmp;
 
 /* ARGSUSED */
 static SIGVAL
-abortReset (n)
-    int n;
+abortReset (int n)
 {
 	Longjmp (resetJmp, 1);
 }
@@ -89,8 +88,8 @@ abortReset (n)
  * this display connection better not have any windows...
  */
  
-pseudoReset (dpy)
-Display	*dpy;
+void
+pseudoReset (Display *dpy)
 {
 	Window	root;
 	int	screen;
@@ -111,6 +110,6 @@ Display	*dpy;
 		(void) alarm (0);
 	}
 	Signal (SIGALRM, SIG_DFL);
-	XSetErrorHandler ((int (*)()) 0);
+	XSetErrorHandler ((XErrorHandler)0 );
 	Debug ("pseudoReset done\n");
 }

@@ -33,16 +33,18 @@ from The Open Group.
  *
  * policy.c.  Implement site-dependent policy for XDMCP connections
  */
+/* $XFree86: xc/programs/xdm/policy.c,v 3.8 2002/12/07 20:31:04 herrb Exp $ */
 
 # include "dm.h"
+# include "dm_auth.h"
+
+#include <errno.h>
 
 #ifdef XDMCP
 
 # include <X11/X.h>
-# include <sys/socket.h>
-#ifdef AF_INET
-# include <netinet/in.h>
-#endif
+
+# include "dm_socket.h"
 
 static ARRAY8 noAuthentication = { (CARD16) 0, (CARD8Ptr) 0 };
 
@@ -65,8 +67,7 @@ static XdmAuthRec auth[] = {
 #define NumAuth	(sizeof auth / sizeof auth[0])
 
 ARRAY8Ptr
-ChooseAuthentication (authenticationNames)
-    ARRAYofARRAY8Ptr	authenticationNames;
+ChooseAuthentication (ARRAYofARRAY8Ptr authenticationNames)
 {
     int	i, j;
 
@@ -78,9 +79,12 @@ ChooseAuthentication (authenticationNames)
     return &noAuthentication;
 }
 
-CheckAuthentication (pdpy, displayID, name, data)
-    struct protoDisplay	*pdpy;
-    ARRAY8Ptr		displayID, name, data;
+int
+CheckAuthentication (
+    struct protoDisplay	*pdpy,
+    ARRAY8Ptr		displayID,
+    ARRAY8Ptr		name,
+    ARRAY8Ptr		data)
 {
 #ifdef HASXDMAUTH
     if (name->length && !strncmp ((char *)name->data, "XDM-AUTHENTICATION-1", 20))
@@ -90,9 +94,9 @@ CheckAuthentication (pdpy, displayID, name, data)
 }
 
 int
-SelectAuthorizationTypeIndex (authenticationName, authorizationNames)
-    ARRAY8Ptr		authenticationName;
-    ARRAYofARRAY8Ptr	authorizationNames;
+SelectAuthorizationTypeIndex (
+    ARRAY8Ptr		authenticationName,
+    ARRAYofARRAY8Ptr	authorizationNames)
 {
     int	i, j;
 
@@ -116,12 +120,12 @@ SelectAuthorizationTypeIndex (authenticationName, authorizationNames)
 
 /*ARGSUSED*/
 int
-Willing (addr, connectionType, authenticationName, status, type)
-    ARRAY8Ptr	    addr;
-    CARD16	    connectionType;
-    ARRAY8Ptr	    authenticationName;
-    ARRAY8Ptr	    status;
-    xdmOpCode	    type;
+Willing (
+    ARRAY8Ptr	    addr,
+    CARD16	    connectionType,
+    ARRAY8Ptr	    authenticationName,
+    ARRAY8Ptr	    status,
+    xdmOpCode	    type)
 {
     char	statusBuf[256];
     int		ret;
@@ -130,7 +134,26 @@ Willing (addr, connectionType, authenticationName, status, type)
     if (!ret)
 	sprintf (statusBuf, "Display not authorized to connect");
     else
-	sprintf (statusBuf, "Willing to manage");
+    {
+        if (*willing)
+	{   FILE *fd = NULL;
+	    if ((fd = popen(willing, "r")))
+	    {
+		char *s = NULL;
+		while(!(s = fgets(statusBuf, 256, fd)) && errno == EINTR)
+			;
+		if (s && strlen(statusBuf) > 0)
+			statusBuf[strlen(statusBuf)-1] = 0; /* chop newline */
+		else
+			snprintf (statusBuf, sizeof(statusBuf), "Willing, but %s failed",willing);
+	    }
+	    else
+	        snprintf (statusBuf, sizeof(statusBuf), "Willing, but %s failed",willing);
+	    if (fd) pclose(fd);
+	}
+	else
+	    sprintf (statusBuf, "Willing to manage");
+    }
     status->length = strlen (statusBuf);
     status->data = (CARD8Ptr) malloc (status->length);
     if (!status->data)
@@ -142,19 +165,19 @@ Willing (addr, connectionType, authenticationName, status, type)
 
 /*ARGSUSED*/
 ARRAY8Ptr
-Accept (from, fromlen, displayNumber)
-    struct sockaddr *from;
-    int		    fromlen;
-    CARD16	    displayNumber;
+Accept (
+    struct sockaddr *from,
+    int		    fromlen,
+    CARD16	    displayNumber)
 {
     return 0;
 }
 
 /*ARGSUSED*/
 int
-SelectConnectionTypeIndex (connectionTypes, connectionAddresses)
-    ARRAY16Ptr	     connectionTypes;
-    ARRAYofARRAY8Ptr connectionAddresses;
+SelectConnectionTypeIndex (
+    ARRAY16Ptr	     connectionTypes,
+    ARRAYofARRAY8Ptr connectionAddresses)
 {
     return 0;
 }

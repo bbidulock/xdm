@@ -26,6 +26,7 @@ other dealings in this Software without prior written authorization
 from The Open Group.
 
 */
+/* $XFree86: xc/programs/xdm/greet.h,v 1.8 2001/12/14 20:01:22 dawes Exp $ */
 
 /*
  * greet.h - interface to xdm's dynamically-loadable modular greeter
@@ -33,34 +34,60 @@ from The Open Group.
 
 #include <X11/Xlib.h>
 
-struct dlfuncs {
-    int (*_PingServer)();
-    int (*_SessionPingFailed)();
-    int (*_Debug)();
-    int (*_RegisterCloseOnFork)();
-    int (*_SecureDisplay)();
-    int (*_UnsecureDisplay)();
-    int (*_ClearCloseOnFork)();
-    int (*_SetupDisplay)();
-    int (*_LogError)();
-    int (*_SessionExit)();
-    int (*_DeleteXloginResources)();
-    int (*_source)();
-    char **(*_defaultEnv)();
-    char **(*_setEnv)();
-    char **(*_parseArgs)();
-    int (*_printEnv)();
-    char **(*_systemEnv)();
-    int (*_LogOutOfMem)();
-    void (*_setgrent)();		/* no longer used */
-    struct group *(*_getgrent)();	/* no longer used */
-    void (*_endgrent)();		/* no longer used */
-#ifdef USESHADOW
-    struct spwd *(*_getspnam)();
-    void (*_endspent)();
+/*
+ * Do this rather than break a build over a const-mismatch
+ */
+#if defined(__linux__) || defined(CSRG_BASED)
+#define CRYPT_ARGS    const char *s1, const char *s2
+#define GETSPNAM_ARGS const char *name
+#define GETPWNAM_ARGS const char *name
+#else
+#define CRYPT_ARGS    /*unknown*/
+#define GETSPNAM_ARGS /*unknown*/
+#define GETPWNAM_ARGS /*unknown*/
 #endif
-    struct passwd *(*_getpwnam)();
-    char *(*_crypt)();
+
+#if defined(__FreeBSD__) || defined(__bsdi__) || defined(__osf__)
+#define SETGRENT_TYPE int
+#else
+#define SETGRENT_TYPE void
+#endif
+
+struct dlfuncs {
+    int (*_PingServer)(struct display *d, Display *alternateDpy);
+    void (*_SessionPingFailed)(struct display *d);
+    void (*_Debug)(char * fmt, ...);
+    void (*_RegisterCloseOnFork)(int fd);
+    void (*_SecureDisplay)(struct display *d, Display *dpy);
+    void (*_UnsecureDisplay)(struct display *d, Display *dpy);
+    void (*_ClearCloseOnFork)(int fd);
+    void (*_SetupDisplay)(struct display *d);
+    void (*_LogError)(char * fmt, ...);
+    void (*_SessionExit)(struct display *d, int status, int removeAuth);
+    void (*_DeleteXloginResources)(struct display *d, Display *dpy);
+    int (*_source)(char **environ, char *file);
+    char **(*_defaultEnv)(void);
+    char **(*_setEnv)(char **e, char *name, char *value);
+    char **(*_putEnv)(const char *string, char **env);
+    char **(*_parseArgs)(char **argv, char *string);
+    void (*_printEnv)(char **e);
+    char **(*_systemEnv)(struct display *d, char *user, char *home);
+    void (*_LogOutOfMem)(char * fmt, ...);
+    SETGRENT_TYPE (*_setgrent)(void);		/* no longer used */
+    struct group *(*_getgrent)(void);	/* no longer used */
+    void (*_endgrent)(void);		/* no longer used */
+#ifdef USESHADOW
+    struct spwd *(*_getspnam)(GETSPNAM_ARGS);
+    void (*_endspent)(void);
+#endif
+    struct passwd *(*_getpwnam)(GETPWNAM_ARGS);
+#ifdef linux
+    void (*_endpwent)(void);
+#endif
+    char *(*_crypt)(CRYPT_ARGS);
+#ifdef USE_PAM
+    pam_handle_t **(*_thepamhp)(void);
+#endif
 };
 
 /*
@@ -123,33 +150,40 @@ typedef greet_user_rtn (*GreetUserProc)(
  * called, with the pointer values passed as a paramter.
  */
 
-extern	int     (*__xdm_PingServer)();
-extern	int     (*__xdm_SessionPingFailed)();
-extern	int     (*__xdm_Debug)();
-extern	int     (*__xdm_RegisterCloseOnFork)();
-extern	int     (*__xdm_SecureDisplay)();
-extern	int     (*__xdm_UnsecureDisplay)();
-extern	int     (*__xdm_ClearCloseOnFork)();
-extern	int     (*__xdm_SetupDisplay)();
-extern	int     (*__xdm_LogError)();
-extern	int     (*__xdm_SessionExit)();
-extern	int     (*__xdm_DeleteXloginResources)();
-extern	int     (*__xdm_source)();
-extern	char    **(*__xdm_defaultEnv)();
-extern	char    **(*__xdm_setEnv)();
-extern	char    **(*__xdm_parseArgs)();
-extern	int     (*__xdm_printEnv)();
-extern	char    **(*__xdm_systemEnv)();
-extern	int     (*__xdm_LogOutOfMem)();
-extern	void    (*__xdm_setgrent)();
-extern	struct group    *(*__xdm_getgrent)();
-extern	void    (*__xdm_endgrent)();
+extern	int     (*__xdm_PingServer)(struct display *d, Display *alternateDpy);
+extern	void    (*__xdm_SessionPingFailed)(struct display *d);
+extern	void    (*__xdm_Debug)(char * fmt, ...);
+extern	void    (*__xdm_RegisterCloseOnFork)(int fd);
+extern	void    (*__xdm_SecureDisplay)(struct display *d, Display *dpy);
+extern	void    (*__xdm_UnsecureDisplay)(struct display *d, Display *dpy);
+extern	void    (*__xdm_ClearCloseOnFork)(int fd);
+extern	void    (*__xdm_SetupDisplay)(struct display *d);
+extern	void    (*__xdm_LogError)(char * fmt, ...);
+extern	void    (*__xdm_SessionExit)(struct display *d, int status, int removeAuth);
+extern	void    (*__xdm_DeleteXloginResources)(struct display *d, Display *dpy);
+extern	int     (*__xdm_source)(char **environ, char *file);
+extern	char    **(*__xdm_defaultEnv)(void);
+extern	char    **(*__xdm_setEnv)(char **e, char *name, char *value);
+extern	char    **(*__xdm_putEnv)(const char *string, char **env);
+extern	char    **(*__xdm_parseArgs)(char **argv, char *string);
+extern	void    (*__xdm_printEnv)(char **e);
+extern	char    **(*__xdm_systemEnv)(struct display *d, char *user, char *home);
+extern	void    (*__xdm_LogOutOfMem)(char * fmt, ...);
+extern	void    (*__xdm_setgrent)(void);
+extern	struct group    *(*__xdm_getgrent)(void);
+extern	void    (*__xdm_endgrent)(void);
 #ifdef USESHADOW
-extern	struct spwd   *(*__xdm_getspnam)();
-extern	void   (*__xdm_endspent)();
+extern	struct spwd   *(*__xdm_getspnam)(GETSPNAM_ARGS);
+extern	void    (*__xdm_endspent)(void);
 #endif
-extern	struct passwd   *(*__xdm_getpwnam)();
-extern	char     *(*__xdm_crypt)();
+extern	struct passwd   *(*__xdm_getpwnam)(GETPWNAM_ARGS);
+#ifdef linux
+extern  void    (*__xdm_endpwent)(void);
+#endif
+extern	char    *(*__xdm_crypt)(CRYPT_ARGS);
+#ifdef USE_PAM
+extern  pam_handle_t    **(*__xdm_thepamhp)(void);
+#endif
 
 /*
  * Force the shared library to call through the function pointer
@@ -167,9 +201,10 @@ extern	char     *(*__xdm_crypt)();
 #define	LogError	(*__xdm_LogError)
 #define	SessionExit	(*__xdm_SessionExit)
 #define	DeleteXloginResources	(*__xdm_DeleteXloginResources)
-#define	source	(*__xdm_source)
+#define	source		(*__xdm_source)
 #define	defaultEnv	(*__xdm_defaultEnv)
-#define	setEnv	(*__xdm_setEnv)
+#define	setEnv		(*__xdm_setEnv)
+#define putEnv		(*__xdm_putEnv)
 #define	parseArgs	(*__xdm_parseArgs)
 #define	printEnv	(*__xdm_printEnv)
 #define	systemEnv	(*__xdm_systemEnv)
@@ -181,7 +216,11 @@ extern	char     *(*__xdm_crypt)();
 #define	getspnam	(*__xdm_getspnam)
 #define	endspent	(*__xdm_endspent)
 #endif
+#ifdef linux
+#define endpwent	(*__xdm_endpwent)
+#endif
 #define	getpwnam	(*__xdm_getpwnam)
 #define	crypt		(*__xdm_crypt)
+#define thepamhp	(*__xdm_thepamhp)
 
 #endif /* GREET_LIB */

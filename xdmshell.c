@@ -36,12 +36,11 @@ in this Software without prior written authorization from The Open Group.
  * bring down X when you are finished.
  */
 
+/* $XFree86: xc/programs/xdm/xdmshell.c,v 3.7 2001/12/14 20:01:26 dawes Exp $ */
+
 #include <stdio.h>
 #include "dm.h"
 #include <errno.h>
-#ifdef X_NOT_STDC_ENV
-extern int errno;
-#endif
 
 #ifdef macII
 #define ON_CONSOLE_ONLY
@@ -64,17 +63,9 @@ extern int errno;
 
 char *ProgramName;
 
-static char *SysErrorMsg (n)
-    int n;
-{
-    char *s = strerror(n);
-    return (s ? s : "unknown error");
-}
-
-
-static int exec_args (filename, args)
-    char *filename;
-    char **args;
+static int exec_args (
+    char *filename,
+    char **args)
 {
     int pid;
     waitType status;
@@ -103,9 +94,10 @@ static int exec_args (filename, args)
     return waitCode (status);
 }
 
-static int exec_one_arg (filename, arg)
-    char    *filename;
-    char    *arg;
+#if defined(macII) || defined(sun)
+static int exec_one_arg (
+    char    *filename,
+    char    *arg)
 {
     char    *argv[3];
 
@@ -114,10 +106,12 @@ static int exec_one_arg (filename, arg)
     argv[2] = NULL;
     return exec_args (filename, argv);
 }
+#endif
 
-main (argc, argv)
-    int argc;
-    char *argv[];
+int
+main (
+    int argc,
+    char *argv[])
 {
     int ttyfd;
     char cmdbuf[256];
@@ -199,7 +193,7 @@ main (argc, argv)
     args[4] = NULL;
     if (exec_args (cmdbuf, args) == -1) {
 	fprintf (stderr, "%s:  unable to execute %s (error %d, %s)\r\n",
-		 ProgramName, cmdbuf, errno, SysErrorMsg(errno));
+		 ProgramName, cmdbuf, errno, strerror(errno));
 	exit (1);
     }
 

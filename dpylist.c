@@ -26,6 +26,7 @@ other dealings in this Software without prior written authorization
 from The Open Group.
 
 */
+/* $XFree86: xc/programs/xdm/dpylist.c,v 1.5 2001/12/14 20:01:21 dawes Exp $ */
 
 /*
  * xdm - display manager daemon
@@ -35,16 +36,18 @@ from The Open Group.
  */
 
 # include "dm.h"
+# include "dm_error.h"
 
 static struct display	*displays;
 
-AnyDisplaysLeft ()
+int
+AnyDisplaysLeft (void)
 {
 	return displays != (struct display *) 0;
 }
 
-ForEachDisplay (f)
-	void	(*f)();
+void
+ForEachDisplay (void (*f)(struct display *))
 {
 	struct display	*d, *next;
 
@@ -55,8 +58,7 @@ ForEachDisplay (f)
 }
 
 struct display *
-FindDisplayByName (name)
-char	*name;
+FindDisplayByName (char *name)
 {
 	struct display	*d;
 
@@ -67,8 +69,7 @@ char	*name;
 }
 
 struct display *
-FindDisplayByPid (pid)
-int	pid;
+FindDisplayByPid (int pid)
 {
 	struct display	*d;
 
@@ -79,8 +80,7 @@ int	pid;
 }
 
 struct display *
-FindDisplayByServerPid (serverPid)
-int	serverPid;
+FindDisplayByServerPid (int serverPid)
 {
 	struct display	*d;
 
@@ -93,8 +93,7 @@ int	serverPid;
 #ifdef XDMCP
 
 struct display *
-FindDisplayBySessionID (sessionID)
-    CARD32  sessionID;
+FindDisplayBySessionID (CARD32 sessionID)
 {
     struct display	*d;
 
@@ -105,10 +104,7 @@ FindDisplayBySessionID (sessionID)
 }
 
 struct display *
-FindDisplayByAddress (addr, addrlen, displayNumber)
-    XdmcpNetaddr addr;
-    int		 addrlen;
-    CARD16	 displayNumber;
+FindDisplayByAddress (XdmcpNetaddr addr, int addrlen, CARD16 displayNumber)
 {
     struct display  *d;
 
@@ -126,8 +122,8 @@ FindDisplayByAddress (addr, addrlen, displayNumber)
 
 #define IfFree(x)  if (x) free ((char *) x)
     
-RemoveDisplay (old)
-struct display	*old;
+void
+RemoveDisplay (struct display *old)
 {
     struct display	*d, *p;
     char		**x;
@@ -184,9 +180,7 @@ struct display	*old;
 }
 
 struct display *
-NewDisplay (name, class)
-char		*name;
-char		*class;
+NewDisplay (char *name, char *class)
 {
     struct display	*d;
 
@@ -250,6 +244,7 @@ char		*class;
     d->openTimeout = 0;
     d->startAttempts = 0;
     d->startTries = 0;
+    d->lastCrash = 0;
     d->terminateServer = 0;
     d->grabTimeout = 0;
 #ifdef XDMCP
@@ -268,7 +263,3 @@ char		*class;
     displays = d;
     return d;
 }
-
-
-
-

@@ -26,6 +26,7 @@ other dealings in this Software without prior written authorization
 from The Open Group.
 
 */
+/* $XFree86: xc/programs/xdm/resource.c,v 3.10 2002/12/07 20:31:04 herrb Exp $ */
 
 /*
  * xdm - display manager daemon
@@ -35,6 +36,8 @@ from The Open Group.
  */
 
 # include "dm.h"
+# include "dm_error.h"
+
 # include <X11/Intrinsic.h>
 # include <X11/Xmu/CharSet.h>
 
@@ -47,6 +50,7 @@ char	*errorLogFile;
 int	daemonMode;
 char	*pidFile;
 int	lockPidFile;
+int	sourceAddress;
 char	*authDir;
 int	autoRescan;
 int	removeDomainname;
@@ -55,6 +59,7 @@ char	*accessFile;
 char	**exportList;
 char	*randomFile;
 char	*greeterLib;
+char	*willing;
 int	choiceTimeout;	/* chooser choice timeout */
 
 # define DM_STRING	0
@@ -114,10 +119,14 @@ int	choiceTimeout;	/* chooser choice timeout */
 #define DEF_ACCESS_FILE	""
 #endif
 #ifndef DEF_RANDOM_FILE
-#define DEF_RANDOM_FILE "/dev/mem"
+# ifdef linux
+#  define DEF_RANDOM_FILE "/dev/urandom"
+# else
+#  define DEF_RANDOM_FILE "/dev/mem"
+# endif
 #endif
 #ifndef DEF_GREETER_LIB
-#define DEF_GREETER_LIB "/X11/lib/X11/xdm/libXdmGreet.so"
+#define DEF_GREETER_LIB "/usr/lib/X11/xdm/libXdmGreet.so"
 #endif
 
 #define DEF_UDP_PORT	"177"	    /* registered XDMCP port, dont change */
@@ -128,38 +137,42 @@ struct dmResources {
 	char	**dm_value;
 	char	*default_value;
 } DmResources[] = {
-"servers",	"Servers", 	DM_STRING,	&servers,
-				DEF_SERVER_LINE,
-"requestPort",	"RequestPort",	DM_INT,		(char **) &request_port,
-				DEF_UDP_PORT,
-"debugLevel",	"DebugLevel",	DM_INT,		(char **) &debugLevel,
-				"0",
-"errorLogFile",	"ErrorLogFile",	DM_STRING,	&errorLogFile,
-				"",
-"daemonMode",	"DaemonMode",	DM_BOOL,	(char **) &daemonMode,
-				"true",
-"pidFile",	"PidFile",	DM_STRING,	&pidFile,
-				"",
-"lockPidFile",	"LockPidFile",	DM_BOOL,	(char **) &lockPidFile,
-				"true",
-"authDir",	"authDir",	DM_STRING,	&authDir,
-				DEF_AUTH_DIR,
-"autoRescan",	"AutoRescan",	DM_BOOL,	(char **) &autoRescan,
-				"true",
-"removeDomainname","RemoveDomainname",DM_BOOL,	(char **) &removeDomainname,
-				"true",
-"keyFile",	"KeyFile",	DM_STRING,	&keyFile,
-				DEF_KEY_FILE,
-"accessFile",	"AccessFile",	DM_STRING,	&accessFile,
-				DEF_ACCESS_FILE,
-"exportList",	"ExportList",	DM_ARGV,	(char **) &exportList,
-				"",
-"randomFile",	"RandomFile",	DM_STRING,	&randomFile,
-				DEF_RANDOM_FILE,
-"greeterLib",	"GreeterLib",	DM_STRING,	&greeterLib,
-				DEF_GREETER_LIB,
-"choiceTimeout","ChoiceTimeout",DM_INT,		(char **) &choiceTimeout,
-				"15",
+{ "servers",	"Servers", 	DM_STRING,	&servers,
+				DEF_SERVER_LINE} ,
+{ "requestPort","RequestPort",	DM_INT,		(char **) &request_port,
+				DEF_UDP_PORT} ,
+{ "debugLevel",	"DebugLevel",	DM_INT,		(char **) &debugLevel,
+				"0"} ,
+{ "errorLogFile","ErrorLogFile",	DM_STRING,	&errorLogFile,
+				""} ,
+{ "daemonMode",	"DaemonMode",	DM_BOOL,	(char **) &daemonMode,
+				"true"} ,
+{ "pidFile",	"PidFile",	DM_STRING,	&pidFile,
+				""} ,
+{ "lockPidFile","LockPidFile",	DM_BOOL,	(char **) &lockPidFile,
+				"true"} ,
+{ "authDir",	"authDir",	DM_STRING,	&authDir,
+				DEF_AUTH_DIR} ,
+{ "autoRescan",	"AutoRescan",	DM_BOOL,	(char **) &autoRescan,
+				"true"} ,
+{ "removeDomainname","RemoveDomainname",DM_BOOL,(char **) &removeDomainname,
+				"true"} ,
+{ "keyFile",	"KeyFile",	DM_STRING,	&keyFile,
+				DEF_KEY_FILE} ,
+{ "accessFile",	"AccessFile",	DM_STRING,	&accessFile,
+				DEF_ACCESS_FILE} ,
+{ "exportList",	"ExportList",	DM_ARGV,	(char **) &exportList,
+				""} ,
+{ "randomFile",	"RandomFile",	DM_STRING,	&randomFile,
+				DEF_RANDOM_FILE} ,
+{ "greeterLib",	"GreeterLib",	DM_STRING,	&greeterLib,
+				DEF_GREETER_LIB} ,
+{ "choiceTimeout","ChoiceTimeout",DM_INT,	(char **) &choiceTimeout,
+				"15"} ,
+{ "sourceAddress","SourceAddress",DM_BOOL,	(char **) &sourceAddress,
+				"false"} ,
+{ "willing",	"Willing",	DM_STRING,	&willing,
+				""} ,
 };
 
 # define NUM_DM_RESOURCES	(sizeof DmResources / sizeof DmResources[0])
@@ -176,40 +189,40 @@ struct displayResource {
 /* resources for managing the server */
 
 struct displayResource serverResources[] = {
-"serverAttempts","ServerAttempts",DM_INT,	boffset(serverAttempts),
-				"1",
-"openDelay",	"OpenDelay",	DM_INT,		boffset(openDelay),
-				"15",
-"openRepeat",	"OpenRepeat",	DM_INT,		boffset(openRepeat),
-				"5",
-"openTimeout",	"OpenTimeout",	DM_INT,		boffset(openTimeout),
-				"30",
-"startAttempts","StartAttempts",DM_INT,		boffset(startAttempts),
-				"4",
-"pingInterval",	"PingInterval",	DM_INT,		boffset(pingInterval),
-				"5",
-"pingTimeout",	"PingTimeout",	DM_INT,		boffset(pingTimeout),
-				"5",
-"terminateServer","TerminateServer",DM_BOOL,	boffset(terminateServer),
-				"false",
-"grabServer",	"GrabServer",	DM_BOOL,	boffset(grabServer),
-				"false",
-"grabTimeout",	"GrabTimeout",	DM_INT,		boffset(grabTimeout),
-				"3",
-"resetSignal",	"Signal",	DM_INT,		boffset(resetSignal),
-				"1",	/* SIGHUP */
-"termSignal",	"Signal",	DM_INT,		boffset(termSignal),
-				"15",	/* SIGTERM */
-"resetForAuth",	"ResetForAuth",	DM_BOOL,	boffset(resetForAuth),
-				"false",
-"authorize",	"Authorize",	DM_BOOL,	boffset(authorize),
-				"true",
-"authComplain",	"AuthComplain",	DM_BOOL,	boffset(authComplain),
-				"true",
-"authName",	"AuthName",	DM_ARGV,	boffset(authNames),
-				DEF_AUTH_NAME,
-"authFile",	"AuthFile",	DM_STRING,	boffset(clientAuthFile),
-				"",
+{ "serverAttempts","ServerAttempts",DM_INT,	boffset(serverAttempts),
+				"1" },
+{ "openDelay",	"OpenDelay",	DM_INT,		boffset(openDelay),
+				"15" },
+{ "openRepeat",	"OpenRepeat",	DM_INT,		boffset(openRepeat),
+				"5" },
+{ "openTimeout","OpenTimeout",	DM_INT,		boffset(openTimeout),
+				"120" },
+{ "startAttempts","StartAttempts",DM_INT,	boffset(startAttempts),
+				"4" },
+{ "pingInterval","PingInterval",DM_INT,		boffset(pingInterval),
+				"5" },
+{ "pingTimeout","PingTimeout",	DM_INT,		boffset(pingTimeout),
+				"5" },
+{ "terminateServer","TerminateServer",DM_BOOL,	boffset(terminateServer),
+				"false" },
+{ "grabServer",	"GrabServer",	DM_BOOL,	boffset(grabServer),
+				"false" },
+{ "grabTimeout","GrabTimeout",	DM_INT,		boffset(grabTimeout),
+				"3" },
+{ "resetSignal","Signal",	DM_INT,		boffset(resetSignal),
+				"1" },	/* SIGHUP */
+{ "termSignal",	"Signal",	DM_INT,		boffset(termSignal),
+				"15" },	/* SIGTERM */
+{ "resetForAuth","ResetForAuth",DM_BOOL,	boffset(resetForAuth),
+				"false" },
+{ "authorize",	"Authorize",	DM_BOOL,	boffset(authorize),
+				"true" },
+{ "authComplain","AuthComplain",DM_BOOL,	boffset(authComplain),
+				"true" },
+{ "authName",	"AuthName",	DM_ARGV,	boffset(authNames),
+				DEF_AUTH_NAME },
+{ "authFile",	"AuthFile",	DM_STRING,	boffset(clientAuthFile),
+				"" },
 };
 
 # define NUM_SERVER_RESOURCES	(sizeof serverResources/\
@@ -218,30 +231,30 @@ struct displayResource serverResources[] = {
 /* resources which control the session behaviour */
 
 struct displayResource sessionResources[] = {
-"resources",	"Resources",	DM_STRING,	boffset(resources),
-				"",
-"xrdb",		"Xrdb",		DM_STRING,	boffset(xrdb),
-				XRDB_PROGRAM,
-"setup",	"Setup",	DM_STRING,	boffset(setup),
-				"",
-"startup",	"Startup",	DM_STRING,	boffset(startup),
-				"",
-"reset",	"Reset",	DM_STRING,	boffset(reset),
-				"",
-"session",	"Session",	DM_STRING,	boffset(session),
-				DEF_SESSION,
-"userPath",	"Path",		DM_STRING,	boffset(userPath),
-				DEF_USER_PATH,
-"systemPath",	"Path",		DM_STRING,	boffset(systemPath),
-				DEF_SYSTEM_PATH,
-"systemShell",	"Shell",	DM_STRING,	boffset(systemShell),
-				DEF_SYSTEM_SHELL,
-"failsafeClient","FailsafeClient",	DM_STRING,	boffset(failsafeClient),
-				DEF_FAILSAFE_CLIENT,
-"userAuthDir",	"UserAuthDir",	DM_STRING,	boffset(userAuthDir),
-				DEF_USER_AUTH_DIR,
-"chooser",	"Chooser",	DM_STRING,	boffset(chooser),
-				DEF_CHOOSER,
+{ "resources",	"Resources",	DM_STRING,	boffset(resources),
+				"" },
+{ "xrdb",	"Xrdb",		DM_STRING,	boffset(xrdb),
+				XRDB_PROGRAM },
+{ "setup",	"Setup",	DM_STRING,	boffset(setup),
+				"" },
+{ "startup",	"Startup",	DM_STRING,	boffset(startup),
+				"" },
+{ "reset",	"Reset",	DM_STRING,	boffset(reset),
+				"" },
+{ "session",	"Session",	DM_STRING,	boffset(session),
+				DEF_SESSION },
+{ "userPath",	"Path",		DM_STRING,	boffset(userPath),
+				DEF_USER_PATH },
+{ "systemPath",	"Path",		DM_STRING,	boffset(systemPath),
+				DEF_SYSTEM_PATH },
+{ "systemShell","Shell",	DM_STRING,	boffset(systemShell),
+				DEF_SYSTEM_SHELL },
+{ "failsafeClient","FailsafeClient",	DM_STRING,	boffset(failsafeClient),
+				DEF_FAILSAFE_CLIENT },
+{ "userAuthDir","UserAuthDir",	DM_STRING,	boffset(userAuthDir),
+				DEF_USER_AUTH_DIR },
+{ "chooser",	"Chooser",	DM_STRING,	boffset(chooser),
+				DEF_CHOOSER },
 };
 
 # define NUM_SESSION_RESOURCES	(sizeof sessionResources/\
@@ -249,18 +262,19 @@ struct displayResource sessionResources[] = {
 
 XrmDatabase	DmResourceDB;
 
-GetResource (name, class, valueType, valuep, default_value)
-    char    *name, *class;
-    int	    valueType;
-    char    **valuep;
-    char    *default_value;
+static void
+GetResource (
+    char    *name,
+    char    *class,
+    int	    valueType,
+    char    **valuep,
+    char    *default_value)
 {
     char	*type;
     XrmValue	value;
     char	*string, *new_string;
     char	str_buf[50];
     int	len;
-    extern char **parseArgs();
 
     if (DmResourceDB && XrmGetResource (DmResourceDB,
 	name, class,
@@ -347,9 +361,8 @@ XrmOptionDescRec optionTable [] = {
 static int	originalArgc;
 static char	**originalArgv;
 
-InitResources (argc, argv)
-int	argc;
-char	**argv;
+void
+InitResources (int argc, char **argv)
 {
 	XrmInitialize ();
 	originalArgc = argc;
@@ -357,7 +370,8 @@ char	**argv;
 	ReinitResources ();
 }
 
-ReinitResources ()
+void
+ReinitResources (void)
 {
     int	argc;
     char	**a;
@@ -401,24 +415,23 @@ ReinitResources ()
     free (argv);
 }
 
-LoadDMResources ()
+void
+LoadDMResources (void)
 {
 	int	i;
 	char	name[1024], class[1024];
 
 	for (i = 0; i < NUM_DM_RESOURCES; i++) {
-		sprintf (name, "DisplayManager.%s", DmResources[i].name);
-		sprintf (class, "DisplayManager.%s", DmResources[i].class);
+		snprintf (name, sizeof(name), "DisplayManager.%s", DmResources[i].name);
+		snprintf (class, sizeof(class), "DisplayManager.%s", DmResources[i].class);
 		GetResource (name, class, DmResources[i].type,
 			      (char **) DmResources[i].dm_value,
 			      DmResources[i].default_value);
 	}
 }
 
-static
-CleanUpName (src, dst, len)
-char	*src, *dst;
-int	len;
+static void
+CleanUpName (char *src, char *dst, int len)
 {
     while (*src) {
 	if (--len <= 0)
@@ -437,10 +450,11 @@ int	len;
     *dst = '\0';
 }
 
-LoadDisplayResources (d, resources, numResources)
-    struct display	    *d;
-    struct displayResource  *resources;
-    int			    numResources;
+static void
+LoadDisplayResources (
+    struct display	    *d,
+    struct displayResource  *resources,
+    int			    numResources)
 {
     int	i;
     char	name[1024], class[1024];
@@ -449,9 +463,9 @@ LoadDisplayResources (d, resources, numResources)
     CleanUpName (d->name, dpyName, sizeof (dpyName));
     CleanUpName (d->class ? d->class : d->name, dpyClass, sizeof (dpyClass));
     for (i = 0; i < numResources; i++) {
-	    sprintf (name, "DisplayManager.%s.%s", 
+	    snprintf (name, sizeof(name), "DisplayManager.%s.%s", 
 		    dpyName, resources[i].name);
-	    sprintf (class, "DisplayManager.%s.%s",
+	    snprintf (class, sizeof(class), "DisplayManager.%s.%s",
 		    dpyClass, resources[i].class);
 	    GetResource (name, class, resources[i].type,
 			  (char **) (((char *) d) + resources[i].offset),
@@ -459,14 +473,14 @@ LoadDisplayResources (d, resources, numResources)
     }
 }
 
-LoadServerResources (d)
-    struct display  *d;
+void
+LoadServerResources (struct display *d)
 {
     LoadDisplayResources (d, serverResources, NUM_SERVER_RESOURCES);
 }
 
-LoadSessionResources (d)
-    struct display  *d;
+void
+LoadSessionResources (struct display *d)
 {
     LoadDisplayResources (d, sessionResources, NUM_SESSION_RESOURCES);
 }

@@ -26,6 +26,7 @@ other dealings in this Software without prior written authorization
 from The Open Group.
 
 */
+/* $XFree86: xc/programs/xdm/rpcauth.c,v 1.4 2001/12/14 20:01:23 dawes Exp $ */
 
 /*
  * xdm - display manager daemon
@@ -39,19 +40,21 @@ from The Open Group.
 # include   <X11/Xos.h>
 # include   <rpc/rpc.h>
 # include   <rpc/key_prot.h>
+
 # include   "dm.h"
+# include   "dm_auth.h"
+# include   "dm_error.h"
 
 /*ARGSUSED*/
-SecureRPCInitAuth (name_len, name)
-    unsigned short  name_len;
-    char	    *name;
+void
+SecureRPCInitAuth (unsigned short name_len, char *name)
 {
 }
 
 Xauth *
-SecureRPCGetAuth (namelen, name)
-    unsigned short  namelen;
-    char	    *name;
+SecureRPCGetAuth (
+    unsigned short  namelen,
+    char	    *name)
 {
     char    key[MAXNETNAMELEN+1];
     Xauth   *new;
