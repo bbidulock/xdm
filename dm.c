@@ -113,7 +113,7 @@ static int TitleLen;
 static SIGVAL ChildNotify (int n);
 #endif
 
-static int StorePid (void);
+static long StorePid (void);
 static void RemovePid (void);
 
 static pid_t parent_pid = -1; 	/* PID of parent xdm process */
@@ -877,13 +877,20 @@ CloseOnFork (void)
 static int  pidFd;
 static FILE *pidFilePtr;
 
-static int
+/*
+ * Create and populate file storing xdm's process ID.
+ */
+static long
 StorePid (void)
 {
-    int		oldpid;
+    long	oldpid;
+    char	pidstr[11]; /* enough space for a 32-bit pid plus \0 */
+    size_t	pidstrlen;
 
-    if (pidFile[0] != '\0') {
-	pidFd = open (pidFile, O_RDWR);
+    if (pidFile[0] != '\0')
+    {
+	Debug ("storing process ID in %s\n", pidFile);
+	pidFd = open (pidFile, O_WRONLY|O_CREAT|O_EXCL, 0666);
 	if (pidFd == -1 && errno == ENOENT)
 	{
 	    /* Make sure directory exists if needed
@@ -906,58 +913,52 @@ StorePid (void)
 		}
 	    }
 
-	    pidFd = open (pidFile, O_RDWR|O_CREAT, 0666);
+	    pidFd = open (pidFile, O_WRONLY|O_CREAT|O_EXCL, 0666);
 	}
-	if (pidFd == -1 || !(pidFilePtr = fdopen (pidFd, "r+")))
+	if (pidFd == -1)
 	{
-	    LogError ("process-id file %s cannot be opened\n",
-		      pidFile);
+	    if (errno == EEXIST)
+	    {
+		/* pidFile already exists; see if we can open it */
+		pidFilePtr = fopen (pidFile, "r");
+		if (pidFilePtr == NULL)
+		{
+		    LogError ("cannot open process ID file %s for reading: "
+			      "%s\n", pidFile, _SysErrorMsg (errno));
+		    return -1;
+		}
+		if (fscanf (pidFilePtr, "%ld\n", &oldpid) != 1)
+		{
+		    LogError ("existing process ID file %s empty or contains "
+			      "garbage\n", pidFile);
+		    oldpid = -1;
+		}
+		fclose (pidFilePtr);
+		return oldpid;
+	    }
+		else
+	    {
+		LogError ("cannot fdopen process ID file %s for writing: "
+			  "%s\n", pidFile, _SysErrorMsg (errno));
+		return -1;
+	    }
+	}
+	if ((pidFilePtr = fdopen (pidFd, "w")) == NULL)
+	{
+	    LogError ("cannot open process ID file %s for writing: %s\n",
+		      pidFile, _SysErrorMsg (errno));
 	    return -1;
 	}
-	if (fscanf (pidFilePtr, "%d\n", &oldpid) != 1)
-	    oldpid = -1;
-	fseek (pidFilePtr, 0l, 0);
-	if (lockPidFile)
+	(void) snprintf (pidstr, 11, "%ld", (long) getpid ());
+	pidstrlen = strlen (pidstr);
+	if (fprintf (pidFilePtr, "%s\n", pidstr) != ( pidstrlen + 1))
 	{
-#ifdef F_SETLK
-# ifndef SEEK_SET
-#  define SEEK_SET 0
-# endif
-	    struct flock lock_data;
-	    lock_data.l_type = F_WRLCK;
-	    lock_data.l_whence = SEEK_SET;
-	    lock_data.l_start = lock_data.l_len = 0;
-	    if (fcntl(pidFd, F_SETLK, &lock_data) == -1)
-	    {
-		if (errno == EAGAIN)
-		    return oldpid;
-		else
-		    return -1;
-	    }
-#else
-# ifdef LOCK_EX
-	    if (flock (pidFd, LOCK_EX|LOCK_NB) == -1)
-	    {
-		if (errno == EWOULDBLOCK)
-		    return oldpid;
-		else
-		    return -1;
-	    }
-# else
-	    if (lockf (pidFd, F_TLOCK, 0) == -1)
-	    {
-		if (errno == EACCES)
-		    return oldpid;
-		else
-		    return -1;
-	    }
-# endif
-#endif
+	    LogError ("cannot write to process ID file %s: %s\n", pidFile,
+		      _SysErrorMsg (errno));
+	    return -1;
 	}
-	ftruncate(pidFd, 0);
-	fprintf (pidFilePtr, "%5ld\n", (long)getpid ());
 	(void) fflush (pidFilePtr);
-	RegisterCloseOnFork (pidFd);
+	(void) fclose (pidFilePtr);
     }
     return 0;
 }
