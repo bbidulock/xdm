@@ -1,4 +1,4 @@
-/* $XdotOrg: dm.h,v 1.4 2001/02/09 02:05:40 xorgcvs Exp $ */
+/* $XdotOrg: xc/programs/xdm/dm.h,v 1.2 2004/04/23 19:54:42 eich Exp $ */
 /* $Xorg: dm.h,v 1.4 2001/02/09 02:05:40 xorgcvs Exp $ */
 /*
 
@@ -272,13 +272,6 @@ struct greet_info {
 	Boolean		allow_null_passwd; /* allow null password on login */
 	Boolean		allow_root_login; /* allow direct root login */
 };
-
-/* setgroups is not covered by POSIX, arg type varies */
-#if defined(SYSV) || defined(SVR4) || defined(__osf__) || defined(linux) || defined(__GNU__)
-#define GID_T gid_t
-#else
-#define GID_T int
-#endif
 
 typedef void (*ChooserFunc)(CARD16 connectionType, ARRAY8Ptr addr, char *closure);
 typedef void (*ListenFunc)(ARRAY8Ptr addr, void **closure);
