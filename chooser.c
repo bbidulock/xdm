@@ -1,5 +1,5 @@
 /*
- * $XdotOrg: xc/programs/xdm/chooser.c,v 1.1.4.3 2003/12/06 13:24:29 kaleb Exp $
+ * $XdotOrg: xc/programs/xdm/chooser.c,v 1.1.4.4 2003/12/06 18:51:45 kaleb Exp $
  * $Xorg: chooser.c,v 1.4 2001/02/09 02:05:40 xorgcvs Exp $
  *
 Copyright 1990, 1998  The Open Group
@@ -1066,8 +1066,8 @@ main (int argc, char **argv)
     Dimension   width, height;
     Position	x, y;
 #ifdef USE_XINERAMA
-    XineramaScreenInfo *screens;
-    int                 s_num;
+    XRectangle *screens;
+    int		s_num;
 #endif
 
 
@@ -1099,12 +1099,11 @@ main (int argc, char **argv)
     XtGetValues (toplevel, position, (Cardinal) 2);
 #ifdef USE_XINERAMA
     if (
-	XineramaIsActive(XtDisplay(toplevel)) &&
-	(screens = XineramaQueryScreens(XtDisplay(toplevel), &s_num)) != NULL
-       )
+	XineramaActive(XtDisplay(toplevel),  XtWindow(toplevel)) &&
+	    XineramaGetData(XtDisplay(toplevel), XtWindow(toplevel), &screens, &s_num))
     {
-	x = (Position)(screens[0].x_org + (screens[0].width - width) / 2);
-	y = (Position)(screens[0].y_org + (screens[0].height - height) / 3);
+	x = (Position)(screens[0].x + (screens[0].width - width) / 2);
+	y = (Position)(screens[0].y + (screens[0].height - height) / 3);
 	
 	XFree(screens);
     }
