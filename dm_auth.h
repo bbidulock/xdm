@@ -1,5 +1,5 @@
 /*
- * $XFree86: xc/programs/xdm/dm_auth.h,v 1.3 2003/09/17 05:48:32 herrb Exp $
+ * $XFree86: xc/programs/xdm/dm_auth.h,v 1.4 2003/10/27 21:39:06 herrb Exp $
  */
 
 /************************************************************

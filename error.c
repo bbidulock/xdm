@@ -26,7 +26,7 @@ other dealings in this Software without prior written authorization
 from The Open Group.
 
 */
-/* $XFree86: xc/programs/xdm/error.c,v 1.6tsi Exp $ */
+/* $XFree86: xc/programs/xdm/error.c,v 1.7 2002/10/09 16:38:20 tsi Exp $ */
 
 /*
  * xdm - display manager daemon

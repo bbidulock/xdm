@@ -26,7 +26,7 @@ other dealings in this Software without prior written authorization
 from The Open Group.
 
 */
-/* $XFree86: xc/programs/xdm/krb5auth.c,v 1.3 2001/01/17 23:45:21 dawes Exp $ */
+/* $XFree86: xc/programs/xdm/krb5auth.c,v 1.4 2001/12/14 20:01:22 dawes Exp $ */
 
 /*
  * xdm - display manager daemon

@@ -26,7 +26,7 @@ in this Software without prior written authorization from The Open Group.
  * Author:  Keith Packard, MIT X Consortium
  */
 
-/* $XFree86: xc/programs/xdm/choose.c,v 3.16tsi Exp $ */
+/* $XFree86: xc/programs/xdm/choose.c,v 3.17 2003/07/09 15:27:38 tsi Exp $ */
 
 /*
  * choose.c
