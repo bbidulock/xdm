@@ -1,4 +1,4 @@
-/* $XdotOrg: xc/programs/xdm/xdmcp.c,v 1.2 2004/04/23 19:54:42 eich Exp $ */
+/* $XdotOrg: xc/programs/xdm/xdmcp.c,v 1.3 2004/05/24 19:05:01 eich Exp $ */
 /* $Xorg: xdmcp.c,v 1.4 2001/02/09 02:05:41 xorgcvs Exp $ */
 /*
 
@@ -943,13 +943,20 @@ request_respond (
     ARRAY8Ptr	    connectionAddress;
 
     Debug ("Request respond %d\n", length);
+    connectionTypes.length = 0;
     connectionTypes.data = 0;
+    connectionAddresses.length = 0;
     connectionAddresses.data = 0;
+    authenticationName.length = 0;
     authenticationName.data = 0;
+    authenticationData.length = 0;
     authenticationData.data = 0;
+    authorizationNames.length = 0;
     authorizationNames.data = 0;
     authorizationName.length = 0;
+    authorizationName.data = 0;
     authorizationData.length = 0;
+    authorizationData.data = 0;
     manufacturerDisplayID.data = 0;
     if (XdmcpReadCARD16 (&buffer, &displayNumber) &&
 	XdmcpReadARRAY16 (&buffer, &connectionTypes) &&
