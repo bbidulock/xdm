@@ -26,7 +26,7 @@ other dealings in this Software without prior written authorization
 from The Open Group.
 
 */
-/* $XFree86: xc/programs/xdm/genauth.c,v 3.21 2003/11/26 07:33:10 herrb Exp $ */
+/* $XFree86: xc/programs/xdm/genauth.c,v 3.22 2003/12/18 16:38:39 dawes Exp $ */
 
 /*
  * xdm - display manager daemon
@@ -346,7 +346,7 @@ AddPreGetEntropy (void)
 static void
 InitXdmcpWrapper (void)
 {
-    u_int32_t sum[4];
+    uint32_t sum[4];
 
 #ifdef	ARC4_RANDOM
     sum[0] = arc4random();
