@@ -1,4 +1,4 @@
-/* $XdotOrg: xc/programs/xdm/resource.c,v 1.2 2004/04/23 19:54:42 eich Exp $ */
+/* $XdotOrg$ */
 /* $Xorg: resource.c,v 1.4 2001/02/09 02:05:40 xorgcvs Exp $ */
 /*
 
@@ -237,7 +237,7 @@ struct dmResources {
 #if !defined(ARC4_RANDOM)
 { "randomFile",	"RandomFile",	DM_STRING,	&randomFile,
 				DEF_RANDOM_FILE} ,
-{ "prgndSocket", "PrngdSocket", DM_STRING,	&prngdSocket, 
+{ "prngdSocket", "PrngdSocket", DM_STRING,	&prngdSocket, 
 				DEF_PRNGD_SOCKET},
 { "prngdPort", "PrngdPort",	DM_INT,		(char **) &prngdPort,
 				DEF_PRNGD_PORT},
