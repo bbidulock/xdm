@@ -1,4 +1,4 @@
-/* $XdotOrg: xc/programs/xdm/xdmcp.c,v 1.1.4.4 2003/12/06 13:24:29 kaleb Exp $ */
+/* $XdotOrg: xc/programs/xdm/xdmcp.c,v 1.2 2004/04/23 19:54:42 eich Exp $ */
 /* $Xorg: xdmcp.c,v 1.4 2001/02/09 02:05:41 xorgcvs Exp $ */
 /*
 
@@ -1190,7 +1190,8 @@ manage (
 					 &pdpy->connectionAddress,
 					 from,
 					 pdpy->displayNumber);
-	    Debug ("Computed display name: %s\n", name);
+	    Debug ("Computed display name: %s for: %s\n",
+		   name, (char *)pdpy->connectionAddress.data);
 	    if (!name)
 	    {
 		send_failed (from, fromlen, "(no name)", sessionID, 
