@@ -97,12 +97,6 @@ extern  void	endpwent(void);
 # endif
 extern	char	*crypt(CRYPT_ARGS);
 #endif
-#ifdef USE_PAM
-pam_handle_t **thepamhp()
-{
-	static pam_handle_t *pamh = NULL;
-	return &pamh;
-}
 
 #ifdef USE_PAM
 pam_handle_t **
@@ -594,6 +588,7 @@ StartClient (
 	    LogError ("initgroups for \"%s\" failed, errno=%d\n", name, errno);
 	    return (0);
 	}
+#endif	/* QNX4 doesn't support multi-groups, no initgroups() */
 #ifdef USE_PAM
 	if (pamh) {
 	    pam_error = pam_setcred (pamh, PAM_ESTABLISH_CRED);

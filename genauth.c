@@ -265,7 +265,6 @@ pmd5_hash (unsigned int *out, unsigned const int in[16])
 /* ####################################################################### */
 
 
-#if !defined(ARC4_RANDOM) && !defined(DEV_RANDOM)
 static int
 sumFile (const char *name, int len, int whence, off_t offset)
 {
