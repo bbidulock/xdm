@@ -1,5 +1,5 @@
 /* $Xorg: verify.c,v 1.4 2001/02/09 02:05:41 xorgcvs Exp $ */
-/* $XdotOrg: $ */
+/* $XdotOrg: xc/programs/xdm/greeter/verify.c,v 1.3 2004/04/24 23:28:17 alanc Exp $ */
 /*
 
 Copyright 1988, 1998  The Open Group
@@ -240,7 +240,7 @@ Verify (struct display *d, struct greet_info *greet, struct verify_info *verify)
 	/* Build path of the auth script and call it */
 	snprintf(path, sizeof(path), _PATH_AUTHPROG "%s", style);
 	auth_call(as, path, style, "-s", "response", greet->name, 
-		  (void *)NULL);
+		  lc->lc_class, (void *)NULL);
 	authok = auth_getstate(as);
 
 	if ((authok & AUTH_ALLOW) == 0) {
