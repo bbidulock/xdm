@@ -1,3 +1,4 @@
+/* $XdotOrg: xc/programs/xdm/auth.c,v 1.1.4.4 2003/12/06 13:24:29 kaleb Exp $ */
 /* $Xorg: auth.c,v 1.5 2001/02/09 02:05:40 xorgcvs Exp $ */
 /*
 
@@ -26,7 +27,7 @@ other dealings in this Software without prior written authorization
 from The Open Group.
 
 */
-/* $XFree86: xc/programs/xdm/auth.c,v 3.33 2004/01/16 00:03:54 herrb Exp $ */
+/* $XFree86: xc/programs/xdm/auth.c,v 3.32 2003/12/22 17:48:12 tsi Exp $ */
 
 /*
  * xdm - display manager daemon

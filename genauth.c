@@ -1,3 +1,4 @@
+/* $XdotOrg: xc/programs/xdm/genauth.c,v 1.1.4.5 2003/12/20 00:28:31 kaleb Exp $ */
 /* $Xorg: genauth.c,v 1.5 2001/02/09 02:05:40 xorgcvs Exp $ */
 /*
 
@@ -26,7 +27,7 @@ other dealings in this Software without prior written authorization
 from The Open Group.
 
 */
-/* $XFree86: xc/programs/xdm/genauth.c,v 3.24 2003/12/21 15:07:06 herrb Exp $ */
+/* $XFree86: xc/programs/xdm/genauth.c,v 3.23 2003/12/20 19:45:12 dawes Exp $ */
 
 /*
  * xdm - display manager daemon

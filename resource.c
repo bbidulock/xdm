@@ -1,3 +1,4 @@
+/* $XdotOrg: resource.c,v 1.4 2001/02/09 02:05:40 xorgcvs Exp $ */
 /* $Xorg: resource.c,v 1.4 2001/02/09 02:05:40 xorgcvs Exp $ */
 /*
 
@@ -26,7 +27,7 @@ other dealings in this Software without prior written authorization
 from The Open Group.
 
 */
-/* $XFree86: xc/programs/xdm/resource.c,v 3.12 2003/09/17 05:48:32 herrb Exp $ */
+/* $XFree86: xc/programs/xdm/resource.c,v 3.11 2003/07/09 15:27:39 tsi Exp $ */
 
 /*
  * xdm - display manager daemon
