@@ -26,7 +26,7 @@ in this Software without prior written authorization from The Open Group.
  * Author:  Keith Packard, MIT X Consortium
  */
 
-/* $XFree86: xc/programs/xdm/chooser.c,v 3.24 2001/12/14 20:01:20 dawes Exp $ */
+/* $XFree86: xc/programs/xdm/chooser.c,v 3.26 2003/07/18 15:53:28 tsi Exp $ */
 
 /*
  * Chooser - display a menu of names and let the user select one
@@ -194,6 +194,9 @@ typedef struct _hostName {
 static HostName    *hostNamedb;
 
 static int  socketFD;
+#if defined(IPv6) && defined(AF_INET6)
+static int  socket6FD;
+#endif
 
 static int  pingTry;
 
@@ -262,13 +265,22 @@ static void
 PingHosts (XtPointer closure, XtIntervalId *id)
 {
     HostAddr	*hosts;
+    int		 sfd = socketFD;
 
     for (hosts = hostAddrdb; hosts; hosts = hosts->next)
     {
-	if (hosts->type == QUERY)
-	    XdmcpFlush (socketFD, &directBuffer, (XdmcpNetaddr) hosts->addr, hosts->addrlen);
+#if defined(IPv6) && defined(AF_INET6)
+	if ( ((struct sockaddr *) hosts->addr)->sa_family == AF_INET6 )
+	    sfd = socket6FD;
 	else
-	    XdmcpFlush (socketFD, &broadcastBuffer, (XdmcpNetaddr) hosts->addr, hosts->addrlen);
+	    sfd = socketFD;
+#endif
+	if (hosts->type == QUERY)
+	    XdmcpFlush (sfd, &directBuffer, 
+			(XdmcpNetaddr) hosts->addr, hosts->addrlen);
+	else
+	    XdmcpFlush (sfd, &broadcastBuffer, 
+			(XdmcpNetaddr) hosts->addr, hosts->addrlen);
     }
     if (++pingTry < TRIES)
 	XtAddTimeOut (PING_INTERVAL, PingHosts, (XtPointer) 0);
@@ -321,6 +333,13 @@ AddHostname (ARRAY8Ptr hostname, ARRAY8Ptr status, struct sockaddr *addr, int wi
 	hostAddr.length = 4;
 	connectionType = FamilyInternet;
 	break;
+#if defined(IPv6) && defined(AF_INET6)
+    case AF_INET6:
+	hostAddr.data = (CARD8 *) &((struct sockaddr_in6 *) addr)->sin6_addr;
+	hostAddr.length = 16;
+	connectionType = FamilyInternet6;
+	break;
+#endif
     default:
 	hostAddr.data = (CARD8 *) "";
 	hostAddr.length = 0;
@@ -350,11 +369,14 @@ AddHostname (ARRAY8Ptr hostname, ARRAY8Ptr status, struct sockaddr *addr, int wi
 	    switch (addr->sa_family)
 	    {
 	    case AF_INET:
+#if defined(IPv6) && defined(AF_INET6)
+	    case AF_INET6:
+#endif
 	    	{
 	    	    struct hostent  *hostent;
 		    char	    *host;
     	
-	    	    hostent = gethostbyaddr ((char *)hostAddr.data, hostAddr.length, AF_INET);
+	    	    hostent = gethostbyaddr ((char *)hostAddr.data, hostAddr.length, addr->sa_family);
 	    	    if (hostent)
 	    	    {
 			XdmcpDisposeARRAY8 (hostname);
@@ -464,11 +486,16 @@ ReceivePacket (XtPointer closure, int *source, XtInputId *id)
     ARRAY8	    hostname;
     ARRAY8	    status;
     int		    saveHostname = 0;
+#if defined(IPv6) && defined(AF_INET6)
+    struct sockaddr_storage addr;
+#else
     struct sockaddr addr;
+#endif
     int		    addrlen;
+    int		    sfd = * (int *) closure;
 
     addrlen = sizeof (addr);
-    if (!XdmcpFill (socketFD, &buffer, (XdmcpNetaddr) &addr, &addrlen))
+    if (!XdmcpFill (sfd, &buffer, (XdmcpNetaddr) &addr, &addrlen))
 	return;
     if (!XdmcpReadHeader (&buffer, &header))
 	return;
@@ -486,7 +513,8 @@ ReceivePacket (XtPointer closure, int *source, XtInputId *id)
 	    if (header.length == 6 + authenticationName.length +
 	    	hostname.length + status.length)
 	    {
-		if (AddHostname (&hostname, &status, &addr, header.opcode == (int) WILLING))
+		if (AddHostname (&hostname, &status, (struct sockaddr *) &addr,
+		  		 header.opcode == (int) WILLING))
 		    saveHostname = 1;
 	    }
     	}
@@ -498,7 +526,8 @@ ReceivePacket (XtPointer closure, int *source, XtInputId *id)
     	{
 	    if (header.length == 4 + hostname.length + status.length)
 	    {
-		if (AddHostname (&hostname, &status, &addr, header.opcode == (int) WILLING))
+		if (AddHostname (&hostname, &status, (struct sockaddr *) &addr,
+		  		 header.opcode == (int) WILLING))
 		    saveHostname = 1;
 
 	    }
@@ -558,7 +587,9 @@ RegisterHostaddr (struct sockaddr *addr, int len, xdmOpCode type)
 static void
 RegisterHostname (char *name)
 {
+#if !defined(IPv6) || !defined(AF_INET6)
     struct hostent	*hostent;
+#endif
     struct sockaddr_in	in_addr;
     struct ifconf	ifc;
     register struct ifreq *ifr;
@@ -673,13 +704,48 @@ RegisterHostname (char *name)
     }
     else
     {
-
-	/* address as hex string, e.g., "12180022" (depreciated) */
+	/* address as hex string, e.g., "12180022" (deprecated) */
 	if (strlen(name) == 8 &&
 	    FromHex(name, (char *)&in_addr.sin_addr, strlen(name)) == 0)
 	{
 	    in_addr.sin_family = AF_INET;
+	    in_addr.sin_port = htons (XDM_UDP_PORT);
+#ifdef BSD44SOCKETS
+	    in_addr.sin_len = sizeof(in_addr);
+#endif
+	    RegisterHostaddr ((struct sockaddr *)&in_addr, sizeof (in_addr),
+				QUERY);
 	}
+#if defined(IPv6) && defined(AF_INET6)
+	else {
+	    char sport[8];
+	    struct addrinfo *ai, *nai, hints;
+	    bzero(&hints,sizeof(hints));
+	    hints.ai_socktype = SOCK_DGRAM;
+	    sprintf(sport, "%d", XDM_UDP_PORT);
+	    if (getaddrinfo(name, sport, &hints, &ai) == 0) {
+		for (nai = ai ; nai != NULL ; nai = nai->ai_next) {
+		    if ((nai->ai_family == AF_INET) || 
+		        (nai->ai_family == AF_INET6)) {
+			if (((nai->ai_family == AF_INET) && 
+			  IN_MULTICAST(((struct sockaddr_in *) nai->ai_addr)
+			    ->sin_addr.s_addr))
+			  || ((nai->ai_family == AF_INET6) && 
+			    IN6_IS_ADDR_MULTICAST(
+				&((struct sockaddr_in6 *) nai->ai_addr)
+				  ->sin6_addr))) 
+			{
+			    RegisterHostaddr(nai->ai_addr, nai->ai_addrlen, 
+			      BROADCAST_QUERY);
+			} else {
+			    RegisterHostaddr(nai->ai_addr, nai->ai_addrlen, 
+			      QUERY);
+			}
+		    }
+		}
+	    }
+	}
+#else
 	/* Per RFC 1123, check first for IP address in dotted-decimal form */
 	else if ((in_addr.sin_addr.s_addr = inet_addr(name)) != -1)
 	    in_addr.sin_family = AF_INET;
@@ -699,6 +765,7 @@ RegisterHostname (char *name)
 #endif
 	RegisterHostaddr ((struct sockaddr *)&in_addr, sizeof (in_addr),
 			  QUERY);
+#endif /* IPv6 */
     }
 }
 #else /* __GNU__ */
@@ -718,12 +785,30 @@ RegisterHostname (char *name)
     else
     {
 
-	/* address as hex string, e.g., "12180022" (depreciated) */
+	/* address as hex string, e.g., "12180022" (deprecated) */
 	if (strlen(name) == 8 &&
 	    FromHex(name, (char *)&in_addr.sin_addr, strlen(name)) == 0)
 	{
 	    in_addr.sin_family = AF_INET;
-	}
+	    in_addr.sin_port = htons (XDM_UDP_PORT);
+	    RegisterHostaddr ((struct sockaddr *)&in_addr, sizeof (in_addr),
+				QUERY);
+	} else {
+#if defined(IPv6) && defined(AF_INET6)
+	    char sport[8];
+	    struct addrinfo *ai, *nai, hints;
+	    bzero(&hints,sizeof(hints));
+	    hints.ai_socktype = SOCK_DGRAM;
+	    sprintf(sport, "%d", XDM_UDP_PORT);
+	    if (getaddrinfo(name, sport, &hints, &ai) == 0) {
+		for (nai = ai ; nai != NULL ; nai = nai->ai_next) {
+		    if ((nai->ai_family == AF_INET) || 
+		        (nai->ai_family == AF_INET6)) {
+			RegisterHostaddr(nai->ai_addr, nai->ai_addrlen, QUERY);
+		    }
+		}
+	    }
+#else
 	/* Per RFC 1123, check first for IP address in dotted-decimal form */
 	else if ((in_addr.sin_addr.s_addr = inet_addr(name)) != -1)
 	    in_addr.sin_family = AF_INET;
@@ -740,6 +825,9 @@ RegisterHostname (char *name)
 	in_addr.sin_port = htons (XDM_UDP_PORT);
 	RegisterHostaddr ((struct sockaddr *)&in_addr, sizeof (in_addr),
 			  QUERY);
+#endif
+	}
+
     }
 }
 #endif /* __GNU__ */
@@ -820,6 +908,9 @@ InitXDMCP (char **argv)
 #else
     if ((socketFD = socket (AF_INET, SOCK_DGRAM, 0)) < 0)
 	return 0;
+#if defined(IPv6) && defined(AF_INET6)
+    socket6FD = socket (AF_INET6, SOCK_DGRAM, 0);
+#endif
 #endif
 #ifndef STREAMSCONN
 #ifdef SO_BROADCAST
@@ -830,7 +921,11 @@ InitXDMCP (char **argv)
 #endif
     
     XtAddInput (socketFD, (XtPointer) XtInputReadMask, ReceivePacket,
-		(XtPointer) 0);
+		(XtPointer) &socketFD);
+#if defined(IPv6) && defined(AF_INET6)
+    XtAddInput (socket6FD, (XtPointer) XtInputReadMask, ReceivePacket,
+		(XtPointer) &socket6FD);
+#endif
     while (*argv)
     {
 	RegisterHostname (*argv);
@@ -847,6 +942,9 @@ Choose (HostName *h)
     if (app_resources.xdmAddress)
     {
 	struct sockaddr_in  in_addr;
+#if defined(IPv6) && defined(AF_INET6)
+	struct sockaddr_in6 in6_addr;
+#endif
 	struct sockaddr	*addr = NULL;
 	int		family;
 	int		len = 0;
@@ -871,6 +969,19 @@ Choose (HostName *h)
 	    addr = (struct sockaddr *) &in_addr;
 	    len = sizeof (in_addr);
 	    break;
+#if defined(IPv6) && defined(AF_INET6)
+	case AF_INET6:
+	    bzero(&in6_addr, sizeof(in6_addr));
+#ifdef SIN6_LEN
+	    in6_addr.sin6_len = sizeof(in6_addr);
+#endif
+	    in6_addr.sin6_family = family;
+	    memmove( &in6_addr.sin6_port, xdm + 2, 2);
+	    memmove( &in6_addr.sin6_addr, xdm + 4, 16);
+	    addr = (struct sockaddr *) &in6_addr;
+	    len = sizeof (in6_addr);
+	    break;
+#endif
 	}
 #if defined(STREAMSCONN)
 	if ((fd = t_open ("/dev/tcp", O_RDWR, NULL)) == -1)
