@@ -26,6 +26,7 @@ other dealings in this Software without prior written authorization
 from The Open Group.
 
 */
+/* $XFree86: xc/programs/xdm/socket.c,v 3.10 2001/12/14 20:01:24 dawes Exp $ */
 
 /*
  * xdm - display manager daemon
@@ -35,19 +36,22 @@ from The Open Group.
  */
 
 #include "dm.h"
+#include "dm_error.h"
 
 #ifdef XDMCP
 #ifndef STREAMSCONN
 
 #include <errno.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <sys/un.h>
-#include <netdb.h>
+#include "dm_socket.h"
 
-#ifdef X_NOT_STDC_ENV
-extern int errno;
+#ifndef X_NO_SYS_UN
+#ifndef Lynx
+#include <sys/un.h>
+#else
+#include <un.h>
 #endif
+#endif
+#include <netdb.h>
 
 
 extern int	xdmcpFd;
@@ -56,10 +60,11 @@ extern int	chooserFd;
 extern FD_TYPE	WellKnownSocketsMask;
 extern int	WellKnownSocketsMax;
 
-CreateWellKnownSockets ()
+void
+CreateWellKnownSockets (void)
 {
     struct sockaddr_in	sock_addr;
-    char		*name, *localHostname();
+    char *name;
 
     if (request_port == 0)
 	    return;
@@ -103,19 +108,21 @@ CreateWellKnownSockets ()
     FD_SET (chooserFd, &WellKnownSocketsMask);
 }
 
-GetChooserAddr (addr, lenp)
-    char	*addr;
-    int		*lenp;
+int
+GetChooserAddr (
+    char	*addr,
+    int		*lenp)
 {
     struct sockaddr_in	in_addr;
     int			len;
 
     len = sizeof in_addr;
-    if (getsockname (chooserFd, (struct sockaddr *)&in_addr, &len) < 0)
+    if (getsockname (chooserFd, (struct sockaddr *)&in_addr, (void *)&len) < 0)
 	return -1;
     Debug ("Chooser socket port: %d\n", ntohs(in_addr.sin_port));
     memmove( addr, (char *) &in_addr, len);
     *lenp = len;
+
     return 0;
 }
 

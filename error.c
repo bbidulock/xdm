@@ -26,6 +26,7 @@ other dealings in this Software without prior written authorization
 from The Open Group.
 
 */
+/* $XFree86: xc/programs/xdm/error.c,v 1.7 2002/10/09 16:38:20 tsi Exp $ */
 
 /*
  * xdm - display manager daemon
@@ -37,114 +38,73 @@ from The Open Group.
  * we generally do not have a terminal to talk to
  */
 
-# include "dm.h"
 # include <stdio.h>
-#if NeedVarargsPrototypes
 # include <stdarg.h>
-#else
-/* this type needs to be big enough to contain int or pointer */
-typedef long Fmtarg_t;
-#endif
 
-/*VARARGS1*/
-LogInfo(
-#if NeedVarargsPrototypes
-    char * fmt, ...)
-#else
-    fmt, arg1, arg2, arg3, arg4, arg5, arg6)
-    char *fmt;
-    Fmtarg_t arg1, arg2, arg3, arg4, arg5, arg6;
-#endif
+# include "dm.h"
+# include "dm_error.h"
+
+#define WRITES(fd, buf) write(fd, buf, strlen(buf))
+
+void LogInfo(char * fmt, ...)
 {
-    fprintf (stderr, "xdm info (pid %d): ", getpid());
-#if NeedVarargsPrototypes
+    char buf[1024];
+
+    snprintf(buf, sizeof buf, "xdm info (pid %ld): ", (long)getpid());
+    WRITES(STDERR_FILENO, buf);
     {
 	va_list args;
 	va_start(args, fmt);
-	vfprintf (stderr, fmt, args);
+	vsnprintf (buf, sizeof buf, fmt, args);
 	va_end(args);
     }
-#else
-    fprintf (stderr, fmt, arg1, arg2, arg3, arg4, arg5, arg6);
-#endif
-    fflush (stderr);
+    WRITES(STDERR_FILENO, buf);
 }
 
-/*VARARGS1*/
-LogError (
-#if NeedVarargsPrototypes
-    char * fmt, ...)
-#else
-    fmt, arg1, arg2, arg3, arg4, arg5, arg6)
-    char *fmt;
-    Fmtarg_t arg1, arg2, arg3, arg4, arg5, arg6;
-#endif
+void LogError (char * fmt, ...)
 {
-    fprintf (stderr, "xdm error (pid %d): ", getpid());
-#if NeedVarargsPrototypes
+    char buf[1024];
+
+    snprintf (buf, sizeof buf, "xdm error (pid %ld): ", (long)getpid());
+    WRITES(STDERR_FILENO, buf);
     {
 	va_list args;
 	va_start(args, fmt);
-	vfprintf (stderr, fmt, args);
+	vsnprintf (buf, sizeof buf, fmt, args);
 	va_end(args);
     }
-#else
-    fprintf (stderr, fmt, arg1, arg2, arg3, arg4, arg5, arg6);
-#endif
-    fflush (stderr);
+    WRITES(STDERR_FILENO, buf);
 }
 
-/*VARARGS1*/
-LogPanic (
-#if NeedVarargsPrototypes
-    char * fmt, ...)
-#else
-    fmt, arg1, arg2, arg3, arg4, arg5, arg6)
-    char *fmt;
-    Fmtarg_t arg1, arg2, arg3, arg4, arg5, arg6;
-#endif
+void LogPanic (char * fmt, ...)
 {
-    fprintf (stderr, "xdm panic (pid %d): ", getpid());
-#if NeedVarargsPrototypes
+    char buf[1024];
+
+    snprintf (buf, sizeof buf, "xdm panic (pid %ld): ", (long)getpid());
+    WRITES(STDERR_FILENO, buf);
     {
 	va_list args;
 	va_start(args, fmt);
-	vfprintf (stderr, fmt, args);
+	vsnprintf (buf, sizeof buf, fmt, args);
 	va_end(args);
     }
-#else
-    fprintf (fmt, arg1, arg2, arg3, arg4, arg5, arg6);
-#endif
-    fflush (stderr);
-    exit (1);
+    WRITES(STDERR_FILENO, buf);
+    _exit (1);
 }
 
-/*VARARGS1*/
-LogOutOfMem (
-#if NeedVarargsPrototypes
-    char * fmt, ...)
-#else
-    fmt, arg1, arg2, arg3, arg4, arg5, arg6)
-    char *fmt;
-    Fmtarg_t arg1, arg2, arg3, arg4, arg5, arg6;
-#endif
+void LogOutOfMem (char * fmt, ...)
 {
     fprintf (stderr, "xdm: out of memory in routine ");
-#if NeedVarargsPrototypes
     {
 	va_list args;
 	va_start(args, fmt);
 	vfprintf (stderr, fmt, args);
 	va_end(args);
     }
-#else
-    fprintf (stderr, fmt, arg1, arg2, arg3, arg4, arg5, arg6);
-#endif
     fflush (stderr);
 }
 
-Panic (mesg)
-char	*mesg;
+void Panic (char *mesg)
 {
     int	i;
 
@@ -155,31 +115,21 @@ char	*mesg;
 }
 
 
-/*VARARGS1*/
-Debug (
-#if NeedVarargsPrototypes
-    char * fmt, ...)
-#else
-    fmt, arg1, arg2, arg3, arg4, arg5, arg6)
-    char *fmt;
-    Fmtarg_t arg1, arg2, arg3, arg4, arg5, arg6;
-#endif
+void Debug (char * fmt, ...)
 {
+    char buf[1024];
+
     if (debugLevel > 0)
     {
-#if NeedVarargsPrototypes
 	va_list args;
 	va_start(args, fmt);
-	vprintf (fmt, args);
+	vsnprintf (buf, sizeof buf, fmt, args);
 	va_end(args);
-#else
-	printf (fmt, arg1, arg2, arg3, arg4, arg5, arg6);
-#endif
-	fflush (stdout);
+	WRITES(STDOUT_FILENO, buf);
     }
 }
 
-InitErrorLog ()
+void InitErrorLog (void)
 {
 	int	i;
 	if (errorLogFile[0]) {

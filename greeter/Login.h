@@ -26,6 +26,7 @@ other dealings in this Software without prior written authorization
 from The Open Group.
 
 */
+/* $XFree86: xc/programs/xdm/greeter/Login.h,v 3.7 2002/10/06 20:42:16 herrb Exp $ */
 
 /*
  * xdm - display manager daemon
@@ -74,7 +75,32 @@ from The Open Group.
 # define XtNsessionArgument	"sessionArgument"
 # define XtNsecureSession	"secureSession"
 # define XtNallowAccess		"allowAccess"
+# define XtNallowNullPasswd	"allowNullPasswd"
+# define XtNallowRootLogin	"allowRootLogin"
 
+#ifdef XPM
+/* added by Amit Margalit Oct 1996 */
+# define XtNhiColor		"hiColor"
+# define XtNshdColor		"shdColor"
+# define XtNframeWidth		"frameWidth"
+# define XtNinnerFramesWidth	"innerFramesWidth"
+# define XtNsepWidth		"sepWidth"
+
+/* caolan begin */
+#define XtNlastEventTime "lastEventTime"
+#define XtCLastEventTime "LastEventTime"
+/* caolan end */
+
+#define XtNuseShape "useShape"
+#define XtCUseShape "UseShape"
+#define XtNlogoFileName "logoFileName"
+#define XtCLogoFileName "LogoFileName"
+#define XtNlogoPadding "logoPadding"
+#define XtCLogoPadding "LogoPadding"
+
+# define XtCFrameWidth		"FrameWidth"
+
+#endif /* XPM */
 # define XtCGreeting		"Greeting"
 # define XtCNamePrompt		"NamePrompt"
 # define XtCPasswdPrompt	"PasswdPrompt"
@@ -83,13 +109,22 @@ from The Open Group.
 # define XtCSessionArgument	"SessionArgument"
 # define XtCSecureSession	"SecureSession"
 # define XtCAllowAccess		"AllowAccess"
+# define XtCAllowNullPasswd	"AllowNullPasswd"
+# define XtCAllowRootLogin	"AllowRootLogin"
 
 /* notifyDone interface definition */
 
+#ifndef __OpenBSD__
 #define NAME_LEN	32
+#define PASSWORD_LEN	32
+#else
+#include <pwd.h>
+#define NAME_LEN	(_PW_NAME_LEN + 2)
+#define PASSWORD_LEN	(_PASSWORD_LEN + 2)
+#endif
 
 typedef struct _LoginData { 
-	char	name[NAME_LEN], passwd[NAME_LEN];
+	char	name[NAME_LEN], passwd[PASSWORD_LEN];
 } LoginData;
 
 # define NOTIFY_OK	0

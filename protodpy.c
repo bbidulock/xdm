@@ -25,6 +25,7 @@ in this Software without prior written authorization from The Open Group.
  *
  * Author:  Keith Packard, MIT X Consortium
  */
+/* $XFree86: xc/programs/xdm/protodpy.c,v 1.5 2001/12/14 20:01:23 dawes Exp $ */
 
 /*
  * protodpy.c
@@ -35,17 +36,13 @@ in this Software without prior written authorization from The Open Group.
  */
 
 #include "dm.h"
+#include "dm_error.h"
 
 #ifdef XDMCP
 
 #include <sys/types.h>
-#ifdef X_NOT_STDC_ENV
-#define Time_t long
-extern Time_t time ();
-#else
 #include <time.h>
 #define Time_t time_t
-#endif
 
 static struct protoDisplay	*protoDisplays;
 
@@ -64,10 +61,10 @@ PrintProtoDisplay (pdpy)
 #endif
 
 struct protoDisplay *
-FindProtoDisplay (address, addrlen, displayNumber)
-    XdmcpNetaddr    address;
-    int		    addrlen;
-    CARD16	    displayNumber;
+FindProtoDisplay (
+    XdmcpNetaddr    address,
+    int		    addrlen,
+    CARD16	    displayNumber)
 {
     struct protoDisplay	*pdpy;
 
@@ -83,9 +80,8 @@ FindProtoDisplay (address, addrlen, displayNumber)
     return (struct protoDisplay *) 0;
 }
 
-static
-TimeoutProtoDisplays (now)
-    Time_t    now;
+static void
+TimeoutProtoDisplays (Time_t now)
 {
     struct protoDisplay	*pdpy, *next;
 
@@ -98,14 +94,13 @@ TimeoutProtoDisplays (now)
 }
 
 struct protoDisplay *
-NewProtoDisplay (address, addrlen, displayNumber,
-		 connectionType, connectionAddress, sessionID)
-    XdmcpNetaddr    address;
-    int		    addrlen;
-    CARD16	    displayNumber;
-    CARD16	    connectionType;
-    ARRAY8Ptr	    connectionAddress;
-    CARD32	    sessionID;
+NewProtoDisplay (
+    XdmcpNetaddr    address,
+    int		    addrlen,
+    CARD16	    displayNumber,
+    CARD16	    connectionType,
+    ARRAY8Ptr	    connectionAddress,
+    CARD32	    sessionID)
 {
     struct protoDisplay	*pdpy;
     Time_t date;

@@ -26,6 +26,7 @@ other dealings in this Software without prior written authorization
 from The Open Group.
 
 */
+/* $XFree86: xc/programs/xdm/krb5auth.c,v 1.4 2001/12/14 20:01:22 dawes Exp $ */
 
 /*
  * xdm - display manager daemon
@@ -39,15 +40,16 @@ from The Open Group.
  */
 
 #include "dm.h"
+#include "dm_error.h"
+
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <krb5/krb5.h>
 #include <krb5/kdb.h>			/* for TGTNAME */
 
 /*ARGSUSED*/
-Krb5InitAuth (name_len, name)
-    unsigned short  name_len;
-    char	    *name;
+void
+Krb5InitAuth (unsigned short name_len, char *name)
 {
     krb5_init_ets();		/* initialize error_message() tables */
 }
@@ -57,8 +59,7 @@ Krb5InitAuth (name_len, name)
  * name should be freed by caller.
  */
 char *
-Krb5CCacheName(dname)
-    char *dname;
+Krb5CCacheName(char *dname)
 {
     char *name;
     char *tmpdir;
@@ -75,9 +76,7 @@ Krb5CCacheName(dname)
 }
 
 krb5_error_code
-Krb5DisplayCCache(dname, ccache_return)
-    char *dname;
-    krb5_ccache *ccache_return;
+Krb5DisplayCCache(char *dname, krb5_ccache *ccache_return)
 {
     krb5_error_code code;
     char *name;
@@ -92,10 +91,7 @@ Krb5DisplayCCache(dname, ccache_return)
 }
 
 Xauth *
-Krb5GetAuthFor(namelen, name, dname)
-    unsigned short namelen;
-    char *name;
-    char *dname;
+Krb5GetAuthFor(unsigned short namelen, char *name, char *dname)
 {
     Xauth   *new;
     char *filename;
@@ -145,9 +141,7 @@ Krb5GetAuthFor(namelen, name, dname)
 
 
 Xauth *
-Krb5GetAuth (namelen, name)
-    unsigned short  namelen;
-    char	    *name;
+Krb5GetAuth (unsigned short namelen, char *name)
 {
     return Krb5GetAuthFor(namelen, name, NULL);
 }
@@ -164,10 +158,10 @@ int preauth_search_list[] = {
  * Returns 0 if successful, 1 if not.
  */
 int
-Krb5Init(name, passwd, d)
-    char *name;
-    char *passwd;
-    struct display *d;		/* k5_ccache filled in if successful */
+Krb5Init(
+    char *name,
+    char *passwd,
+    struct display *d)		/* k5_ccache filled in if successful */
 {
     krb5_ccache ccache;
     krb5_error_code code;
