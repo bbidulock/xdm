@@ -17,8 +17,13 @@
 *viewport.allowResize:	true
 
 *list.translations:	#override \
-	<BtnDown>:	Set() CheckWilling() \n\
-	<BtnUp>(2):	Accept()
+	<Key>Return:    Accept() \n\
+	<Key>:          KeySwitch() \n\
+	<Btn1Down>:     Store() Set() CheckWilling() Setold() \n\
+	<Btn1Up>(2):    Accept() \n\
+	<Btn4Down>:     BtnSwitch() \n\
+	<Btn5Down>:     BtnSwitch()
+
 *list.defaultColumns:	1
 *list.forceColumns:	true
 

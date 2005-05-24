@@ -1,5 +1,5 @@
 /*
- * $XdotOrg$
+ * $XdotOrg: xc/programs/xdm/chooser.c,v 1.2 2004/04/23 19:54:42 eich Exp $
  * $Xorg: chooser.c,v 1.4 2001/02/09 02:05:40 xorgcvs Exp $
  *
 Copyright 1990, 1998  The Open Group
@@ -135,8 +135,10 @@ in this Software without prior written authorization from The Open Group.
 #endif /* hpux */
 
 #include    <netdb.h>
+#include    <X11/keysym.h>
 
 static int FromHex (char *s, char *d, int len);
+static int oldline;
 
 Widget	    toplevel, label, viewport, paned, list, box, cancel, acceptit, ping;
 
@@ -996,6 +998,198 @@ Choose (HostName *h)
     }
 }
 
+/*
+  next_line returns the next line in a list
+  across the list end.
+  (0, 1, 2, 3, 0, 1, 2, 3 ....)
+*/
+
+static int 
+next_line(unsigned int current, unsigned int size, int event)
+{
+  switch(event) {
+    case Button5:
+      return (current + 1) % size;
+    case Button4:
+      return (current + size - 1) % size;
+    case XK_Down:
+      return (current + 1) % size;
+    case XK_Up:
+      return (current + size - 1) % size;
+  }  
+  return -1;
+}
+
+/* 
+  Hostselect selects a given chooser line.
+  Returns 1 when host is willing and 0 if not
+*/
+
+static int
+Hostselect (int line)
+{
+  XawListReturnStruct	*r;
+  HostName		*h;
+  r = XawListShowCurrent (list);
+  /* Assume the next host is willing */
+  XawListHighlight (list,line);
+  r = XawListShowCurrent (list);
+  /* copied from DoCheckWilling */
+  for (h = hostNamedb; h; h = h->next)
+  {
+    if (!strcmp (r->string, h->fullname))
+    {
+      if (!h->willing)
+	XawListUnhighlight (list);
+      else
+      {
+	/* Scroll viewport to make sure new selection is visible */
+	Arg		size[2];
+	Dimension	height, portheight;
+	Position	y;
+	int		lineheight, liney, newy = 0;
+
+	XtSetArg (size[0], XtNheight, &height);
+	XtSetArg (size[1], XtNy, &y);
+	XtGetValues (list, size, (Cardinal) 2);
+
+	XtSetArg (size[0], XtNheight, &portheight);
+	XtGetValues (viewport, size, (Cardinal) 1);
+
+	lineheight = height / NameTableSize;
+	liney = lineheight * line;
+
+	if ((y + liney) < 0) {
+    	    XawViewportSetCoordinates(viewport, 0, liney);
+	} else if ((y + liney + lineheight) > portheight) {
+    	    XawViewportSetCoordinates(viewport, 0,
+				      (liney + lineheight) - portheight);
+	}
+	
+        return 1;
+      }
+    }
+  } 
+  return 0; 
+}
+
+/* 
+  Selectfirst selects the first willing host
+  in the chooser list (so you can select a host without
+  presence of mouse, but with pressing space or return,
+  or XK_Down / XK_Up
+*/
+
+static void
+Selectfirst (void)
+{
+  int line;
+  
+  for (line = 0; line < NameTableSize; line++)
+  {
+    if (Hostselect(line))
+      return;
+  }        
+  return;
+}
+
+/*
+  Storeold stores the selected line into global int oldentry
+*/
+
+static void
+Storeold (Widget w, XEvent *event, String *params, Cardinal *num_params)
+{
+  oldline = (XawListShowCurrent(list))->list_index;
+}
+
+/*
+  Setold restores the global int oldentry 
+  when you try to select a host with your mouse
+  who is unwilling as follows:
+  <Btn1Down>:     Store() Set() CheckWilling() Setold() \n\
+*/
+
+static void
+Setold (Widget w, XEvent *event, String *params, Cardinal *num_params)
+{
+
+  if ( (XawListShowCurrent(list))->list_index == XAW_LIST_NONE && oldline != XAW_LIST_NONE)
+    XawListHighlight (list, oldline);
+}
+
+/*
+  HostCycle tries to select the next willing host across
+  the list end and will stop at the first found willing host
+  or after trying all entries.
+*/
+
+static void
+HostCycle(unsigned int line, unsigned int size, KeySym keysym)
+{
+  unsigned int newline = line;
+  /* Do it only once around the chooser list, either direction */
+  while ( (newline = next_line(newline,size,keysym)) != line && newline != -1)
+  {
+    if (Hostselect(newline))
+      return;
+  }
+  /* No other willing host could be found, stay at the old one*/
+  XawListHighlight (list, line);
+  return;
+}
+
+/*
+  Switch_Key handles XK_Up and XK_Down
+  and highlights an appropriate line in the chooser list.
+*/
+
+static void
+Switch_Key (Widget w, XEvent *event, String *params, Cardinal *num_params)
+{
+  char strbuf[128];
+  KeySym keysym = 0;
+  static XComposeStatus compose_status = {NULL, 0};
+  XawListReturnStruct	*r;
+
+  XLookupString (&event->xkey, strbuf, sizeof (strbuf),
+                           &keysym, &compose_status);    
+
+  if (keysym != XK_Up && keysym != XK_Down)
+    return;
+
+  r = XawListShowCurrent (list);
+    
+  if (r->list_index == XAW_LIST_NONE)
+    Selectfirst();
+  else
+    HostCycle(r->list_index,NameTableSize,keysym);
+
+  return;
+}
+
+
+
+/*
+  Switch_Btn handles ScrollWheel Forward (Button5) and Backward
+  (Button4) and highlights an appropriate line in the chooser list.
+*/
+
+static void
+Switch_Btn (Widget w, XEvent *event, String *params, Cardinal *num_params)
+{
+    XawListReturnStruct	*r;
+    r = XawListShowCurrent (list);
+    
+    if (r->list_index == XAW_LIST_NONE)
+      Selectfirst();
+    else
+      HostCycle(r->list_index,NameTableSize,event->xbutton.button);
+
+  return;
+}
+
+
 /* ARGSUSED */
 static void
 DoAccept (Widget w, XEvent *event, String *params, Cardinal *num_params)
@@ -1058,6 +1252,10 @@ static XtActionsRec app_actions[] = {
     { "Cancel",	      DoCancel },
     { "CheckWilling", DoCheckWilling },
     { "Ping",	      DoPing },
+    { "KeySwitch",    Switch_Key },
+    { "BtnSwitch",    Switch_Btn },
+    { "Store",	      Storeold },
+    { "Setold",	      Setold },    
 };
 
 int
