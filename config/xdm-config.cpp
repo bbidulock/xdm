@@ -15,15 +15,17 @@ DisplayManager.willing:		SU nobody -c XDMDIR/Xwilling
 ! X terminals may not be configured that way, so they will require
 ! individual resource settings.
 DisplayManager*authorize:	true
+!
+DisplayManager*chooser:		CHOOSERPATH
+DisplayManager*resources:	XDMDIR/Xresources
+DisplayManager*startup:		XDMDIR/Xstartup
+DisplayManager*session:		XDMDIR/Xsession
+DisplayManager*reset:		XDMDIR/Xreset
+DisplayManager*authComplain:	true
 ! The following three resources set up display :0 as the console.
 DisplayManager._0.setup:	XDMDIR/Xsetup_0
 DisplayManager._0.startup:	XDMDIR/GiveConsole
 DisplayManager._0.reset:	XDMDIR/TakeConsole
-!
-DisplayManager*chooser:		CHOOSERPATH
-DisplayManager*resources:	XDMDIR/Xresources
-DisplayManager*session:		XDMDIR/Xsession
-DisplayManager*authComplain:	true
 #ifdef XPM
 DisplayManager*loginmoveInterval:	10
 #endif /* XPM */
