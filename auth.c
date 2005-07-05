@@ -1,4 +1,4 @@
-/* $XdotOrg: xc/programs/xdm/auth.c,v 1.1.4.4 2003/12/06 13:24:29 kaleb Exp $ */
+/* $XdotOrg: xc/programs/xdm/auth.c,v 1.2 2004/04/23 19:54:42 eich Exp $ */
 /* $Xorg: auth.c,v 1.5 2001/02/09 02:05:40 xorgcvs Exp $ */
 /*
 
@@ -1183,9 +1183,9 @@ writeLocalAuth (FILE *file, Xauth *auth, char *name)
 #ifdef TCPCONN
 #if defined(IPv6) && defined(AF_INET6)
     fd = socket (AF_INET6, SOCK_STREAM, 0);
-#else
-    fd = socket (AF_INET, SOCK_STREAM, 0);
+    if (fd < 0)
 #endif
+    fd = socket (AF_INET, SOCK_STREAM, 0);
     DefineSelf (fd, file, auth);
     close (fd);
 #endif
