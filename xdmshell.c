@@ -57,6 +57,10 @@ in this Software without prior written authorization from The Open Group.
 /*
  * HP-UX does have vfork, but A/UX doesn't
  */
+#ifdef HAVE_WORKING_VFORK /* autoconf's preferred name */
+# define HAS_VFORK
+#endif
+
 #ifndef HAS_VFORK
 #define vfork() fork()
 #endif
