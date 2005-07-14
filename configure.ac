@@ -31,9 +31,27 @@ AM_CONFIG_HEADER(config.h)
 AC_PROG_CC
 AC_PROG_INSTALL
 
+AC_FUNC_FORK
+AC_CHECK_FUNC(mkstemp, 
+   AC_DEFINE(HAS_MKSTEMP,1,[Define to 1 if you have the `mkstemp' function.]))
 
-AC_CHECK_LIB(rpcsvc, xdr_status, has_secure_rpc=yes, has_secure_rpc=no)
-AM_CONDITIONAL(HAS_SECURE_RPC, test x$has_secure_rpc = xyes)
+XTRANS_TCP_FLAGS
+dnl Sets $SECURE_RPC to "yes" or "no"
+XTRANS_SECURE_RPC_FLAGS
+AM_CONDITIONAL(HAS_SECURE_RPC, test x$SECURE_RPC = xyes)
+
+# Check for PAM support
+AC_ARG_WITH(pam, AC_HELP_STRING([--with-pam],[Use PAM for authentication]),
+	[USE_PAM=$withval], [USE_PAM="try"])
+if test "x$USE_PAM" != "xno" ; then
+	AC_SEARCH_LIBS(pam_open_session,[pam])
+	AC_CHECK_FUNC(pam_open_session, 
+		[AC_DEFINE(USE_PAM,1,[Use PAM for authentication])],
+		[if test "x$USE_PAM" != "xtry" ; then
+			AC_MSG_ERROR(["PAM support requested, but pam_open_session not found."])
+		 fi])
+fi
+
 
 # FIXME: find out how to check for these things. Note that Kerberos was
 # turned off everywhere but on OpenBSD.
@@ -65,6 +83,8 @@ AC_SUBST(XDM_LIBS)
 # Chooser
 #
 XAW_CHECK_XPRINT_SUPPORT(CHOOSER)
+
+CHOOSER_LIBS="$CHOOSER_LIBS $DMCP_LIBS"
 
 AC_SUBST(CHOOSER_CFLAGS)
 AC_SUBST(CHOOSER_LIBS)

@@ -25,7 +25,7 @@ bin_PROGRAMS = xdm xdmshell sessreg chooser
 # xdm
 #
 
-xdm_CFLAGS = $(XDM_CFLAGS) -D_XOPEN_SOURCE -DPOSIX_SOURCE -D_BSD_SOURCE
+xdm_CFLAGS = $(XDM_CFLAGS)
 xdm_LDADD = $(XDM_LIBS)
 
 xdm_SOURCES =	\
