@@ -25,7 +25,7 @@ bin_PROGRAMS = xdm xdmshell sessreg chooser
 # xdm
 #
 
-xdm_CFLAGS = $(XDM_CFLAGS)
+xdm_CFLAGS = $(XDM_CFLAGS) -D_BSD_SOURCE
 xdm_LDADD = $(XDM_LIBS)
 
 xdm_SOURCES =	\
@@ -50,7 +50,6 @@ xdm_SOURCES =	\
         genauth.c \
         access.c \
         choose.c \
-        xdmauth.c		\
 	greeter/greet.c		\
 	greeter/Login.c		\
 	greeter/Login.h		\
@@ -83,6 +82,7 @@ endif
 #
 #  xdmshell
 #
+xdmshell_CFLAGS = $(XPROTO_CFLAGS)
 
 xdmshell_SOURCES =	\
         xdmshell.c
@@ -90,6 +90,8 @@ xdmshell_SOURCES =	\
 #
 #  sessreg
 #
+
+sessreg_CFLAGS = $(XPROTO_CFLAGS)
 
 sessreg_SOURCES =	\
 	sessreg.c
