@@ -30,6 +30,7 @@ AM_CONFIG_HEADER(config.h)
 
 AC_PROG_CC
 AC_PROG_INSTALL
+AC_CANONICAL_HOST
 
 AC_FUNC_FORK
 AC_CHECK_FUNC(mkstemp, 
@@ -52,6 +53,14 @@ if test "x$USE_PAM" != "xno" ; then
 		 fi])
 fi
 
+case $host_os in
+    linux*)
+        OS_CFLAGS="-D_XOPEN_SOURCE"
+        ;;
+    *)
+        OS_CFLAGS=
+        ;;
+esac
 
 # FIXME: find out how to check for these things. Note that Kerberos was
 # turned off everywhere but on OpenBSD.
@@ -68,7 +77,7 @@ XAW_CHECK_XPRINT_SUPPORT(XDM)
 
 PKG_CHECK_MODULES(DMCP, xdmcp)
 PKG_CHECK_MODULES(XPROTO, xproto)
-XDM_CFLAGS="$XDM_CFLAGS $DMCP_CFLAGS $XPROTO_CFLAGS"
+XDM_CFLAGS="$XDM_CFLAGS $DMCP_CFLAGS $XPROTO_CFLAGS $OS_CFLAGS"
 XDM_LIBS="$XDM_LIBS $DMCP_LIBS"
 
 
