@@ -22,7 +22,7 @@ dnl
 dnl Process this file with autoconf to create configure.
 
 AC_PREREQ([2.57])
-AC_INIT(xdm,[7.0], [xorg@freedesktop.org],xdm)
+AC_INIT(xdm,[0.99.0], [https://bugs.freedesktop.org/enter_bug.cgi?product=xorg],xdm)
 AM_INIT_AUTOMAKE([dist-bzip2])
 AM_MAINTAINER_MODE
 
@@ -100,5 +100,7 @@ CHOOSER_LIBS="$CHOOSER_LIBS $DMCP_LIBS"
 
 AC_SUBST(CHOOSER_CFLAGS)
 AC_SUBST(CHOOSER_LIBS)
+
+XORG_RELEASE_VERSION
 
 AC_OUTPUT([Makefile])
