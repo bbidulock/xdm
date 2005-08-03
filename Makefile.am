@@ -91,7 +91,7 @@ xdmshell_SOURCES =	\
 #  sessreg
 #
 
-sessreg_CFLAGS = $(XPROTO_CFLAGS)
+sessreg_CFLAGS = $(SESSREG_CFLAGS)
 
 sessreg_SOURCES =	\
 	sessreg.c

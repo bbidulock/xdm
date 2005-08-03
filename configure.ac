@@ -34,16 +34,27 @@ AC_CANONICAL_HOST
 
 AC_FUNC_FORK
 AC_CHECK_FUNC(mkstemp, 
-   AC_DEFINE(HAS_MKSTEMP,1,[Define to 1 if you have the `mkstemp' function.]))
+   AC_DEFINE(HAS_MKSTEMP,1,[Define to 1 if you have the 'mkstemp' function.]))
 
 XTRANS_TCP_FLAGS
+XTRANS_CONNECTION_FLAGS
 dnl Sets $SECURE_RPC to "yes" or "no"
 XTRANS_SECURE_RPC_FLAGS
 AM_CONDITIONAL(HAS_SECURE_RPC, test x$SECURE_RPC = xyes)
 
+# darwin could have PAM support, but not yet
+case $host_os in
+    darwin*)
+        use_pam_default=no
+        ;;
+    *)
+        use_pam_default=try
+        ;;
+esac
+
 # Check for PAM support
 AC_ARG_WITH(pam, AC_HELP_STRING([--with-pam],[Use PAM for authentication]),
-	[USE_PAM=$withval], [USE_PAM="try"])
+	[USE_PAM=$withval], [USE_PAM=$use_pam_default])
 if test "x$USE_PAM" != "xno" ; then
 	AC_SEARCH_LIBS(pam_open_session,[pam])
 	AC_CHECK_FUNC(pam_open_session, 
@@ -56,6 +67,9 @@ fi
 case $host_os in
     linux*)
         OS_CFLAGS="-D_XOPEN_SOURCE"
+        ;;
+    darwin*)
+        OS_CFLAGS="-D__DARWIN__ -DNO_LASTLOG"
         ;;
     *)
         OS_CFLAGS=
@@ -89,6 +103,12 @@ AM_CONDITIONAL(HAS_XDM_AUTH, test x$xdmauth = xyes)
 AC_SUBST(XDM_CFLAGS)
 AC_SUBST(XDM_LIBS)
 
+#
+# sessreg
+#
+
+SESSREG_CFLAGS="$XPROTO_CFLAGS $OS_CFLAGS"
+AC_SUBST(SESSREG_CFLAGS)
 
 #
 # Chooser
