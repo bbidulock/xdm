@@ -19,7 +19,7 @@
 #  TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 #  PERFORMANCE OF THIS SOFTWARE.
 
-bin_PROGRAMS = xdm xdmshell sessreg chooser
+bin_PROGRAMS = xdm xdmshell chooser
 
 #
 # xdm
@@ -86,15 +86,6 @@ xdmshell_CFLAGS = $(XPROTO_CFLAGS)
 
 xdmshell_SOURCES =	\
         xdmshell.c
-
-#
-#  sessreg
-#
-
-sessreg_CFLAGS = $(SESSREG_CFLAGS)
-
-sessreg_SOURCES =	\
-	sessreg.c
 
 #
 #  chooser
