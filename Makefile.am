@@ -19,7 +19,10 @@
 #  TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 #  PERFORMANCE OF THIS SOFTWARE.
 
-bin_PROGRAMS = xdm xdmshell chooser
+bin_PROGRAMS = xdm xdmshell
+
+xdmdir = $(libdir)/xdm
+xdm_PROGRAMS = chooser
 
 #
 # xdm
