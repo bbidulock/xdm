@@ -32,11 +32,32 @@ AC_PROG_CC
 AC_PROG_INSTALL
 AC_CANONICAL_HOST
 
-AC_FUNC_FORK
-AC_CHECK_FUNC(mkstemp, 
-   AC_DEFINE(HAS_MKSTEMP,1,[Define to 1 if you have the 'mkstemp' function.]))
+XORG_PROG_RAWCPP
 
-XTRANS_TCP_FLAGS
+AC_FUNC_FORK
+AC_CHECK_FUNC(mkstemp, AC_DEFINE(HAS_MKSTEMP,1,
+	[Define to 1 if you have the 'mkstemp' function.]))
+AC_CHECK_FUNC(getifaddrs, AC_DEFINE(HAS_GETIFADDRS,1,
+	[Define to 1 if you have the 'getifaddrs' function.]))
+
+# According to the old Imakefile, FreeBSD has this in libutil
+AC_CHECK_FUNC(setproctitle, [HAS_SETPROCTITLE="yes"],
+	AC_CHECK_LIB(util, setproctitle, 
+		     [HAS_SETPROCTITLE="yes" ; XDM_LIBS="$(XDM_LIBS) -lutil"]))
+if test "x$HAS_SETPROCTITLE" = "xyes" ; then
+	AC_DEFINE(HAS_SETPROCTITLE,1,
+		[Define to 1 if you have the 'setproctitle' function.])
+fi
+
+# According to the old Imakefile, BSD/OS has this in libutil
+AC_CHECK_FUNC(setusercontext, [HAS_SETUSERCONTEXT="yes"],
+	AC_CHECK_LIB(util, setusercontext, 
+		    [HAS_SETUSERCONTEXT="yes" ; XDM_LIBS="$(XDM_LIBS) -lutil"]))
+if test "x$HAS_SETUSERCONTEXT" = "xyes" ; then
+	AC_DEFINE(HAS_SETUSERCONTEXT,1,
+		[Define to 1 if you have the 'setusercontext' function.])
+fi
+
 XTRANS_CONNECTION_FLAGS
 dnl Sets $SECURE_RPC to "yes" or "no"
 XTRANS_SECURE_RPC_FLAGS
@@ -64,24 +85,94 @@ if test "x$USE_PAM" != "xno" ; then
 		 fi])
 fi
 
+# FIXME: Find better test for which OS'es use su -m  - for now, just try to
+# mirror the Imakefile setting of:
+# if  defined(OpenBSDArchitecture) || defined(NetBSDArchitecture) || defined(FreeBSDArchitecture) || defined(DarwinArchitecture)
+
+
 case $host_os in
     linux*)
         OS_CFLAGS="-D_XOPEN_SOURCE"
+	SU="su"
         ;;
     darwin*)
         OS_CFLAGS="-D__DARWIN__ -DNO_LASTLOG"
+	SU="su -m"
+        ;;
+    *bsd*)
+        OS_CFLAGS="-DCSRG_BASED"
+	SU="su -m"
         ;;
     *)
         OS_CFLAGS=
+	SU="su"
         ;;
 esac
+AC_SUBST(SU)
 
 # FIXME: find out how to check for these things. Note that Kerberos was
 # turned off everywhere but on OpenBSD.
 AM_CONDITIONAL(HAS_KERBEROS_FIVE, false)
 AM_CONDITIONAL(HAS_ARC4_RANDOM, false)
 
+# Figure out where everything goes in the filesystem
+
+AC_ARG_WITH(logdir,
+	AC_HELP_STRING([--with-logdir=<pathname>],
+	  [specify directory for xdm log files (default=/var/log)]),
+	[XDMLOGDIR="$withval"], [XDMLOGDIR="/var/log"])
+AC_SUBST(XDMLOGDIR)
+
+AC_ARG_WITH(piddir,
+	AC_HELP_STRING([--with-piddir=<pathname>],
+	  [specify directory for xdm pid files (default=/var/run)]),
+	[XDMPIDDIR="$withval"], [XDMPIDDIR="/var/run"])
+AC_SUBST(XDMPIDDIR)
+
+AC_ARG_WITH(default-vt,
+	AC_HELP_STRING([--with-default-vt=<vtname>],
+	  [specify default vt to start xdm on (default=none)]),
+	[DEFAULTVT="$withval"], [DEFAULTVT=""])
+AC_SUBST(DEFAULTVT)
+
+AC_ARG_WITH(config-type,
+	AC_HELP_STRING([--with-config-type={ws|fs}],
+	 [default config file type to use - workstation (ws) or fileserver (fs) (default=ws)]),
+	[SERVERSTYPE="$withval"], [SERVERSTYPE="ws"])
+AC_SUBST(SERVERSTYPE)
+
 # Checks for pkg-config packages
+
+PKG_CHECK_MODULES(XPM, xpm)
+
+# XPM logos for the greeter screen
+AC_ARG_ENABLE(xpm-logos, 
+    	AC_HELP_STRING([--enable-xpm-logos], 
+			[Display xpm logos in greeter (default is YES)]),
+	[USE_XPM="$enableval"], [USE_XPM="yes"])
+if test "x$USE_XPM" = "xyes" ; then
+	AC_DEFINE([XPM], 1, 
+		[Define to 1 to display XPM logos on greeter screen])
+fi
+AM_CONDITIONAL(USE_XPM, test "x$USE_XPM" = "xyes")
+
+AC_ARG_WITH(color-pixmap,
+	AC_HELP_STRING([--with-color-pixmap=<filename>],
+		[specify xpm file to use as color logo (default=xorg.xpm)]),
+	[XDM_PIXMAP="$withval"], [XDM_PIXMAP="xorg.xpm"])
+AC_ARG_WITH(bw-pixmap,
+	AC_HELP_STRING([--with-bw-pixmap=<filename>],
+      [specify xpm file to use as black-and-white logo (default=xorg-bw.xpm)]),
+	[XDM_BWPIXMAP="$withval"], [XDM_BWPIXMAP="xorg-bw.xpm"])
+AC_ARG_WITH(pixmapdir,
+	AC_HELP_STRING([--with-pixmapdir=<pathname>],
+	   [specify directory for xpm files (default=${libdir}/xdm/pixmaps)]),
+	[XDM_PIXMAPDIR="$withval"], [XDM_PIXMAPDIR='${libdir}/xdm/pixmaps'])
+
+AC_SUBST(XDM_PIXMAP)
+AC_SUBST(XDM_BWPIXMAP)
+AC_SUBST(XDM_PIXMAPDIR)
+
 
 #
 #  XDM
@@ -116,4 +207,4 @@ AC_SUBST(CHOOSER_LIBS)
 
 XORG_RELEASE_VERSION
 
-AC_OUTPUT([Makefile])
+AC_OUTPUT([Makefile config/Makefile])

@@ -19,6 +19,8 @@
 #  TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 #  PERFORMANCE OF THIS SOFTWARE.
 
+SUBDIRS = config
+
 bin_PROGRAMS = xdm xdmshell
 
 xdmdir = $(libdir)/xdm
@@ -83,9 +85,30 @@ xdm_SOURCES += krb5auth.c
 endif
 
 #
+#  xdm man page 
+#
+
+man1_MANS = xdm.man
+
+BUILT_SOURCES = $(man1_MANS)
+EXTRA_DIST = $(libman_SOURCES:man=man.cpp)
+
+include $(top_srcdir)/cpprules.in
+
+XORGRELSTRING = @PACKAGE_STRING@
+  XORGMANNAME = X Version 11
+
+EXTRAMANDEFS = \
+	-D__xorgversion__="\"$(XORGRELSTRING)\" \"$(XORGMANNAME)\"" \
+	-DCHOOSERPATH=$(pkglibdir)/chooser -DXDMLOGDIR=$(XDMLOGDIR) \
+	-DXDMDIR=$(pkglibdir) -DBINDIR=$(bindir)
+
+CPP_FILES_FLAGS = $(MANDEFS) $(EXTRAMANDEFS)
+
+#
 #  xdmshell
 #
-xdmshell_CFLAGS = $(XPROTO_CFLAGS)
+xdmshell_CFLAGS = $(XPROTO_CFLAGS) -DBINDIR=$(bindir)
 
 xdmshell_SOURCES =	\
         xdmshell.c
