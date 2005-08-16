@@ -1,4 +1,4 @@
-.\" $XdotOrg: xc/programs/xdm/xdm.man,v 1.2 2004/04/23 19:54:42 eich Exp $
+.\" $XdotOrg: xc/programs/xdm/xdm.man,v 1.3 2004/07/26 22:56:33 herrb Exp $
 .\" $Xorg: xdm.man,v 1.4 2001/02/09 02:05:41 xorgcvs Exp $
 .\" Copyright 1988, 1994, 1998  The Open Group
 .\"
@@ -164,7 +164,7 @@ as resources.
 Names the configuration file, which specifies resources to control
 the behavior of
 .I xdm.
-.I __projectroot__/lib/X11/xdm/xdm-config
+.I XDMDIR/xdm-config
 is the default.
 See the section \fBConfiguration File\fP.
 .IP "\fB\-nodaemon\fP"
@@ -306,7 +306,7 @@ uses the \fIlockf\fP library call, while on BSD it uses \fIflock.\fP
 This names a directory under which
 .I xdm
 stores authorization files while initializing the session.  The
-default value is \fI __projectroot__/lib/X11/xdm.\fP
+default value is \fI XDMDIR.\fP
 Can be overridden for specific displays by
 DisplayManager.\fIDISPLAY\fP.authFile.
 .IP \fBDisplayManager.autoRescan\fP
@@ -374,7 +374,7 @@ algorithm is used instead.
 .IP \fBDisplayManager.greeterLib\fP
 On systems that support a dynamically-loadable greeter library, the
 name of the library.  The default is
-\fI __projectroot__/lib/X11/xdm/libXdmGreet.so\fP.
+\fI XDMDIR/libXdmGreet.so\fP.
 .IP \fBDisplayManager.choiceTimeout\fP
 Number of seconds to wait for display to respond after user has
 selected a host from the chooser.  If the display sends an XDMCP
@@ -406,7 +406,7 @@ section
 which describes the various
 resources that are appropriate to place in this file.
 There is no default value for this resource, but
-\fI __projectroot__/lib/X11/xdm/Xresources\fP
+\fI XDMDIR/Xresources\fP
 is the conventional name.
 .IP "\fBDisplayManager.\fP\fIDISPLAY\fP\fB.chooser\fP"
 Specifies the program run to offer a host menu for Indirect queries
@@ -416,7 +416,7 @@ See the sections \fBXDMCP Access Control\fP and \fBChooser\fP.
 .IP "\fBDisplayManager.\fP\fIDISPLAY\fP\fB.xrdb\fP"
 Specifies the program used to load the resources.  By default,
 .I xdm
-uses \fI __projectroot__/bin/xrdb\fP.
+uses \fI BINDIR/xrdb\fP.
 .IP "\fBDisplayManager.\fP\fIDISPLAY\fP\fB.cpp\fP"
 This specifies the name of the C preprocessor which is used by \fIxrdb\fP.
 .IP "\fBDisplayManager.\fP\fIDISPLAY\fP\fB.setup\fP"
@@ -434,7 +434,7 @@ file used here is \fIXstartup\fP.
 See the section \fBStartup Program.\fP
 .IP "\fBDisplayManager.\fP\fIDISPLAY\fP\fB.session\fP"
 This specifies the session to be executed (not running as root).
-By default, \fI __projectroot__/bin/xterm\fP is
+By default, \fI BINDIR/xterm\fP is
 run.  The conventional name is \fIXsession\fP.
 See the section
 .B "Session Program."
@@ -497,7 +497,7 @@ sets the PATH environment variable for the session to this value.  It should
 be a colon separated list of directories; see
 .IR sh (1)
 for a full description.
-``:/bin:/usr/bin:__projectroot__/bin:/usr/ucb''
+``:/bin:/usr/bin:BINDIR:/usr/ucb''
 is a common setting.
 The default value can be specified at build time in the X system
 configuration file with DefaultUserPath.
@@ -506,7 +506,7 @@ configuration file with DefaultUserPath.
 sets the PATH environment variable for the startup and reset scripts to the
 value of this resource.  The default for this resource is specified
 at build time by the DefaultSystemPath entry in the system configuration file;
-``/etc:/bin:/usr/bin:__projectroot__/bin:/usr/ucb'' is a common choice.
+``/etc:/bin:/usr/bin:BINDIR:/usr/ucb'' is a common choice.
 Note the absence of ``.'' from this entry.  This is a good practice to
 follow for root; it avoids many common Trojan Horse system penetration
 schemes.
@@ -520,7 +520,7 @@ If the default session fails to execute,
 will fall back to this program.  This program is executed with no
 arguments, but executes using the same environment variables as
 the session would have had (see the section \fBSession Program\fP).
-By default, \fI __projectroot__/bin/xterm\fP is used.
+By default, \fI BINDIR/xterm\fP is used.
 .IP "\fBDisplayManager.\fP\fIDISPLAY\fP\fB.grabServer\fP"
 .IP "\fBDisplayManager.\fP\fIDISPLAY\fP\fB.grabTimeout\fP"
 To improve security,
@@ -599,7 +599,7 @@ variable XAUTHORITY at the created file.  It uses \fI/tmp\fP by default.
 First, the
 .I xdm
 configuration file should be set up.
-Make a directory (usually \fI __projectroot__/lib/X11/xdm\fP) to contain all
+Make a directory (usually \fI XDMDIR\fP) to contain all
 of the relevant files.
 .LP
 Here is a reasonable configuration file, which could be
@@ -608,12 +608,12 @@ named \fIxdm-config\fP:
 
 .ta .5i 4i
 
-	DisplayManager.servers:	__projectroot__/lib/X11/xdm/Xservers
+	DisplayManager.servers:	XDMDIR/Xservers
 	DisplayManager.errorLogFile:	XDMLOGDIR/xdm.log
-	DisplayManager*resources:	__projectroot__/lib/X11/xdm/Xresources
-	DisplayManager*startup:	__projectroot__/lib/X11/xdm/Xstartup
-	DisplayManager*session:	__projectroot__/lib/X11/xdm/Xsession
-	DisplayManager.pidFile:	__projectroot__/lib/X11/xdm/xdm-pid
+	DisplayManager*resources:	XDMDIR/Xresources
+	DisplayManager*startup:	XDMDIR/Xstartup
+	DisplayManager*session:	XDMDIR/Xsession
+	DisplayManager.pidFile:	XDMDIR/xdm-pid
 	DisplayManager._0.authorize:	true
 	DisplayManager*authorize:	false
 
@@ -824,7 +824,7 @@ line to start the server.  A typical entry for local display number 0 would
 be:
 .nf
 
-  :0 Digital-QV local __projectroot__/bin/X :0
+  :0 Digital-QV local BINDIR/X :0
 
 .fi
 The display types are:
@@ -839,8 +839,8 @@ foreign		remote display: \fIxdm\fP opens an X connection to a running server
 The display name must be something that can be passed in the \fB\-display\fP
 option to an X program.  This string is used to generate the display-specific
 resource names, so be careful to match the
-names (e.g., use ``:0 Sun-CG3 local __projectroot__/bin/X :0'' instead of
-``localhost:0 Sun-CG3 local __projectroot__/bin/X :0''
+names (e.g., use ``:0 Sun-CG3 local BINDIR/X :0'' instead of
+``localhost:0 Sun-CG3 local BINDIR/X :0''
 if your other resources are specified as
 ``DisplayManager._0.session'').  The display class portion is also used in the
 display-specific resources, as the class of the resource.  This is
@@ -926,7 +926,7 @@ Here is a sample \fIXsetup\fP script:
 
 \&	#!/bin/sh
 \&	# Xsetup_0 \- setup script for one workstation
-	xcmsdb < __projectroot__/lib/monitors/alex.0
+	xcmsdb < XDMDIR/monitors/alex.0
 	xconsole\0\-geometry\0480x130\-0\-0\0\-notify\0\-verbose\0\-exitOnFail &
 
 .fi
@@ -1123,8 +1123,8 @@ Here is a sample \fIXstartup\fP script:
 		xmessage\0\-file /etc/nologin\0\-timeout 30\0\-center
 		exit 1
 	fi
-	sessreg\0\-a\0\-l $DISPLAY\0\-x __projectroot__/lib/xdm/Xservers $LOGNAME
-	__projectroot__/lib/xdm/GiveConsole
+	sessreg\0\-a\0\-l $DISPLAY\0\-x XDMDIR/Xservers $LOGNAME
+	XDMDIR/GiveConsole
 	exit 0
 .fi
 .SH "SESSION PROGRAM"
@@ -1237,8 +1237,8 @@ A sample \fIXreset\fP script:
 \&	#
 \&	# This program is run as root after the session ends
 \&	#
-	sessreg\0\-d\0\-l $DISPLAY\0\-x __projectroot__/lib/xdm/Xservers $LOGNAME
-	__projectroot__/lib/xdm/TakeConsole
+	sessreg\0\-d\0\-l $DISPLAY\0\-x XDMDIR/Xservers $LOGNAME
+	XDMDIR/TakeConsole
 	exit 0
 .fi
 .SH "CONTROLLING THE SERVER"
@@ -1310,7 +1310,7 @@ line:
 .nf
 .ta .5i
 
-	xdm \-server \(lq:0 SUN-3/60CG4 local __projectroot__/bin/X :0\(rq
+	xdm \-server \(lq:0 SUN-3/60CG4 local BINDIR/X :0\(rq
 
 .fi
 .PP
@@ -1341,7 +1341,7 @@ interested in
 .I xinit.
 .SH FILES
 .TP 20
-.I __projectroot__/lib/X11/xdm/xdm-config
+.I XDMDIR/xdm-config
 the default configuration file
 .TP 20
 .I $HOME/.Xauthority
@@ -1350,16 +1350,16 @@ user authorization file where \fIxdm\fP stores keys for clients to read
 .I CHOOSERPATH
 the default chooser
 .TP 20
-.I __projectroot__/bin/xrdb
+.I BINDIR/xrdb
 the default resource database loader
 .TP 20
-.I __projectroot__/bin/X
+.I BINDIR/X
 the default server
 .TP 20
-.I __projectroot__/bin/xterm
+.I BINDIR/xterm
 the default session program and failsafe client
 .TP 20
-.I __projectroot__/lib/X11/xdm/A<display>\-<suffix>
+.I XDMDIR/A<display>\-<suffix>
 the default place for authorization files
 .TP 20
 .I /tmp/K5C<display>
