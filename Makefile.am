@@ -91,7 +91,7 @@ endif
 man1_MANS = xdm.man
 
 BUILT_SOURCES = $(man1_MANS)
-EXTRA_DIST = $(libman_SOURCES:man=man.cpp)
+EXTRA_DIST = $(man1_MANS:man=man.cpp)
 
 include $(top_srcdir)/cpprules.in
 

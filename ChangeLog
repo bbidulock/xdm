@@ -1,0 +1,5 @@
+2005-08-17  Adam Jackson  <ajax@freedesktop.org>
+
+	* configure.ac:
+	* Makefile.am:
+	Fix EXTRA_DIST to point to a real variable.  Bump to 0.99.1.
