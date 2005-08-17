@@ -39,11 +39,14 @@ AC_CHECK_FUNC(mkstemp, AC_DEFINE(HAS_MKSTEMP,1,
 	[Define to 1 if you have the 'mkstemp' function.]))
 AC_CHECK_FUNC(getifaddrs, AC_DEFINE(HAS_GETIFADDRS,1,
 	[Define to 1 if you have the 'getifaddrs' function.]))
+AC_CHECK_FUNC(getspnam, AC_DEFINE(USESHADOW,1,
+	[Define to 1 if you have the shadow password functions.]))
+
 
 # According to the old Imakefile, FreeBSD has this in libutil
 AC_CHECK_FUNC(setproctitle, [HAS_SETPROCTITLE="yes"],
 	AC_CHECK_LIB(util, setproctitle, 
-		     [HAS_SETPROCTITLE="yes" ; XDM_LIBS="$(XDM_LIBS) -lutil"]))
+		     [HAS_SETPROCTITLE="yes" ; XDM_LIBS="$XDM_LIBS -lutil"]))
 if test "x$HAS_SETPROCTITLE" = "xyes" ; then
 	AC_DEFINE(HAS_SETPROCTITLE,1,
 		[Define to 1 if you have the 'setproctitle' function.])
@@ -52,7 +55,7 @@ fi
 # According to the old Imakefile, BSD/OS has this in libutil
 AC_CHECK_FUNC(setusercontext, [HAS_SETUSERCONTEXT="yes"],
 	AC_CHECK_LIB(util, setusercontext, 
-		    [HAS_SETUSERCONTEXT="yes" ; XDM_LIBS="$(XDM_LIBS) -lutil"]))
+		    [HAS_SETUSERCONTEXT="yes" ; XDM_LIBS="$XDM_LIBS -lutil"]))
 if test "x$HAS_SETUSERCONTEXT" = "xyes" ; then
 	AC_DEFINE(HAS_SETUSERCONTEXT,1,
 		[Define to 1 if you have the 'setusercontext' function.])
@@ -143,14 +146,26 @@ AC_SUBST(SERVERSTYPE)
 
 # Checks for pkg-config packages
 
-PKG_CHECK_MODULES(XPM, xpm)
+PKG_CHECK_EXISTS(xinerama, [
+	AC_DEFINE([USE_XINERAMA], 1, 
+		[Define to 1 to use XINERAMA in greeter & chooser])
+	PKG_CHECK_MODULES(XINERAMA, xinerama)
+	XDM_CFLAGS="$XDM_CFLAGS $XINERAMA_CFLAGS"
+	XDM_LIBS="$XDM_LIBS $XINERAMA_LIBS"
+	CHOOSER_CFLAGS="$CHOOSER_CFLAGS $XINERAMA_CFLAGS"
+	CHOOSER_LIBS="$CHOOSER_LIBS $XINERAMA_LIBS"
+])
 
 # XPM logos for the greeter screen
 AC_ARG_ENABLE(xpm-logos, 
     	AC_HELP_STRING([--enable-xpm-logos], 
 			[Display xpm logos in greeter (default is YES)]),
-	[USE_XPM="$enableval"], [USE_XPM="yes"])
+	[USE_XPM="$enableval"], 
+	PKG_CHECK_EXISTS(xpm, [USE_XPM="yes"], [USE_XPM="no"]))
 if test "x$USE_XPM" = "xyes" ; then
+	PKG_CHECK_MODULES(XPM, xpm)
+	XDM_CFLAGS="$XDM_CFLAGS $XPM_CFLAGS"
+	XDM_LIBS="$XDM_LIBS $XPM_LIBS"
 	AC_DEFINE([XPM], 1, 
 		[Define to 1 to display XPM logos on greeter screen])
 fi
@@ -178,12 +193,12 @@ AC_SUBST(XDM_PIXMAPDIR)
 #  XDM
 #
 
-XAW_CHECK_XPRINT_SUPPORT(XDM)
+XAW_CHECK_XPRINT_SUPPORT(XDM_PRINT)
 
 PKG_CHECK_MODULES(DMCP, xdmcp)
 PKG_CHECK_MODULES(XPROTO, xproto)
-XDM_CFLAGS="$XDM_CFLAGS $DMCP_CFLAGS $XPROTO_CFLAGS $OS_CFLAGS"
-XDM_LIBS="$XDM_LIBS $DMCP_LIBS"
+XDM_CFLAGS="$XDM_CFLAGS $XDM_PRINT_CFLAGS $DMCP_CFLAGS $XPROTO_CFLAGS $OS_CFLAGS"
+XDM_LIBS="$XDM_LIBS $XDM_PRINT_LIBS $DMCP_LIBS"
 
 
 AC_CHECK_LIB(Xdmcp, XdmcpWrap, [xdmauth="yes"], [xdmauth="no"], [$DMCP_LIBS])
@@ -197,10 +212,9 @@ AC_SUBST(XDM_LIBS)
 #
 # Chooser
 #
-XAW_CHECK_XPRINT_SUPPORT(CHOOSER)
 
-CHOOSER_CFLAGS="-D_BSD_SOURCE $XPROTO_CFLAGS"
-CHOOSER_LIBS="$CHOOSER_LIBS $DMCP_LIBS"
+CHOOSER_CFLAGS="-D_BSD_SOURCE $XDM_PRINT_CFLAGS $XPROTO_CFLAGS"
+CHOOSER_LIBS="$CHOOSER_LIBS $XDM_PRINT_LIBS $DMCP_LIBS"
 
 AC_SUBST(CHOOSER_CFLAGS)
 AC_SUBST(CHOOSER_LIBS)
