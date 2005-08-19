@@ -1,4 +1,5 @@
 /* $Xorg: greet.c,v 1.4 2001/02/09 02:05:41 xorgcvs Exp $ */
+/* $XdotOrg: $ */
 /*
 
 Copyright 1988, 1998  The Open Group
@@ -35,6 +36,10 @@ from The Open Group.
  * widget to get username/password
  *
  */
+
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
 
 #include <X11/Intrinsic.h>
 #include <X11/StringDefs.h>
