@@ -90,6 +90,8 @@ endif
 
 man1_MANS = xdm.man
 
+DISTCLEANFILES = $(man1_MANS)
+
 BUILT_SOURCES = $(man1_MANS)
 EXTRA_DIST = $(man1_MANS:man=man.cpp)
 
