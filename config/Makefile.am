@@ -3,13 +3,14 @@
 
 include $(top_srcdir)/cpprules.in
 
-pkglib_DATA = \
+dist_pkglib_DATA = \
 	xdm-config \
 	Xresources \
-	Xservers \
 	Xaccess
 
-pkglib_SCRIPTS = \
+pkglib_DATA = Xservers
+
+dist_pkglib_SCRIPTS = \
 	Xsession \
 	GiveConsole \
 	TakeConsole \
@@ -20,14 +21,19 @@ pkglib_SCRIPTS = \
 
 pixmapdir = $(pkglibdir)/pixmaps
 
-pixmap_DATA = xorg-bw.xpm xorg.xpm
+dist_pixmap_DATA = xorg-bw.xpm xorg.xpm
 
 BUILT_SOURCES = Xservers.ws
 
 CLEANFILES = $(BUILT_SOURCES) Xservers Xservers.ws xdm-config Xresources
 
-Xservers:
+EXTRA_DIST = Xservers.ws.cpp
+
+Xservers: Xservers.$(SERVERSTYPE)
 	ln -s Xservers.$(SERVERSTYPE) Xservers
+
+Xservers.ws: $(srcdir)/Xservers.ws.cpp
+	$(RAWCPP) -DBINDIR=@bindir@ -DSERVERNAME=7 < $< > $@
 
 # Defines used when cpp'ing config files to replace settings in the files
 
