@@ -35,6 +35,12 @@ AC_CANONICAL_HOST
 XORG_PROG_RAWCPP
 
 AC_FUNC_FORK
+
+dnl If you're looking here because you got a message that said
+dnl 'error: possibly undefined macro: AC_DEFINE', the source of
+dnl your problem is not here.   You need to upgrade to pkgconfig 0.18
+dnl or later to get an updated pkg.m4 with PKG_CHECK_EXISTS defined.
+dnl See http://www.mail-archive.com/autoconf@gnu.org/msg13413.html
 AC_CHECK_FUNC(mkstemp, AC_DEFINE(HAS_MKSTEMP,1,
 	[Define to 1 if you have the 'mkstemp' function.]))
 AC_CHECK_FUNC(getifaddrs, AC_DEFINE(HAS_GETIFADDRS,1,
