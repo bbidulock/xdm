@@ -28,7 +28,7 @@ BUILT_SOURCES = Xservers.ws xdm-config Xresources
 
 CLEANFILES = $(BUILT_SOURCES) Xservers Xservers.ws xdm-config Xresources
 
-EXTRA_DIST = Xservers.ws.cpp xdm-config.cpp Xresources.cpp
+EXTRA_DIST = Xservers.ws.cpp xdm-config.cpp Xresources.cpp Xservers.fs
 
 Xservers: Xservers.$(SERVERSTYPE)
 	ln -s Xservers.$(SERVERSTYPE) Xservers
