@@ -124,3 +124,20 @@ chooser_LDADD = $(CHOOSER_LIBS)
 
 chooser_SOURCES =	\
 	chooser.c
+
+# App default files  (*.ad)
+
+appdefaultdir = $(sysconfdir)/X11/app-defaults
+
+APPDEFAULTFILES = Chooser
+
+SUFFIXES += .ad
+
+.ad:
+	cp $< $@
+
+appdefault_DATA = $(APPDEFAULTFILES)
+
+CLEANFILES = $(APPDEFAULTFILES)
+
+EXTRA_DIST += $(APPDEFAULTFILES:%=%.ad)
