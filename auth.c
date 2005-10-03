@@ -89,6 +89,10 @@ from The Open Group.
 #include <net/if.h>
 #endif /* __GNU__ */
 
+#if defined(TCPCONN) && !defined(WIN32)
+# include <netinet/in.h>
+#endif
+
 /* Solaris provides an extended interface SIOCGLIFCONF.  Other systems
  * may have this as well, but the code has only been tested on Solaris
  * so far, so we only enable it there.  Other platforms may be added as
