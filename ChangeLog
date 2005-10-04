@@ -1,3 +1,7 @@
+2005-10-05  Kevin E. Martin  <kem-at-freedesktop-dot-org>
+
+	* Makefile.am: Use CLEANFILES for all generated files
+
 2005-09-28  Kristian Høgsberg  <krh@redhat.com>
 
 	* config/Makefile.am (EXTRA_DIST): Add Xservers.fs.
