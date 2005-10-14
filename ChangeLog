@@ -1,3 +1,8 @@
+2005-10-14  Donnie Berkholz  <spyderous@gentoo.org>
+
+	* configure.ac: Add another set of brackets around DEFAULTVT's empty default
+	setting so it isn't treated as a command.
+
 2005-10-05  Kevin E. Martin  <kem-at-freedesktop-dot-org>
 
 	* Makefile.am: Use CLEANFILES for all generated files

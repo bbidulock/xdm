@@ -141,7 +141,7 @@ AC_SUBST(XDMPIDDIR)
 AC_ARG_WITH(default-vt,
 	AC_HELP_STRING([--with-default-vt=<vtname>],
 	  [specify default vt to start xdm on (default=none)]),
-	[DEFAULTVT="$withval"], [DEFAULTVT=""])
+	[DEFAULTVT="$withval"], [[DEFAULTVT=""]])
 AC_SUBST(DEFAULTVT)
 
 AC_ARG_WITH(config-type,
