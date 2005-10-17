@@ -23,7 +23,7 @@ SUBDIRS = config
 
 bin_PROGRAMS = xdm xdmshell
 
-xdmdir = $(libdir)/xdm
+xdmdir = $(libdir)/X11/xdm
 xdm_PROGRAMS = chooser
 
 #
@@ -100,10 +100,16 @@ include $(top_srcdir)/cpprules.in
 XORGRELSTRING = @PACKAGE_STRING@
   XORGMANNAME = X Version 11
 
-EXTRAMANDEFS = \
+MANDEFS = \
 	-D__xorgversion__="\"$(XORGRELSTRING)\" \"$(XORGMANNAME)\"" \
-	-DCHOOSERPATH=$(pkglibdir)/chooser -DXDMLOGDIR=$(XDMLOGDIR) \
-	-DXDMDIR=$(pkglibdir) -DBINDIR=$(bindir)
+	-DCHOOSERPATH=$(xdmdir)/chooser -DXDMLOGDIR=$(XDMLOGDIR) \
+	-DXDMDIR=$(xdmdir) -DBINDIR=$(bindir) \
+	-D__appmansuffix__=$(APP_MAN_SUFFIX) \
+	-D__filemansuffix__=$(FILE_MAN_SUFFIX) \
+	-D__libmansuffix__=$(LIB_MAN_SUFFIX) \
+	-D__miscmansuffix__=$(MISC_MAN_SUFFIX) \
+	-D__drivermansuffix__=$(DRIVER_MAN_SUFFIX) \
+	-D__adminmansuffix__=$(ADMIN_MAN_SUFFIX) 
 
 CPP_FILES_FLAGS = $(MANDEFS) $(EXTRAMANDEFS)
 

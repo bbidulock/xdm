@@ -187,8 +187,9 @@ AC_ARG_WITH(bw-pixmap,
 	[XDM_BWPIXMAP="$withval"], [XDM_BWPIXMAP="xorg-bw.xpm"])
 AC_ARG_WITH(pixmapdir,
 	AC_HELP_STRING([--with-pixmapdir=<pathname>],
-	   [specify directory for xpm files (default=${libdir}/xdm/pixmaps)]),
-	[XDM_PIXMAPDIR="$withval"], [XDM_PIXMAPDIR='${libdir}/xdm/pixmaps'])
+	[specify directory for xpm files (default=${libdir}/X11/xdm/pixmaps)]),
+	[XDM_PIXMAPDIR="$withval"], 
+	[XDM_PIXMAPDIR='${libdir}/X11/xdm/pixmaps'])
 
 AC_SUBST(XDM_PIXMAP)
 AC_SUBST(XDM_BWPIXMAP)
@@ -225,6 +226,7 @@ CHOOSER_LIBS="$CHOOSER_LIBS $XDM_PRINT_LIBS $DMCP_LIBS"
 AC_SUBST(CHOOSER_CFLAGS)
 AC_SUBST(CHOOSER_LIBS)
 
+XORG_MANPAGE_SECTIONS
 XORG_RELEASE_VERSION
 
 AC_OUTPUT([Makefile config/Makefile])

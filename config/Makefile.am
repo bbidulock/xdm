@@ -3,15 +3,17 @@
 
 include $(top_srcdir)/cpprules.in
 
-dist_pkglib_DATA = \
+xdmdir = $(libdir)/X11/xdm
+
+dist_xdm_DATA = \
 	Xaccess
 
-pkglib_DATA = \
+xdm_DATA = \
 	xdm-config \
 	Xresources \
 	Xservers
 
-dist_pkglib_SCRIPTS = \
+dist_xdm_SCRIPTS = \
 	Xsession \
 	GiveConsole \
 	TakeConsole \
@@ -20,7 +22,7 @@ dist_pkglib_SCRIPTS = \
 	Xreset \
 	Xwilling
 
-pixmapdir = $(pkglibdir)/pixmaps
+pixmapdir = $(XDM_PIXMAPDIR)
 
 dist_pixmap_DATA = xorg-bw.xpm xorg.xpm
 
@@ -41,8 +43,8 @@ XPMDEFINES = -DXPM -DBITMAPDIR=$(XDM_PIXMAPDIR) -DXDM_PIXMAP=$(XDM_PIXMAP) \
 #endif
 
 CPP_FILES_FLAGS = -DBINDIR=$(bindir) -DDEFAULTVT=$(DEFAULTVT) \
-    -DXDMDIR=$(pkglibdir) -DXDMLOGDIR=$(XDMLOGDIR) -DXDMPIDDIR=$(XDMPIDDIR) \
-    -DSU=$(SU) -DCHOOSERPATH=$(pkglibdir)/chooser $(XPMDEFINES)
+    -DXDMDIR=$(xdmdir) -DXDMLOGDIR=$(XDMLOGDIR) -DXDMPIDDIR=$(XDMPIDDIR) \
+    -DSU=$(SU) -DCHOOSERPATH=$(xdmdir)/chooser $(XPMDEFINES)
 
 Xservers.ws: $(srcdir)/Xservers.ws.cpp
 	$(RAWCPP) $(RAWCPPFLAGS) $(CPP_FILES_FLAGS) < $(srcdir)/Xservers.ws.cpp | $(CPP_SED_MAGIC) > $@
