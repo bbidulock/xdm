@@ -613,7 +613,7 @@ named \fIxdm-config\fP:
 	DisplayManager*resources:	XDMDIR/Xresources
 	DisplayManager*startup:	XDMDIR/Xstartup
 	DisplayManager*session:	XDMDIR/Xsession
-	DisplayManager.pidFile:	XDMDIR/xdm-pid
+	DisplayManager.pidFile:	XDMPIDDIR/xdm-pid
 	DisplayManager._0.authorize:	true
 	DisplayManager*authorize:	false
 
