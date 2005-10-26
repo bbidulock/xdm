@@ -3,17 +3,18 @@
 
 include $(top_srcdir)/cpprules.in
 
-xdmdir = $(libdir)/X11/xdm
+xdmlibdir = $(XDMLIBDIR)
+xdmconfigdir = $(XDMCONFIGDIR)
 
-dist_xdm_DATA = \
+dist_xdmconfig_DATA = \
 	Xaccess
 
-xdm_DATA = \
+xdmconfig_DATA = \
 	xdm-config \
 	Xresources \
 	Xservers
 
-dist_xdm_SCRIPTS = \
+dist_xdmlib_SCRIPTS = \
 	Xsession \
 	GiveConsole \
 	TakeConsole \
@@ -43,8 +44,9 @@ XPMDEFINES = -DXPM -DBITMAPDIR=$(XDM_PIXMAPDIR) -DXDM_PIXMAP=$(XDM_PIXMAP) \
 #endif
 
 CPP_FILES_FLAGS = -DBINDIR=$(bindir) -DDEFAULTVT=$(DEFAULTVT) \
-    -DXDMDIR=$(xdmdir) -DXDMLOGDIR=$(XDMLOGDIR) -DXDMPIDDIR=$(XDMPIDDIR) \
-    -DSU=$(SU) -DCHOOSERPATH=$(xdmdir)/chooser $(XPMDEFINES)
+    -DXDMDIR=$(XDMLIBDIR) -DXDMLOGDIR=$(XDMLOGDIR) \
+    -DXDMPIDDIR=$(XDMPIDDIR) -DXDMCONFIGDIR=$(XDMCONFIGDIR) \
+    -DSU=$(SU) -DCHOOSERPATH=$(XDMLIBDIR)/chooser $(XPMDEFINES)
 
 Xservers.ws: $(srcdir)/Xservers.ws.cpp
 	$(RAWCPP) $(RAWCPPFLAGS) $(CPP_FILES_FLAGS) < $(srcdir)/Xservers.ws.cpp | $(CPP_SED_MAGIC) > $@

@@ -1,8 +1,8 @@
 # $XdotOrg: app/xdm/greeter/Makefile.am,v $
 
-xdmdir = $(libdir)/X11/xdm
+xdmlibdir = $(XDMLIBDIR)
 
-xdm_LTLIBRARIES = libXdmGreet.la
+xdmlib_LTLIBRARIES = libXdmGreet.la
 
 libXdmGreet_la_SOURCES = \
 		  Login.c \

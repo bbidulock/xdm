@@ -127,6 +127,18 @@ AM_CONDITIONAL(HAS_ARC4_RANDOM, false)
 
 # Figure out where everything goes in the filesystem
 
+AC_ARG_WITH(xdmlibdir,
+	AC_HELP_STRING([--with-xdmlibdir=<pathname>],
+	  [specify directory for xdm scripts and modules (default=${libdir}/X11/xdm)]),
+	[XDMLIBDIR="$withval"], [XDMLIBDIR="${libdir}/X11/xdm"])
+AC_SUBST(XDMLIBDIR)
+
+AC_ARG_WITH(xdmconfigdir,
+	AC_HELP_STRING([--with-xdmconfigdir=<pathname>],
+	  [specify directory for xdm config files (default is same as xdmlibdir)]),
+	[XDMCONFIGDIR="$withval"], [XDMCONFIGDIR="${XDMLIBDIR}"])
+AC_SUBST(XDMCONFIGDIR)
+
 AC_ARG_WITH(logdir,
 	AC_HELP_STRING([--with-logdir=<pathname>],
 	  [specify directory for xdm log files (default=/var/log)]),
@@ -188,9 +200,9 @@ AC_ARG_WITH(bw-pixmap,
 	[XDM_BWPIXMAP="$withval"], [XDM_BWPIXMAP="xorg-bw.xpm"])
 AC_ARG_WITH(pixmapdir,
 	AC_HELP_STRING([--with-pixmapdir=<pathname>],
-	[specify directory for xpm files (default=${libdir}/X11/xdm/pixmaps)]),
+	[specify directory for xpm files (default=xdmlibdir/pixmaps)]),
 	[XDM_PIXMAPDIR="$withval"], 
-	[XDM_PIXMAPDIR='${libdir}/X11/xdm/pixmaps'])
+	[XDM_PIXMAPDIR='${XDMLIBDIR}/pixmaps'])
 
 AC_SUBST(XDM_PIXMAP)
 AC_SUBST(XDM_BWPIXMAP)
@@ -220,10 +232,12 @@ AC_SUBST(XDM_LIBS)
 # Greeter
 #
 
+PKG_CHECK_MODULES(XDMGREET, xt x11)
+
 XDMGREET_CFLAGS="$XDMGREET_CFLAGS $DMCP_CFLAGS $XPROTO_CFLAGS $OS_CFLAGS"
 XDMGREET_LIBS="$XDMGREET_LIBS $DMCP_LIBS"
 
-GREETERLIB="${XDMDIR}/libXdmGreet.so"
+GREETERLIB="${XDMLIBDIR}/libXdmGreet.so"
 AC_DEFINE_DIR(DEF_GREETER_LIB, GREETERLIB, [Location of Xdm Greeter library])
 
 AC_SUBST(XDMGREET_CFLAGS)

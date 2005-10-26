@@ -1,3 +1,16 @@
+2005-10-25  Alan Coopersmith  <alan.coopersmith@sun.com>
+
+	* configure.ac: 
+	* Makefile.am:
+	* config/Makefile.am:
+	* greeter/Makefile.am:
+	Allow overriding directories for xdm scripts/modules & configuration
+	files via configure options --with-xdmlibdir & --with-xdmconfigdir
+	Add libXt and libX11 to dependencies for libXdmgreet.
+	
+	* README: 
+	Document default directories & configure options to change them	
+
 2005-10-25  Shawn Starr <shawn.starr@rogers.com>
       
        * configure.ac:

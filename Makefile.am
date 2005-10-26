@@ -23,8 +23,8 @@ SUBDIRS = config greeter
 
 bin_PROGRAMS = xdm xdmshell
 
-xdmdir = $(libdir)/X11/xdm
-xdm_PROGRAMS = chooser
+xdmlibdir = $(XDMLIBDIR)
+xdmlib_PROGRAMS = chooser
 
 #
 # xdm
