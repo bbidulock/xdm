@@ -1,3 +1,11 @@
+2005-10-25  Shawn Starr <shawn.starr@rogers.com>
+      
+       * configure.ac:
+       * Makefile.am:
+       * greeter/Makefile.am:
+       We forgot to build the Xdm greeter library. Add it to build and cleanup
+       hardcoded values to find it.
+
 2005-10-18  Kevin E. Martin  <kem-at-freedesktop-dot-org>
 
 	* configure.ac:
