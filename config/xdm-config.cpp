@@ -1,15 +1,20 @@
 ! $Xorg: xdm-conf.cpp,v 1.3 2000/08/17 19:54:17 cpqbld Exp $
+! $XdotOrg: $    
 !
 !
 !
 !
 ! $XFree86: xc/programs/xdm/config/xdm-conf.cpp,v 1.10 2002/11/30 19:11:32 herrb Exp $
 !
+#ifndef XDMCONFIGDIR
+#define XDMCONFIGDIR XDMDIR
+#endif
 DisplayManager.errorLogFile:	XDMLOGDIR/xdm.log
 DisplayManager.pidFile:		XDMPIDDIR/xdm.pid
-DisplayManager.keyFile:		XDMDIR/xdm-keys
-DisplayManager.servers:		XDMDIR/Xservers
-DisplayManager.accessFile:	XDMDIR/Xaccess
+DisplayManager.keyFile:		XDMCONFIGDIR/xdm-keys
+DisplayManager.servers:		XDMCONFIGDIR/Xservers
+DisplayManager.accessFile:	XDMCONFIGDIR/Xaccess
+DisplayManager*resources:	XDMCONFIGDIR/Xresources
 DisplayManager.willing:		SU nobody -c XDMDIR/Xwilling
 ! All displays should use authorization, but we cannot be sure
 ! X terminals may not be configured that way, so they will require
@@ -17,7 +22,6 @@ DisplayManager.willing:		SU nobody -c XDMDIR/Xwilling
 DisplayManager*authorize:	true
 !
 DisplayManager*chooser:		CHOOSERPATH
-DisplayManager*resources:	XDMDIR/Xresources
 DisplayManager*startup:		XDMDIR/Xstartup
 DisplayManager*session:		XDMDIR/Xsession
 DisplayManager*reset:		XDMDIR/Xreset
