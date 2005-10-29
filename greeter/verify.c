@@ -1,5 +1,5 @@
 /* $Xorg: verify.c,v 1.4 2001/02/09 02:05:41 xorgcvs Exp $ */
-/* $XdotOrg: xc/programs/xdm/greeter/verify.c,v 1.3 2004/04/24 23:28:17 alanc Exp $ */
+/* $XdotOrg: xc/programs/xdm/greeter/verify.c,v 1.4 2004/10/21 06:03:13 herrb Exp $ */
 /*
 
 Copyright 1988, 1998  The Open Group
@@ -84,7 +84,7 @@ static char *envvars[] = {
 #include <sys/param.h>
 #include <kerberosIV/krb.h>
 /* OpenBSD 2.8 needs this. */
-#ifdef OpenBSD && OpenBSD <= 200012
+#if defined(OpenBSD) && (OpenBSD <= 200012)
 #include <kerberosIV/kafs.h>
 #endif
 static char krbtkfile[MAXPATHLEN];
