@@ -1,3 +1,13 @@
+2005-10-28  Alan Coopersmith  <alan.coopersmith@sun.com>
+
+	* configure.ac: 
+	Add -DGREET_LIB to GREETER_CFLAGS on Solaris & SVR4 (was in #if SVR4
+	in Imake)
+	Add --with-random-device and checks for /dev/urandom & /dev/random
+	for source of random data for key generation
+	Link libXdmgreet with Xinerama & XPM libraries when using those 
+	features.
+
 2005-10-25  Alan Coopersmith  <alan.coopersmith@sun.com>
 
 	* configure.ac: 

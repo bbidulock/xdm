@@ -113,12 +113,41 @@ case $host_os in
         OS_CFLAGS="-DCSRG_BASED"
 	SU="su -m"
         ;;
+    solaris*|sysv4*)
+	OS_CFLAGS=""
+	GREETER_CFLAGS="$GREETER_CFLAGS -DGREET_LIB"
+	SU="su"
+	;;
     *)
         OS_CFLAGS=
 	SU="su"
         ;;
 esac
 AC_SUBST(SU)
+
+# Check for /dev/random or /dev/urandom
+AC_ARG_WITH(random-device, 
+	AC_HELP_STRING([--with-random-device\[=<pathname>\]],
+		[Use <pathname> as a source of randomness]),
+	RANDOM_DEVICE="$withval", RANDOM_DEVICE="try")
+
+if test x$RANDOM_DEVICE = xyes -o x$RANDOM_DEVICE = xtry ; then
+	AC_CHECK_FILE([/dev/urandom], [RANDOM_DEVICE=/dev/urandom],
+		AC_CHECK_FILE([/dev/random], [RANDOM_DEVICE=/dev/random]))
+	if test x$RANDOM_DEVICE = xyes ; then
+		AC_MSG_ERROR(["random device support requested, but no random device was found."])		
+	else 
+		if test x$RANDOM_DEVICE = xtry ; then
+			RANDOM_DEVICE="no"
+		fi
+	fi
+fi
+
+if test x$RANDOM_DEVICE != xno ; then
+	AC_DEFINE_UNQUOTED(DEV_RANDOM,"$RANDOM_DEVICE",
+		[Define to device that provides random data source])
+fi
+
 
 # FIXME: find out how to check for these things. Note that Kerberos was
 # turned off everywhere but on OpenBSD.
@@ -173,6 +202,8 @@ PKG_CHECK_EXISTS(xinerama, [
 	XDM_LIBS="$XDM_LIBS $XINERAMA_LIBS"
 	CHOOSER_CFLAGS="$CHOOSER_CFLAGS $XINERAMA_CFLAGS"
 	CHOOSER_LIBS="$CHOOSER_LIBS $XINERAMA_LIBS"
+	GREETER_CFLAGS="$GREETER_CFLAGS $XINERAMA_CFLAGS"
+	GREETER_LIBS="$GREETER_LIBS $XINERAMA_LIBS"
 ])
 
 # XPM logos for the greeter screen
@@ -185,6 +216,8 @@ if test "x$USE_XPM" = "xyes" ; then
 	PKG_CHECK_MODULES(XPM, xpm)
 	XDM_CFLAGS="$XDM_CFLAGS $XPM_CFLAGS"
 	XDM_LIBS="$XDM_LIBS $XPM_LIBS"
+	GREETER_CFLAGS="$GREETER_CFLAGS $XPM_CFLAGS"
+	GREETER_LIBS="$GREETER_LIBS $XPM_LIBS"
 	AC_DEFINE([XPM], 1, 
 		[Define to 1 to display XPM logos on greeter screen])
 fi
@@ -234,8 +267,8 @@ AC_SUBST(XDM_LIBS)
 
 PKG_CHECK_MODULES(XDMGREET, xt x11)
 
-XDMGREET_CFLAGS="$XDMGREET_CFLAGS $DMCP_CFLAGS $XPROTO_CFLAGS $OS_CFLAGS"
-XDMGREET_LIBS="$XDMGREET_LIBS $DMCP_LIBS"
+XDMGREET_CFLAGS="$XDMGREET_CFLAGS $DMCP_CFLAGS $XPROTO_CFLAGS $OS_CFLAGS $GREETER_CFLAGS"
+XDMGREET_LIBS="$XDMGREET_LIBS $DMCP_LIBS $GREETER_LIBS"
 
 GREETERLIB="${XDMLIBDIR}/libXdmGreet.so"
 AC_DEFINE_DIR(DEF_GREETER_LIB, GREETERLIB, [Location of Xdm Greeter library])
