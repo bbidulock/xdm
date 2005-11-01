@@ -298,6 +298,109 @@ CHOOSER_LIBS="$CHOOSER_LIBS $XDM_PRINT_LIBS $DMCP_LIBS"
 AC_SUBST(CHOOSER_CFLAGS)
 AC_SUBST(CHOOSER_LIBS)
 
+# Defaults for X session - should probably be configure --with-* flags
+# Currently just trying to mirror what defaults were set in Imake
+
+# -DDEF_SERVER_LINE=":0 local $(DEF_SERVER) :0"
+if test -z "$DEF_SERVER" ; then 
+	DEF_SERVER="${bindir}/X"
+fi
+if test -z "$DEF_SERVER_LINE" ; then 
+	DEF_SERVER_LINE=":0 local ${DEF_SERVER} :0"
+fi
+AC_DEFINE_DIR(DEF_SERVER_LINE, DEF_SERVER_LINE,
+	[Define to default Xserver file entry for local X server])
+
+# -DXRDB_PROGRAM="$(BINDIR)/xrdb"
+AC_DEFINE_DIR(XRDB_PROGRAM, bindir/xrdb, 
+	[Define to pathname for xrdb program])
+
+# -DDEF_SESSION="$(BINDIR)/xterm -ls"
+AC_DEFINE_DIR(DEF_SESSION, bindir/xterm -ls,
+	[Define to default command to start X session])
+
+# -DDEF_USER_PATH="$(DEF_USER_PATH)"
+# Default values taken from DefaultUserPath setting in the
+# old Imake *.cf files for each platform
+if test -z "$DEF_USER_PATH" ; then
+	case $host_os in
+	    dragonfly*)
+		DEF_USER_PATH="/bin:/usr/bin:/sbin:/usr/sbin:${bindir}:/usr/local/bin"
+		;;
+	    freebsd*)
+		DEF_USER_PATH="/bin:/usr/bin:/sbin:/usr/sbin:${bindir}:/usr/gnu/bin:/usr/local/bin"
+		;;
+	    netbsd*)
+		DEF_USER_PATH="/bin:/usr/bin:/usr/pkg/bin:/usr/local/bin:${bindir}"
+		;;
+	    openbsd*|bsdi*)
+		DEF_USER_PATH="/bin:/usr/bin:/usr/local/bin:${bindir}"
+		;;
+	    solaris*)
+		DEF_USER_PATH="/usr/bin:${bindir}"
+		;;
+	    *)
+		DEF_USER_PATH="/bin:/usr/bin:${bindir}:/usr/ucb"
+		;;
+	esac
+fi
+AC_DEFINE_DIR(DEF_USER_PATH, DEF_USER_PATH,
+	[Define to default PATH environment variable for user sessions])
+
+# -DDEF_SYSTEM_PATH="$(DEF_SYSTEM_PATH)"
+# Default values taken from DefaultSystemPath setting in the
+# old Imake *.cf files for each platform
+if test -z "$DEF_SYSTEM_PATH" ; then
+	case $host_os in
+	    freebsd*|dragonfly*)
+		DEF_SYSTEM_PATH="/bin:/usr/bin:/sbin:/usr/sbin:${bindir}"
+		;;
+	    netbsd*|openbsd*|bsdi*)
+		DEF_SYSTEM_PATH="/sbin:/usr/sbin:/bin:/usr/bin:${bindir}"
+		;;
+	    solaris*)
+		DEF_SYSTEM_PATH="/sbin:/usr/sbin:/usr/bin:${bindir}"
+		;;
+	    *)
+		DEF_SYSTEM_PATH="/etc:/bin:/usr/bin:${bindir}:/usr/ucb"
+		;;
+	esac
+fi
+AC_DEFINE_DIR(DEF_SYSTEM_PATH, DEF_SYSTEM_PATH,
+	[Define to default PATH environment variable for system commands])
+
+# -DDEF_SYSTEM_SHELL="$(BOURNE_SHELL)"
+if test -z "$BOURNE_SHELL" ; then
+	BOURNE_SHELL=/bin/sh
+fi
+AC_DEFINE_DIR(DEF_SYSTEM_SHELL, BOURNE_SHELL,
+	[Define to default shell])
+
+# -DDEF_FAILSAFE_CLIENT="$(BINDIR)/xterm"
+
+AC_DEFINE_DIR(DEF_FAILSAFE_CLIENT, bindir/xterm,
+	[Define to default command to start failsafe X session])
+
+# -DDEF_XDM_CONFIG="$(XDMDIR)/xdm-config"
+
+AC_DEFINE_DIR(DEF_XDM_CONFIG, XDMCONFIGDIR/xdm-config, 
+	[Define to pathname of default xdm-config file])
+
+# -DDEF_CHOOSER="$(CHOOSERPATH)"
+
+AC_DEFINE_DIR(DEF_CHOOSER, XDMLIBDIR/chooser, 
+	[Define to pathname of where chooser binary is installed])
+
+# -DDEF_AUTH_DIR="$(XDMDIR)"
+
+AC_DEFINE_DIR(DEF_AUTH_DIR, XDMCONFIGDIR, 
+	[Define to pathname where authentication cookie files should be stored])
+
+# -DDEF_GREETER_LIB="$(XDMDIR)/libXdmGreet.so"
+
+AC_DEFINE_DIR(DEF_GREETER_LIB, XDMLIBDIR/libXdmGreet.so, 
+	[Define to pathname where greeter shared object is installed (if used)])
+
 XORG_MANPAGE_SECTIONS
 XORG_RELEASE_VERSION
 

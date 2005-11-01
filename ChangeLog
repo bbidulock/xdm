@@ -1,3 +1,12 @@
+2005-11-01  Alan Coopersmith  <alan.coopersmith@sun.com>
+
+	* configure.ac: 
+	Add AC_DEFINE_DIR calls for the path #defines previously set in
+	RES_DEFINES section of xdm Imakefile.   (Some should probably
+	be made settable via configure --with-* flags, but at least they
+	correctly set defaults to match the directories specified to configure
+	now.)
+
 2005-11-01  Kevin E. Martin  <kem-at-freedesktop-dot-org>
 
 	* Makefile.am:
