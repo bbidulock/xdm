@@ -116,7 +116,8 @@ CPP_FILES_FLAGS = $(MANDEFS) $(EXTRAMANDEFS)
 #
 #  xdmshell
 #
-xdmshell_CFLAGS = $(XPROTO_CFLAGS) -DBINDIR="\"$(bindir)\""
+xdmshell_CFLAGS = $(XDMSHELL_CFLAGS) -DBINDIR="\"$(bindir)\""
+
 
 xdmshell_SOURCES =	\
         xdmshell.c

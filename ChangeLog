@@ -1,3 +1,9 @@
+2005-11-01  Kevin E. Martin  <kem-at-freedesktop-dot-org>
+
+	* Makefile.am:
+	* configure.ac:
+	Update pkgcheck depedencies to work with separate build roots.
+
 2005-10-28  Alan Coopersmith  <alan.coopersmith@sun.com>
 
 	* configure.ac: 
