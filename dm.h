@@ -80,7 +80,7 @@ from The Open Group.
 #include <sys/wait.h>
 #else
 #define _POSIX_SOURCE
-#ifdef SCO325
+#ifdef __SCO__
 #include <sys/procset.h>
 #include <sys/siginfo.h>
 #endif

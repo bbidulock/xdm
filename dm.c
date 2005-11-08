@@ -56,6 +56,9 @@ from The Open Group.
 #ifdef __NetBSD__
 #include <sys/param.h>
 #endif
+#ifdef USESECUREWARE
+#include <prot.h>
+#endif
 
 #ifndef sigmask
 #define sigmask(m)  (1 << ((m - 1)))
@@ -73,7 +76,7 @@ from The Open Group.
 #endif
 
 
-#if defined(SVR4) && !defined(SCO) && !defined(sun)
+#if defined(SVR4) && !defined(sun)
 extern FILE    *fdopen();
 #endif
 
@@ -116,6 +119,10 @@ main (int argc, char **argv)
 #ifndef NOXDMTITLE
     Title = argv[0];
     TitleLen = (argv[argc - 1] + strlen(argv[argc - 1])) - Title;
+#endif
+
+#ifdef USESECUREWARE
+    set_auth_parameters (argc, argv);
 #endif
 
     /*

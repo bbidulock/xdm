@@ -61,6 +61,10 @@ extern int key_setnet(struct key_netstarg *arg);
 # include <krb5/krb5.h>
 #endif
 
+#ifdef __SCO__
+#include <prot.h>
+#endif
+
 #ifndef GREET_USER_STATIC
 # include <dlfcn.h>
 # ifndef RTLD_NOW
@@ -70,7 +74,7 @@ extern int key_setnet(struct key_netstarg *arg);
 
 static	int	runAndWait (char **args, char **environ);
 
-#if defined(CSRG_BASED) || defined(__osf__) || defined(__DARWIN__) || defined(__QNXNTO__) || defined(sun) || defined(__GLIBC__)
+#if defined(CSRG_BASED) || defined(__osf__) || defined(__DARWIN__) || defined(__QNXNTO__) || defined(sun) || defined(__GLIBC__) || defined(__SCO__)
 # include <sys/types.h>
 # include <grp.h>
 #else
@@ -88,7 +92,7 @@ extern	struct spwd	*getspnam(GETSPNAM_ARGS);
 extern	void	endspent(void);
 # endif
 #endif
-#if defined(CSRG_BASED) || defined(__GLIBC__) || defined(USL)
+#if defined(CSRG_BASED) || defined(__GLIBC__) || defined(__UNIXWARE__) || defined(__SCO__)
 # include <pwd.h>
 # include <unistd.h>
 #else
@@ -534,6 +538,11 @@ StartClient (
     pam_handle_t *pamh = thepamh ();
     int	pam_error;
 #endif
+#ifdef USESECUREWARE
+    char *reason, **smpenv, *smpshell;
+    int ret;
+    extern struct smp_user_info *userp;
+#endif
 
     if (verify->argv) {
 	Debug ("StartSession %s: ", verify->argv[0]);
@@ -570,6 +579,35 @@ StartClient (
 	}
 #endif
 
+#ifdef USESECUREWARE
+        Debug ("set_identity: uid=%d\n", userp->pw.pw_uid);
+        ret = smp_set_identity (userp, &reason, &smpenv, &smpshell);
+        Debug ("smp_set_identity returns %d luid=%d\n", ret, getluid());
+        switch (ret) {
+          case SMP_FAIL:
+            LogError ("Unable to set identity\n");
+            smp_audit_fail (userp, 0);
+            return 0;
+          case SMP_EXTFAIL:
+            LogError ("Unable to set identity: %s\n", reason);
+            smp_audit_fail (userp, 0);
+            return 0;
+          case SMP_NOTAUTH:
+            LogError ("Authorization failed\n");
+            smp_audit_fail (userp, 0);
+            return 0;
+          case SMP_ACCTLOCK:
+            LogError ("Account is locked\n");
+            smp_audit_fail (userp, 0);
+            return 0;
+          case SMP_COMPLETE:
+            break;
+          default:
+            LogError ("Unhandled identity error %d\n", ret);
+            smp_audit_fail (userp, 0);
+            return 0;
+        }
+#endif
 
 #ifndef AIXV3
 #ifndef HAS_SETUSERCONTEXT
@@ -911,7 +949,7 @@ systemEnv (struct display *d, char *user, char *home)
     return env;
 }
 
-#if (defined(Lynx) && !defined(HAS_CRYPT)) || defined(SCO) && !defined(SCO_USA) && !defined(_SCO_DS)
+#if (defined(Lynx) && !defined(HAS_CRYPT))
 char *crypt(char *s1, char *s2)
 {
 	return(s2);

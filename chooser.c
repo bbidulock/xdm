@@ -75,7 +75,7 @@ in this Software without prior written authorization from The Open Group.
 #include    <X11/extensions/Xinerama.h>
 #endif
 
-#if defined(SVR4) && !defined(SCO325)
+#if defined(SVR4)
 #include    <sys/sockio.h>
 #endif
 #if defined(SVR4) && defined(PowerMAX_OS)
