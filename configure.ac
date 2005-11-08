@@ -192,6 +192,12 @@ AC_ARG_WITH(config-type,
 	[SERVERSTYPE="$withval"], [SERVERSTYPE="ws"])
 AC_SUBST(SERVERSTYPE)
 
+case $host_os in
+    *sco*)	SHELL_CMD="/bin/ksh"	;;
+    *)		SHELL_CMD="/bin/sh"	;;
+esac
+AC_SUBST(SHELL_CMD)
+
 # Checks for pkg-config packages
 
 PKG_CHECK_EXISTS(xinerama, [
@@ -262,7 +268,7 @@ AC_SUBST(XDM_CFLAGS)
 AC_SUBST(XDM_LIBS)
 
 #
-# xmdshell
+# xdmshell
 #
 
 PKG_CHECK_MODULES(AUTH, xau)

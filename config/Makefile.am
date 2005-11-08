@@ -14,8 +14,10 @@ xdmconfig_DATA = \
 	Xresources \
 	Xservers
 
+xdmlib_SCRIPTS = \
+	Xsession
+
 dist_xdmlib_SCRIPTS = \
-	Xsession \
 	GiveConsole \
 	TakeConsole \
 	Xsetup_0 \
@@ -27,11 +29,12 @@ pixmapdir = $(XDM_PIXMAPDIR)
 
 dist_pixmap_DATA = xorg-bw.xpm xorg.xpm
 
-BUILT_SOURCES = Xservers.ws xdm-config Xresources
+BUILT_SOURCES = Xservers.ws xdm-config Xresources Xsession
 
-CLEANFILES = $(BUILT_SOURCES) Xservers Xservers.ws xdm-config Xresources
+CLEANFILES = $(BUILT_SOURCES) Xservers
 
-EXTRA_DIST = Xservers.ws.cpp xdm-config.cpp Xresources.cpp Xservers.fs
+EXTRA_DIST = Xservers.ws.cpp Xservers.fs \
+	xdm-config.cpp Xresources.cpp Xsession.cpp
 
 Xservers: Xservers.$(SERVERSTYPE)
 	ln -s Xservers.$(SERVERSTYPE) Xservers
@@ -46,7 +49,8 @@ XPMDEFINES = -DXPM -DBITMAPDIR=$(XDM_PIXMAPDIR) -DXDM_PIXMAP=$(XDM_PIXMAP) \
 CPP_FILES_FLAGS = -DBINDIR=$(bindir) -DDEFAULTVT=$(DEFAULTVT) \
     -DXDMDIR=$(XDMLIBDIR) -DXDMLOGDIR=$(XDMLOGDIR) \
     -DXDMPIDDIR=$(XDMPIDDIR) -DXDMCONFIGDIR=$(XDMCONFIGDIR) \
-    -DSU=$(SU) -DCHOOSERPATH=$(XDMLIBDIR)/chooser $(XPMDEFINES)
+    -DSU=$(SU) -DCHOOSERPATH=$(XDMLIBDIR)/chooser $(XPMDEFINES) \
+    -DSHELL_CMD=$(SHELL_CMD)
 
 Xservers.ws: $(srcdir)/Xservers.ws.cpp
 	$(RAWCPP) $(RAWCPPFLAGS) $(CPP_FILES_FLAGS) < $(srcdir)/Xservers.ws.cpp | $(CPP_SED_MAGIC) > $@

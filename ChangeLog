@@ -1,3 +1,14 @@
+2005-11-07  Alan Coopersmith  <alan.coopersmith@sun.com>
+
+	Changes to match bug #3180 checkin to monolith:
+	
+	* config/Makefile.am: 
+	Generate Xsession from Xsession.cpp
+	Add SHELL_CMD to cpp substitutions
+
+	* configure.ac
+	Set SHELL_CMD to /bin/ksh for sco, /bin/sh for all other OS'es.
+
 2005-11-01  Alan Coopersmith  <alan.coopersmith@sun.com>
 
 	* configure.ac: 
