@@ -88,12 +88,13 @@ endif
 #  xdm man page 
 #
 
-man1_MANS = xdm.man
+appmandir =  $(mandir)/man$(APP_MAN_SUFFIX)
 
-CLEANFILES = $(man1_MANS)
+appman_SOURCES = xdm.man.cpp
+appman_DATA = $(appman_SOURCES:man.cpp=@APP_MAN_SUFFIX@)
 
-BUILT_SOURCES = $(man1_MANS)
-EXTRA_DIST = $(man1_MANS:man=man.cpp)
+CLEANFILES = $(appman_DATA)
+EXTRA_DIST = $(appman_SOURCES)
 
 include $(top_srcdir)/cpprules.in
 
@@ -112,6 +113,11 @@ MANDEFS = \
 	-D__adminmansuffix__=$(ADMIN_MAN_SUFFIX) 
 
 CPP_FILES_FLAGS = $(MANDEFS) $(EXTRAMANDEFS)
+
+SUFFIXES += .$(APP_MAN_SUFFIX) .man.cpp
+
+.man.cpp.$(APP_MAN_SUFFIX):
+	$(RAWCPP) $(RAWCPPFLAGS) $(CPP_FILES_FLAGS) < $< | $(CPP_SED_MAGIC) > $@
 
 #
 #  xdmshell
