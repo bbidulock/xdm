@@ -1,3 +1,14 @@
+2005-11-13  Alan Coopersmith  <alan.coopersmith@sun.com>
+
+	* configure.ac: 
+	* Makefile.am:
+	* greeter/Makefile.am:
+	Add --enable-dynamic-greeter flag to allow choosing whether
+	greeter should be built into xdm binary or dynamically loaded
+	libXdmGreet.so object.
+	Add -rdynamic flag to link options when using gcc with dynamic
+	greeter to allow greeter object to reference symbols in xdm.
+
 2005-11-12  Alan Coopersmith  <alan.coopersmith@sun.com>
 
 	* Makefile.am: 

@@ -31,7 +31,7 @@ xdmlib_PROGRAMS = chooser
 #
 
 xdm_CFLAGS = $(XDM_CFLAGS) -D_BSD_SOURCE
-xdm_LDADD = $(XDM_LIBS)
+xdm_LDADD = $(XDM_LIBS) $(XDM_LDFLAGS)
 
 xdm_SOURCES =	\
         auth.c \
@@ -55,11 +55,6 @@ xdm_SOURCES =	\
         genauth.c \
         access.c \
         choose.c \
-	greeter/greet.c		\
-	greeter/Login.c		\
-	greeter/Login.h		\
-	greeter/LoginP.h	\
-	greeter/verify.c	\
         dm_auth.h \
         dm_error.h \
         dm.h \
@@ -83,6 +78,21 @@ endif
 if HAS_KERBEROS_FIVE
 xdm_SOURCES += krb5auth.c
 endif
+
+#
+# greeter
+#
+
+if !DYNAMIC_GREETER
+xdm_SOURCES += \
+	greeter/greet.c		\
+	greeter/Login.c		\
+	greeter/Login.h		\
+	greeter/LoginP.h	\
+	greeter/verify.c
+xdm_CFLAGS += $(XDMGREET_CFLAGS)
+endif
+
 
 #
 #  xdm man page 

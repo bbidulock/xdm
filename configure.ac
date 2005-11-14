@@ -115,7 +115,6 @@ case $host_os in
         ;;
     solaris*|sysv4*)
 	OS_CFLAGS=""
-	GREETER_CFLAGS="$GREETER_CFLAGS -DGREET_LIB"
 	SU="su"
 	;;
     *)
@@ -200,6 +199,8 @@ AC_SUBST(SHELL_CMD)
 
 # Checks for pkg-config packages
 
+PKG_CHECK_MODULES(XDM, xmu x11)
+
 PKG_CHECK_EXISTS(xinerama, [
 	AC_DEFINE([USE_XINERAMA], 1, 
 		[Define to 1 to use XINERAMA in greeter & chooser])
@@ -247,17 +248,70 @@ AC_SUBST(XDM_PIXMAP)
 AC_SUBST(XDM_BWPIXMAP)
 AC_SUBST(XDM_PIXMAPDIR)
 
+# Packages used by multiple programs
+
+XAW_CHECK_XPRINT_SUPPORT(XDM_PRINT)
+PKG_CHECK_MODULES(DMCP, xdmcp)
+PKG_CHECK_MODULES(XPROTO, xproto)
+
+#
+# Greeter
+#
+
+AC_MSG_CHECKING([if the greeter should be built as a dynamically loaded shared object])
+
+AC_ARG_ENABLE(dynamic-greeter,
+	AC_HELP_STRING([--enable-dynamic-greeter],
+         [Build greeter as dynamically loaded shared object]),
+	[DYNAMIC_GREETER="$enableval"], [DYNAMIC_GREETER="auto"])
+
+# Not all OS'es built dynamic greeter in monolith, but all the ones supported
+# in the modular tree should be able to use it.   We'll leave this here in case
+# some are found that can't.
+if test "x$DYNAMIC_GREETER" = "xauto" ; then
+	case $host_os in
+	    *)	DYNAMIC_GREETER="yes" ;;
+	esac
+fi
+
+AC_MSG_RESULT([$DYNAMIC_GREETER])
+
+if test "x$DYNAMIC_GREETER" = "xyes" ; then
+
+	GREETER_CFLAGS="$GREETER_CFLAGS -DGREET_LIB"
+
+	# The xdm binary needs to export symbols so that they can be used from
+	# libXdmGreet.so.  Some platforms require extra flags to do this.   
+	# gcc should set these flags when -rdynamic is passed to it, other 
+	# compilers/linkers may need to be added
+	if test "x$GCC" = "xyes"; then
+		XDM_LDFLAGS="$(XDM_LDFLAGS) -rdynamic"
+	fi	
+
+	PKG_CHECK_MODULES(XDMGREET, xt x11)
+
+	GREETERLIB="${XDMLIBDIR}/libXdmGreet.so"
+	AC_DEFINE_DIR(DEF_GREETER_LIB, GREETERLIB, 
+			[Location of Xdm Greeter library])
+
+	XDMGREET_CFLAGS="$XDMGREET_CFLAGS $XDM_PRINT_CFLAGS $DMCP_CFLAGS $XPROTO_CFLAGS $OS_CFLAGS $GREETER_CFLAGS"
+	XDMGREET_LIBS="$XDMGREET_LIBS $XDM_PRINT_LIBS $DMCP_LIBS $GREETER_LIBS"
+
+	AC_SUBST(XDMGREET_CFLAGS)
+	AC_SUBST(XDMGREET_LIBS)
+else
+	XDM_CFLAGS="$XDM_CFLAGS $XDM_PRINT_CFLAGS $GREETER_CFLAGS -DGREET_USER_STATIC"
+	XDM_LIBS="$XDM_LIBS $XDM_PRINT_LIBS $GREETER_LIBS"
+fi
+
+AM_CONDITIONAL(DYNAMIC_GREETER, test x$DYNAMIC_GREETER = xyes)
 
 #
 #  XDM
 #
 
-XAW_CHECK_XPRINT_SUPPORT(XDM_PRINT)
-
-PKG_CHECK_MODULES(DMCP, xdmcp)
-PKG_CHECK_MODULES(XPROTO, xproto)
-XDM_CFLAGS="$XDM_CFLAGS $XDM_PRINT_CFLAGS $DMCP_CFLAGS $XPROTO_CFLAGS $OS_CFLAGS"
-XDM_LIBS="$XDM_LIBS $XDM_PRINT_LIBS $DMCP_LIBS"
+XDM_CFLAGS="$XDM_CFLAGS $DMCP_CFLAGS $XPROTO_CFLAGS $OS_CFLAGS"
+XDM_LIBS="$XDM_LIBS $DMCP_LIBS"
 
 AC_CHECK_LIB(Xdmcp, XdmcpWrap, [xdmauth="yes"], [xdmauth="no"], [$DMCP_LIBS])
 AC_SEARCH_LIBS(crypt, crypt)
@@ -266,6 +320,7 @@ AM_CONDITIONAL(HAS_XDM_AUTH, test x$xdmauth = xyes)
 
 AC_SUBST(XDM_CFLAGS)
 AC_SUBST(XDM_LIBS)
+AC_SUBST(XDM_LDFLAGS)
 
 #
 # xdmshell
@@ -278,21 +333,6 @@ XDMSHELL_LIBS="$XDM_LIBS $XDM_PRINT_LIBS $DMCP_LIBS"
 
 AC_SUBST(XDMSHELL_CFLAGS)
 AC_SUBST(XDMSHELL_LIBS)
-
-#
-# Greeter
-#
-
-PKG_CHECK_MODULES(XDMGREET, xt x11)
-
-XDMGREET_CFLAGS="$XDMGREET_CFLAGS $DMCP_CFLAGS $XPROTO_CFLAGS $OS_CFLAGS $GREETER_CFLAGS"
-XDMGREET_LIBS="$XDMGREET_LIBS $DMCP_LIBS $GREETER_LIBS"
-
-GREETERLIB="${XDMLIBDIR}/libXdmGreet.so"
-AC_DEFINE_DIR(DEF_GREETER_LIB, GREETERLIB, [Location of Xdm Greeter library])
-
-AC_SUBST(XDMGREET_CFLAGS)
-AC_SUBST(XDMGREET_LIBS)
 
 #
 # Chooser
