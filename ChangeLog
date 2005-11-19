@@ -1,3 +1,8 @@
+2005-11-19  Kevin E. Martin  <kem-at-freedesktop-dot-org>
+
+	* configure.ac:
+	Update dependencies to work with separate build roots.
+
 2005-11-13  Alan Coopersmith  <alan.coopersmith@sun.com>
 
 	* configure.ac: 
