@@ -1,3 +1,8 @@
+2005-11-19  Alan Coopersmith  <alan.coopersmith@sun.com>
+
+	* configure.ac: 
+	Add dependency on xau.
+
 2005-11-19  Kevin E. Martin  <kem-at-freedesktop-dot-org>
 
 	* configure.ac:
