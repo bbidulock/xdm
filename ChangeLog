@@ -1,3 +1,10 @@
+2005-11-20  Eric Anholt  <anholt@FreeBSD.org>
+
+	* configure.ac:
+	Bug #5113: The insertion of -lutil into XDM_LIBS ended up having no
+	effect because  PKG_CHECK_MODULES(XDM, ...) later overwrote it.  So put
+	-lutil into XDM_OS_LIBS and add XDM_OS_LIBS to XDM_LIBS later.
+
 2005-11-19  Alan Coopersmith  <alan.coopersmith@sun.com>
 
 	* configure.ac: 

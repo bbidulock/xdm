@@ -53,7 +53,7 @@ AC_CHECK_FUNC(getspnam, AC_DEFINE(USESHADOW,1,
 # According to the old Imakefile, FreeBSD has this in libutil
 AC_CHECK_FUNC(setproctitle, [HAS_SETPROCTITLE="yes"],
 	AC_CHECK_LIB(util, setproctitle, 
-		     [HAS_SETPROCTITLE="yes" ; XDM_LIBS="$XDM_LIBS -lutil"]))
+		     [HAS_SETPROCTITLE="yes" ; XDM_OS_LIBS="$XDM_OS_LIBS -lutil"]))
 if test "x$HAS_SETPROCTITLE" = "xyes" ; then
 	AC_DEFINE(HAS_SETPROCTITLE,1,
 		[Define to 1 if you have the 'setproctitle' function.])
@@ -62,7 +62,7 @@ fi
 # According to the old Imakefile, BSD/OS has this in libutil
 AC_CHECK_FUNC(setusercontext, [HAS_SETUSERCONTEXT="yes"],
 	AC_CHECK_LIB(util, setusercontext, 
-		    [HAS_SETUSERCONTEXT="yes" ; XDM_LIBS="$XDM_LIBS -lutil"]))
+		    [HAS_SETUSERCONTEXT="yes" ; XDM_OS_LIBS="$XDM_OS_LIBS -lutil"]))
 if test "x$HAS_SETUSERCONTEXT" = "xyes" ; then
 	AC_DEFINE(HAS_SETUSERCONTEXT,1,
 		[Define to 1 if you have the 'setusercontext' function.])
@@ -200,6 +200,8 @@ AC_SUBST(SHELL_CMD)
 # Checks for pkg-config packages
 
 PKG_CHECK_MODULES(XDM, xmu x11 xau)
+
+XDM_LIBS="$XDM_LIBS $XDM_OS_LIBS"
 
 PKG_CHECK_EXISTS(xinerama, [
 	AC_DEFINE([USE_XINERAMA], 1, 
