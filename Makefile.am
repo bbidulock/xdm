@@ -113,8 +113,8 @@ XORGRELSTRING = @PACKAGE_STRING@
 
 MANDEFS = \
 	-D__xorgversion__="\"$(XORGRELSTRING)\" \"$(XORGMANNAME)\"" \
-	-DCHOOSERPATH=$(xdmdir)/chooser -DXDMLOGDIR=$(XDMLOGDIR) \
-	-DXDMDIR=$(xdmdir) -DBINDIR=$(bindir) -DXDMPIDDIR=$(XDMPIDDIR) \
+	-DCHOOSERPATH=$(xdmlibdir)/chooser -DXDMLOGDIR=$(XDMLOGDIR) \
+	-DXDMDIR=$(XDMCONFIGDIR) -DBINDIR=$(bindir) -DXDMPIDDIR=$(XDMPIDDIR) \
 	-D__appmansuffix__=$(APP_MAN_SUFFIX) \
 	-D__filemansuffix__=$(FILE_MAN_SUFFIX) \
 	-D__libmansuffix__=$(LIB_MAN_SUFFIX) \

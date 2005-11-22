@@ -1,3 +1,8 @@
+2005-11-21  Alan Coopersmith  <alan.coopersmith@sun.com>
+
+	* Makefile.am (MANDEFS): 
+	Fix file paths in man pages.
+
 2005-11-20  Eric Anholt  <anholt@FreeBSD.org>
 
 	* configure.ac:
