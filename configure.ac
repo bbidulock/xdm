@@ -145,13 +145,23 @@ fi
 if test x$RANDOM_DEVICE != xno ; then
 	AC_DEFINE_UNQUOTED(DEV_RANDOM,"$RANDOM_DEVICE",
 		[Define to device that provides random data source])
+	RANDOMMANDEFS="$RANDOMMANDEFS -DDEV_RANDOM=\\\"$RANDOM_DEVICE\\\""
 fi
 
+
+AC_CHECK_FUNC(arc4random, [HAS_ARC4_RANDOM="yes"], [HAS_ARC4_RANDOM="no"])
+AM_CONDITIONAL(HAS_ARC4_RANDOM, test x$HAS_ARC4_RANDOM = xyes)
+if test x$HAS_ARC4_RANDOM = xyes ; then
+	AC_DEFINE(ARC4_RANDOM, 1, [Define to use arc4random() function])
+	RANDOMMANDEFS="$RANDOMMANDEFS -DARC4_RANDOM"
+fi
+
+AC_SUBST(RANDOMMANDEFS)
 
 # FIXME: find out how to check for these things. Note that Kerberos was
 # turned off everywhere but on OpenBSD.
 AM_CONDITIONAL(HAS_KERBEROS_FIVE, false)
-AM_CONDITIONAL(HAS_ARC4_RANDOM, false)
+
 
 # Figure out where everything goes in the filesystem
 
