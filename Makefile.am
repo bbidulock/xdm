@@ -98,7 +98,7 @@ endif
 #  xdm man page 
 #
 
-appmandir =  $(mandir)/man$(APP_MAN_SUFFIX)
+appmandir = $(APP_MAN_DIR)
 
 appman_SOURCES = xdm.man.cpp
 appman_DATA = $(appman_SOURCES:man.cpp=@APP_MAN_SUFFIX@)
