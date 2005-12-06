@@ -100,11 +100,11 @@ endif
 
 appmandir = $(APP_MAN_DIR)
 
-appman_SOURCES = xdm.man.cpp
-appman_DATA = $(appman_SOURCES:man.cpp=@APP_MAN_SUFFIX@)
+appman_PRE = xdm.man.cpp
+appman_DATA = $(appman_PRE:man.cpp=@APP_MAN_SUFFIX@)
 
 CLEANFILES = $(appman_DATA)
-EXTRA_DIST = $(appman_SOURCES)
+EXTRA_DIST = $(appman_PRE)
 
 include $(top_srcdir)/cpprules.in
 
