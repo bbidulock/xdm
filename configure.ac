@@ -459,6 +459,10 @@ AC_DEFINE_DIR(DEF_AUTH_DIR, XDMCONFIGDIR,
 AC_DEFINE_DIR(DEF_GREETER_LIB, XDMLIBDIR/libXdmGreet.so, 
 	[Define to pathname where greeter shared object is installed (if used)])
 
+PKG_CHECK_MODULES(APPDEFS, xt)
+appdefaultdir=$(pkg-config --variable=appdefaultdir xt)
+AC_SUBST(appdefaultdir)
+
 XORG_MANPAGE_SECTIONS
 XORG_RELEASE_VERSION
 
