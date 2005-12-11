@@ -3,7 +3,7 @@
 
 include $(top_srcdir)/cpprules.in
 
-xdmlibdir = $(XDMLIBDIR)
+xdmscriptdir = $(XDMSCRIPTDIR)
 xdmconfigdir = $(XDMCONFIGDIR)
 
 dist_xdmconfig_DATA = \
@@ -14,10 +14,10 @@ xdmconfig_DATA = \
 	Xresources \
 	Xservers
 
-xdmlib_SCRIPTS = \
+xdmscript_SCRIPTS = \
 	Xsession
 
-dist_xdmlib_SCRIPTS = \
+dist_xdmscript_SCRIPTS = \
 	GiveConsole \
 	TakeConsole \
 	Xsetup_0 \
@@ -47,8 +47,8 @@ XPMDEFINES = -DXPM -DBITMAPDIR=$(XDM_PIXMAPDIR) -DXDM_PIXMAP=$(XDM_PIXMAP) \
 #endif
 
 CPP_FILES_FLAGS = -DBINDIR=$(bindir) -DDEFAULTVT=$(DEFAULTVT) \
-    -DXDMDIR=$(XDMLIBDIR) -DXDMLOGDIR=$(XDMLOGDIR) \
-    -DXDMPIDDIR=$(XDMPIDDIR) -DXDMCONFIGDIR=$(XDMCONFIGDIR) \
+    -DXDMDIR=$(XDMLIBDIR) -DXDMLOGDIR=$(XDMLOGDIR) -DXDMPIDDIR=$(XDMPIDDIR) \
+    -DXDMCONFIGDIR=$(XDMCONFIGDIR) -DXDMSCRIPTDIR=$(XDMSCRIPTDIR) \
     -DSU=$(SU) -DCHOOSERPATH=$(XDMLIBDIR)/chooser $(XPMDEFINES) \
     -DSHELL_CMD=$(SHELL_CMD)
 

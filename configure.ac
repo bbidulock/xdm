@@ -177,6 +177,12 @@ AC_ARG_WITH(xdmconfigdir,
 	[XDMCONFIGDIR="$withval"], [XDMCONFIGDIR="${XDMLIBDIR}"])
 AC_SUBST(XDMCONFIGDIR)
 
+AC_ARG_WITH(xdmscriptdir,
+	AC_HELP_STRING([--with-xdmscriptdir=<pathname>],
+	  [specify directory for xdm scripts (default is same as xdmlibdir)]),
+	[XDMSCRIPTDIR="$withval"], [XDMSCRIPTDIR="${XDMLIBDIR}"])
+AC_SUBST(XDMSCRIPTDIR)
+
 AC_ARG_WITH(logdir,
 	AC_HELP_STRING([--with-logdir=<pathname>],
 	  [specify directory for xdm log files (default=/var/log)]),

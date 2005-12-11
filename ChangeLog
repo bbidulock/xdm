@@ -1,3 +1,13 @@
+2005-12-11  Alan Coopersmith  <alan.coopersmith@sun.com>
+
+	* README:
+	* configure.ac:
+	* config/Makefile.am: 
+	* config/xdm-config.cpp:
+	Bugzilla #5055 <https://bugs.freedesktop.org/show_bug.cgi?id=5055>
+	Add --with-xdmscriptdir to allow builder/packager to decide if
+	scripts should go in config, lib, or data directories.
+
 2005-12-07  Kevin E. Martin  <kem-at-freedesktop-dot-org>
 
 	* Makefile.am:

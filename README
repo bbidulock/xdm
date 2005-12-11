@@ -8,7 +8,8 @@ Log files:		/var/log
 Process id/lock files:	/var/run
 
 These may be overridden with the following options to configure:
-Scripts & modules:	--with-xdmlibdir
+Loadable modules:	--with-xdmlibdir
+Scripts:		--with-xdmscriptdir (or --with-xdmlibdir)
 Configuration files:	--with-xdmconfigdir (or --with-xdmlibdir)
 Pixmap files:		--with-xdmpixmapdir (or --with-xdmlibdir)
 Log files:		--with-logdir
@@ -16,6 +17,6 @@ Process id/lock files:	--with-piddir
 
 For instance, some packagers/sites may prefer:
 	--with-xdmconfigdir=/etc/X11/xdm --with-xdmlibdir=$(prefix)/lib/xdm
-
+	--with-xdmscriptdir=/etc/X11/xdm
 
 $Id$
