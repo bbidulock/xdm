@@ -1,3 +1,4 @@
+/* $XdotOrg: $ */
 /* $Xorg: Login.c,v 1.4 2001/02/09 02:05:41 xorgcvs Exp $ */
 /*
 
@@ -1030,6 +1031,8 @@ static void Initialize (
 #endif
 
 #ifdef XPM
+    int 	rv = 0;
+    
     myXGCV.foreground = w->login.hipixel;
     myXGCV.background = w->core.background_pixel;
     valuemask = GCForeground | GCBackground;
@@ -1117,13 +1120,21 @@ static void Initialize (
         myAttributes.valuemask |= XpmReturnPixels;
         myAttributes.valuemask |= XpmReturnExtensions;
 
-        XpmReadFileToPixmap(XtDisplay(w),            /* display */
-            RootWindowOfScreen(XtScreen(w)),         /* window */
-            w->login.logoFileName,                   /* XPM filename */
-            &(w->login.logoPixmap),                  /* pixmap */
-            &(w->login.logoMask),                    /* pixmap mask */
-            &myAttributes);                          /* XPM attributes */
-        w->login.logoValid = True;
+        rv = XpmReadFileToPixmap(XtDisplay(w),		/* display */
+	     RootWindowOfScreen(XtScreen(w)),		/* window */
+	     w->login.logoFileName,			/* XPM filename */
+	     &(w->login.logoPixmap),			/* pixmap */
+	     &(w->login.logoMask),			/* pixmap mask */
+	     &myAttributes);				/* XPM attributes */
+       
+	if ( rv < 0 )
+	{
+	    LogError("Cannot load xpm file %s: %s.\n", w->login.logoFileName,
+		     XpmGetErrorString(rv));
+	    goto SkipXpmLoad;
+	}
+
+	w->login.logoValid = True;
 
         XGetGeometry(XtDisplay(w), w->login.logoPixmap,
             &tmpWindow,
