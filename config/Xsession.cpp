@@ -6,9 +6,8 @@ XCOMM $XFree86: xc/programs/xdm/config/Xsession,v 1.2 1998/01/11 03:48:32 dawes 
 XCOMM redirect errors to a file in user's home directory if we can
 for errfile in "$HOME/.xsession-errors" "${TMPDIR-/tmp}/xses-$USER" "/tmp/xses-$USER"
 do
-	if ( cp /dev/null "$errfile" 2> /dev/null )
+	if ( umask 077 && cp /dev/null "$errfile" 2> /dev/null )
 	then
-		chmod 600 "$errfile"
 		exec > "$errfile" 2>&1
 		break
 	fi

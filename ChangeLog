@@ -1,3 +1,13 @@
+2006-02-24  Jeremy C. Reed  <reed@reedmedia.net>
+
+	reviewed by: Alan.Coopersmith@Sun.COM
+
+	* config/Xsession.cpp:
+	Bug #5897 <https://bugs.freedesktop.org/show_bug.cgi?id=5897>
+	Create xsession error file with umask 077 instead of chmod
+	a moment later. This was reported by Steven M. Bellovin to NetBSD.
+	<http://www.netbsd.org/cgi-bin/query-pr-single.pl?number=32804>
+
 2006-02-24  Alan Coopersmith  <alan.coopersmith@sun.com>
 
 	* greeter/Login.c: 
