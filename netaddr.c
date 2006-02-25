@@ -155,7 +155,7 @@ int ConvertAddr (XdmcpNetaddr saddr, int *len, char **addr)
 {
     int retval;
 
-    if (len == NULL)
+    if ((len == NULL) || (saddr == NULL))
         return -1;
     *addr = NetaddrAddress(saddr, len);
 #ifdef STREAMSCONN

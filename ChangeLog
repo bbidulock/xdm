@@ -1,3 +1,10 @@
+2006-02-24  Alan Coopersmith  <alan.coopersmith@sun.com>
+
+	* netaddr.c: 
+	Bug #6026 <https://bugs.freedesktop.org/show_bug.cgi?id=6026>
+	Segfault in netaddr.c:ConvertAddr if ifa_addr is NULL
+	(Loser Mcloser <reebydobalina@yahoo.ca>)
+
 2006-02-24  Jeremy C. Reed  <reed@reedmedia.net>
 
 	reviewed by: Alan.Coopersmith@Sun.COM
