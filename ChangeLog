@@ -1,5 +1,13 @@
 2006-02-24  Alan Coopersmith  <alan.coopersmith@sun.com>
 
+	* configure.ac:
+	* session.c:
+	Bug #6036 <https://bugs.freedesktop.org/show_bug.cgi?id=6036>
+	Check for key_setnet declaration before defining it to avoid
+	compiler error of conflicting types on DragonFly BSD
+
+2006-02-24  Alan Coopersmith  <alan.coopersmith@sun.com>
+
 	* netaddr.c: 
 	Bug #6026 <https://bugs.freedesktop.org/show_bug.cgi?id=6026>
 	Segfault in netaddr.c:ConvertAddr if ifa_addr is NULL

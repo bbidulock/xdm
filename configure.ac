@@ -73,6 +73,15 @@ dnl Sets $SECURE_RPC to "yes" or "no"
 XTRANS_SECURE_RPC_FLAGS
 AM_CONDITIONAL(HAS_SECURE_RPC, test x$SECURE_RPC = xyes)
 
+dnl Is key_setnet defined in a header file?
+AC_CHECK_DECL(key_setnet, 
+	AC_DEFINE(HAVE_DECL_KEY_SETNET,1,
+	     [Define to 1 if your headers define the key_setnet() function.]),
+	[],[
+#include <rpc/rpc.h>
+#include <rpc/key_prot.h>
+])
+
 # darwin could have PAM support, but not yet
 case $host_os in
     darwin*)

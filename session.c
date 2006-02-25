@@ -1,4 +1,4 @@
-/* $XdotOrg: xc/programs/xdm/session.c,v 1.1.4.4 2003/12/06 13:24:29 kaleb Exp $ */
+/* $XdotOrg: app/xdm/session.c,v 1.3 2005/11/08 06:33:31 jkj Exp $ */
 /* $Xorg: session.c,v 1.8 2001/02/09 02:05:40 xorgcvs Exp $ */
 /*
 
@@ -55,7 +55,9 @@ from The Open Group.
 #ifdef SECURE_RPC
 # include <rpc/rpc.h>
 # include <rpc/key_prot.h>
+# if !HAVE_DECL_KEY_SETNET
 extern int key_setnet(struct key_netstarg *arg);
+# endif
 #endif
 #ifdef K5AUTH
 # include <krb5/krb5.h>
