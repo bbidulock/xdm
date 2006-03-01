@@ -1,5 +1,5 @@
 /* $Xorg: verify.c,v 1.4 2001/02/09 02:05:41 xorgcvs Exp $ */
-/* $XdotOrg: xc/programs/xdm/greeter/verify.c,v 1.4 2004/10/21 06:03:13 herrb Exp $ */
+/* $XdotOrg: app/xdm/greeter/verify.c,v 1.6 2005/11/08 06:33:32 jkj Exp $ */
 /*
 
 Copyright 1988, 1998  The Open Group
@@ -148,10 +148,15 @@ static int PAM_conv (int num_msg,
 		case PAM_PROMPT_ECHO_OFF:
 			/* wants password */
 			if (reply) {
-				reply = realloc(reply, size);
+				void *r2 = reply;
+				if (! (reply = realloc(reply, size))) {
+					free (r2);
+					return PAM_CONV_ERR;
+				}
 				bzero(reply + size - PAM_RESPONSE_SIZE, PAM_RESPONSE_SIZE);
 			} else {
-				reply = (struct pam_response*)malloc(size);
+				if (! (reply = (struct pam_response*)malloc(size)))
+					return PAM_CONV_ERR;
 				bzero(reply, size);
 			}
 
