@@ -1,3 +1,10 @@
+2006-03-09  Alan Coopersmith  <alan.coopersmith@sun.com>
+
+	* socket.c: (CreateSocklistEntry):
+	Coverity ids #7689, 7690, 7691:
+	When malloc fails, don't just print an error and continue on using
+	the NULL pointer, return NULL to the caller.
+
 2006-03-01  Matthias Hopf  <mhopf@suse.de>
 
 	* greeter/verify.c: (PAM_conv):

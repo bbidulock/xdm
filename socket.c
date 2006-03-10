@@ -1,4 +1,4 @@
-/* $XdotOrg: xc/programs/xdm/socket.c,v 1.3 2004/07/06 00:44:39 anholt Exp $ */
+/* $XdotOrg: app/xdm/socket.c,v 1.4 2005/07/05 18:52:33 alanc Exp $ */
 /* $Xorg: socket.c,v 1.4 2001/02/09 02:05:40 xorgcvs Exp $ */
 /*
 
@@ -247,8 +247,10 @@ static struct socklist *
 CreateSocklistEntry(ARRAY8Ptr addr)
 {
     struct socklist *s = malloc (sizeof(struct socklist));
-    if (s == NULL) 
+    if (s == NULL) {
 	LogOutOfMem("CreateSocklistEntry");
+	return NULL;
+    }
 
     bzero(s, sizeof(struct socklist));
 
@@ -256,8 +258,11 @@ CreateSocklistEntry(ARRAY8Ptr addr)
     {
 	struct sockaddr_in *sin;
 	sin = malloc (sizeof(struct sockaddr_in));
-	if (sin == NULL) 
+	if (sin == NULL) {
 	    LogOutOfMem("CreateSocklistEntry");
+	    free(s);
+	    return NULL;
+	}
 	s->addr = (struct sockaddr *) sin;
 
 	bzero (sin, sizeof (struct sockaddr_in));
@@ -275,8 +280,11 @@ CreateSocklistEntry(ARRAY8Ptr addr)
     {
 	struct sockaddr_in6 *sin6;
 	sin6 = malloc (sizeof(struct sockaddr_in6));
-	if (sin6 == NULL) 
+	if (sin6 == NULL) {
 	    LogOutOfMem("CreateSocklistEntry");
+	    free(s);	    
+	    return NULL;
+	}
 	s->addr = (struct sockaddr *) sin6;
 
 	bzero (sin6, sizeof (struct sockaddr_in6));
