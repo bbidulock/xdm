@@ -1,7 +1,19 @@
+2006-03-10  Alan Coopersmith  <alan.coopersmith@sun.com>
+
+	* chooser.c: 
+	Coverity ids #722, 723, 724, 725, 726, 727, 728:
+	Need to XtFree the values returned by XawListShowCurrent to plug
+	memory leaks.
+
+	* socket.c (UpdateMcastGroup): 
+	Coverity id #834:  
+	After joining a multicast group, add group pointer to the list of
+	active multicast groups instead of just leaking the group pointer.
+
 2006-03-09  Alan Coopersmith  <alan.coopersmith@sun.com>
 
 	* socket.c: (CreateSocklistEntry):
-	Coverity ids #7689, 7690, 7691:
+	Coverity id #332: 
 	When malloc fails, don't just print an error and continue on using
 	the NULL pointer, return NULL to the caller.
 

@@ -1,5 +1,5 @@
 /*
- * $XdotOrg: xc/programs/xdm/chooser.c,v 1.2 2004/04/23 19:54:42 eich Exp $
+ * $XdotOrg: app/xdm/chooser.c,v 1.4 2005/11/08 06:33:31 jkj Exp $
  * $Xorg: chooser.c,v 1.4 2001/02/09 02:05:40 xorgcvs Exp $
  *
 Copyright 1990, 1998  The Open Group
@@ -140,7 +140,7 @@ in this Software without prior written authorization from The Open Group.
 static int FromHex (char *s, char *d, int len);
 static int oldline;
 
-Widget	    toplevel, label, viewport, paned, list, box, cancel, acceptit, ping;
+static Widget	    toplevel, label, viewport, paned, list, box, cancel, acceptit, ping;
 
 static void	CvtStringToARRAY8(
     XrmValuePtr	args,
@@ -1030,7 +1030,7 @@ Hostselect (int line)
 {
   XawListReturnStruct	*r;
   HostName		*h;
-  r = XawListShowCurrent (list);
+
   /* Assume the next host is willing */
   XawListHighlight (list,line);
   r = XawListShowCurrent (list);
@@ -1047,7 +1047,7 @@ Hostselect (int line)
 	Arg		size[2];
 	Dimension	height, portheight;
 	Position	y;
-	int		lineheight, liney, newy = 0;
+	int		lineheight, liney;
 
 	XtSetArg (size[0], XtNheight, &height);
 	XtSetArg (size[1], XtNy, &y);
@@ -1066,10 +1066,12 @@ Hostselect (int line)
 				      (liney + lineheight) - portheight);
 	}
 	
-        return 1;
+	XtFree((char *) r);
+	return 1;
       }
     }
-  } 
+  }
+  XtFree((char *) r);
   return 0; 
 }
 
@@ -1100,7 +1102,10 @@ Selectfirst (void)
 static void
 Storeold (Widget w, XEvent *event, String *params, Cardinal *num_params)
 {
-  oldline = (XawListShowCurrent(list))->list_index;
+  XawListReturnStruct	*r = XawListShowCurrent(list);
+
+  oldline = r->list_index;
+  XtFree((char *) r);
 }
 
 /*
@@ -1165,6 +1170,7 @@ Switch_Key (Widget w, XEvent *event, String *params, Cardinal *num_params)
   else
     HostCycle(r->list_index,NameTableSize,keysym);
 
+  XtFree((char *) r);
   return;
 }
 
@@ -1185,8 +1191,9 @@ Switch_Btn (Widget w, XEvent *event, String *params, Cardinal *num_params)
       Selectfirst();
     else
       HostCycle(r->list_index,NameTableSize,event->xbutton.button);
-
-  return;
+    
+    XtFree((char *) r);
+    return;
 }
 
 
@@ -1213,6 +1220,7 @@ DoAccept (Widget w, XEvent *event, String *params, Cardinal *num_params)
 	    }
 	exit (OBEYSESS_DISPLAY);
     }
+    XtFree((char *) r);
 }
 
 /* ARGSUSED */
@@ -1223,12 +1231,13 @@ DoCheckWilling (Widget w, XEvent *event, String *params, Cardinal *num_params)
     HostName		*h;
     
     r = XawListShowCurrent (list);
-    if (r->list_index == XAW_LIST_NONE)
-	return;
-    for (h = hostNamedb; h; h = h->next)
-	if (!strcmp (r->string, h->fullname))
-	    if (!h->willing)
-		XawListUnhighlight (list);
+    if (r->list_index != XAW_LIST_NONE) {
+	for (h = hostNamedb; h; h = h->next)
+	    if (!strcmp (r->string, h->fullname))
+		if (!h->willing)
+		    XawListUnhighlight (list);
+    }
+    XtFree((char *) r);
 }
 
 /* ARGSUSED */

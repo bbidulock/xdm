@@ -1,4 +1,4 @@
-/* $XdotOrg: app/xdm/socket.c,v 1.4 2005/07/05 18:52:33 alanc Exp $ */
+/* $XdotOrg: app/xdm/socket.c,v 1.5 2006/03/10 00:48:16 alanc Exp $ */
 /* $Xorg: socket.c,v 1.4 2001/02/09 02:05:40 xorgcvs Exp $ */
 /*
 
@@ -461,6 +461,9 @@ UpdateMcastGroup(ARRAY8Ptr addr, void **closure)
 	return;
 
     ChangeMcastMembership(s, g, JOIN_MCAST_GROUP);
+    g->ref = 1;
+    g->next = s->mcastgroups;
+    s->mcastgroups = g;
 }
 
 /* Open or close listening sockets to match the current settings read in
