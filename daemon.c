@@ -1,3 +1,4 @@
+/* $XdotOrg: $ */
 /* $Xorg: daemon.c,v 1.4 2001/02/09 02:05:40 xorgcvs Exp $ */
 /*
 
@@ -58,10 +59,6 @@ from The Open Group.
 #include "dm.h"
 #include "dm_error.h"
 
-#if defined(__GLIBC__) || defined(CSRG_BASED)
-#define HAS_DAEMON
-#endif
-
 #ifndef X_NOT_POSIX
 #define HAS_SETSID
 #endif
@@ -105,7 +102,7 @@ BecomeDaemon (void)
 {
 
     /* If our C library has the daemon() function, just use it. */
-#ifdef HAS_DAEMON
+#ifdef HAVE_DAEMON
     daemon (0, 0);
 #else
     switch (fork()) {

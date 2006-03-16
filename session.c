@@ -1,4 +1,4 @@
-/* $XdotOrg: app/xdm/session.c,v 1.3 2005/11/08 06:33:31 jkj Exp $ */
+/* $XdotOrg: app/xdm/session.c,v 1.4 2006/02/25 02:21:51 alanc Exp $ */
 /* $Xorg: session.c,v 1.8 2001/02/09 02:05:40 xorgcvs Exp $ */
 /*
 
@@ -76,7 +76,7 @@ extern int key_setnet(struct key_netstarg *arg);
 
 static	int	runAndWait (char **args, char **environ);
 
-#if defined(CSRG_BASED) || defined(__osf__) || defined(__DARWIN__) || defined(__QNXNTO__) || defined(sun) || defined(__GLIBC__) || defined(__SCO__)
+#ifdef HAVE_GRP_H
 # include <sys/types.h>
 # include <grp.h>
 #else

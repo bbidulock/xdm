@@ -1,4 +1,4 @@
-/* $XdotOrg: util.c,v 1.4 2001/02/09 02:05:41 xorgcvs Exp $ */
+/* $XdotOrg: app/xdm/util.c,v 1.3 2005/11/08 06:33:31 jkj Exp $ */
 /* $Xorg: util.c,v 1.4 2001/02/09 02:05:41 xorgcvs Exp $ */
 /*
 
@@ -244,7 +244,7 @@ CleanUpChild (void)
 #ifdef CSRG_BASED
 	setsid();
 #else
-#if defined(SYSV) || defined(SVR4) || defined(__CYGWIN__)
+#ifdef SETPGRP_VOID
 #if !(defined(SVR4) && defined(i386))
 	setpgrp ();
 #endif

@@ -1,3 +1,12 @@
+2006-03-16  Alan Coopersmith  <alan.coopersmith@sun.com>
+
+	* configure.ac: 
+	* daemon.c:
+	* session.c:
+	* util.c:
+	Convert checks for <grp.h>, daemon(), and setpgrp arguments to
+	autoconf tests instead of checking OS name #ifdefs.
+
 2006-03-10  Alan Coopersmith  <alan.coopersmith@sun.com>
 
 	* chooser.c: 

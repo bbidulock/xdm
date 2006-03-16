@@ -21,6 +21,8 @@ dnl  PERFORMANCE OF THIS SOFTWARE.
 dnl
 dnl Process this file with autoconf to create configure.
 
+dnl $XdotOrg: $
+
 AC_PREREQ([2.57])
 AC_INIT(xdm,[1.0.1], [https://bugs.freedesktop.org/enter_bug.cgi?product=xorg],xdm)
 AM_INIT_AUTOMAKE([dist-bzip2])
@@ -36,6 +38,7 @@ AC_PROG_INSTALL
 XORG_PROG_RAWCPP
 
 AC_FUNC_FORK
+AC_FUNC_SETPGRP
 
 dnl If you're looking here because you got a message that said
 dnl 'error: possibly undefined macro: AC_DEFINE', the source of
@@ -67,6 +70,9 @@ if test "x$HAS_SETUSERCONTEXT" = "xyes" ; then
 	AC_DEFINE(HAS_SETUSERCONTEXT,1,
 		[Define to 1 if you have the 'setusercontext' function.])
 fi
+
+AC_CHECK_FUNCS([daemon])
+AC_CHECK_HEADERS([grp.h])
 
 XTRANS_CONNECTION_FLAGS
 dnl Sets $SECURE_RPC to "yes" or "no"
