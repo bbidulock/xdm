@@ -1,3 +1,10 @@
+2006-03-16  Jeremy C. Reed  <reed@reedmedia.net>
+
+	reviewed by: Alan Coopersmith
+
+	* configure.ac:
+	DragonFly is a BSD, so is CSRG_BASED and use su with -m option.
+
 2006-03-16  Alan Coopersmith  <alan.coopersmith@sun.com>
 
 	* configure.ac: 

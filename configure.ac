@@ -21,7 +21,7 @@ dnl  PERFORMANCE OF THIS SOFTWARE.
 dnl
 dnl Process this file with autoconf to create configure.
 
-dnl $XdotOrg: $
+dnl $XdotOrg: app/xdm/configure.ac,v 1.33 2006-03-16 21:46:55 alanc Exp $
 
 AC_PREREQ([2.57])
 AC_INIT(xdm,[1.0.1], [https://bugs.freedesktop.org/enter_bug.cgi?product=xorg],xdm)
@@ -124,7 +124,7 @@ case $host_os in
         OS_CFLAGS="-D__DARWIN__ -DNO_LASTLOG"
 	SU="su -m"
         ;;
-    *bsd*)
+    *bsd*|dragonfly*)
         OS_CFLAGS="-DCSRG_BASED"
 	SU="su -m"
         ;;
