@@ -21,7 +21,7 @@ dnl  PERFORMANCE OF THIS SOFTWARE.
 dnl
 dnl Process this file with autoconf to create configure.
 
-dnl $XdotOrg: app/xdm/configure.ac,v 1.33 2006-03-16 21:46:55 alanc Exp $
+dnl $XdotOrg: app/xdm/configure.ac,v 1.34 2006/03/16 21:56:24 reed Exp $
 
 AC_PREREQ([2.57])
 AC_INIT(xdm,[1.0.1], [https://bugs.freedesktop.org/enter_bug.cgi?product=xorg],xdm)
@@ -36,6 +36,11 @@ AM_PROG_LIBTOOL
 AC_PROG_INSTALL
 
 XORG_PROG_RAWCPP
+
+# Check for mktemp to prevent security issue noted in Xorg bug #5898
+# See https://bugs.freedesktop.org/show_bug.cgi?id=5898 for details.
+AC_PATH_PROG(MKTEMP_COMMAND, mktemp)
+AM_CONDITIONAL(HAVE_MKTEMP_COMMAND, test x$MKTEMP_COMMAND != x)
 
 AC_FUNC_FORK
 AC_FUNC_SETPGRP
@@ -223,7 +228,8 @@ AC_ARG_WITH(config-type,
 AC_SUBST(SERVERSTYPE)
 
 case $host_os in
-    *sco*)	SHELL_CMD="/bin/ksh"	;;
+    *sco*|*solaris*)
+		SHELL_CMD="/bin/ksh"	;;
     *)		SHELL_CMD="/bin/sh"	;;
 esac
 AC_SUBST(SHELL_CMD)
@@ -483,6 +489,7 @@ AC_DEFINE_DIR(DEF_GREETER_LIB, XDMLIBDIR/libXdmGreet.so,
 PKG_CHECK_MODULES(APPDEFS, xt)
 appdefaultdir=$(pkg-config --variable=appdefaultdir xt)
 AC_SUBST(appdefaultdir)
+AC_SUBST(MKTEMP_COMMAND)
 
 XORG_MANPAGE_SECTIONS
 XORG_RELEASE_VERSION

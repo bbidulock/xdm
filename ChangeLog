@@ -1,3 +1,14 @@
+2006-03-17  Alan Coopersmith  <alan.coopersmith@sun.com>
+
+	* configure.ac:
+	* config/Xsession.cpp: 
+	* config/Makefile.am:
+	Bug #5898 <https://bugs.freedesktop.org/show_bug.cgi?id=5898>
+	Use mktemp command to create files safely in TMPDIR or /tmp
+	on systems that have it - don't try to create files there if
+	mktemp is not present.   Fix based on NetBSD fix from
+	<http://www.netbsd.org/cgi-bin/query-pr-single.pl?number=32805> .
+
 2006-03-16  Jeremy C. Reed  <reed@reedmedia.net>
 
 	reviewed by: Alan Coopersmith
