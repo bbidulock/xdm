@@ -1,3 +1,8 @@
+2006-03-27  Alan Coopersmith  <alan.coopersmith@sun.com>
+
+	* configure.ac: 
+	Version bump: 1.0.2
+
 2006-03-17  Alan Coopersmith  <alan.coopersmith@sun.com>
 
 	* configure.ac:
