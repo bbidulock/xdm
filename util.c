@@ -1,4 +1,4 @@
-/* $XdotOrg: app/xdm/util.c,v 1.3 2005/11/08 06:33:31 jkj Exp $ */
+/* $XdotOrg: app/xdm/util.c,v 1.4 2006/03/16 21:46:55 alanc Exp $ */
 /* $Xorg: util.c,v 1.4 2001/02/09 02:05:41 xorgcvs Exp $ */
 /*
 
@@ -55,9 +55,6 @@ from The Open Group.
 #include <signal.h>
 #undef _POSIX_SOURCE
 #endif
-#endif
-#if defined(__osf__) || defined(linux) || defined(__QNXNTO__) || defined(__GLIBC__)
-#define setpgrp setpgid
 #endif
 
 void
@@ -241,18 +238,7 @@ freeArgs (char **argv)
 void
 CleanUpChild (void)
 {
-#ifdef CSRG_BASED
 	setsid();
-#else
-#ifdef SETPGRP_VOID
-#if !(defined(SVR4) && defined(i386))
-	setpgrp ();
-#endif
-#else
-	setpgrp (0, getpid ());
-	sigsetmask (0);
-#endif
-#endif
 #ifdef SIGCHLD
 	(void) Signal (SIGCHLD, SIG_DFL);
 #endif

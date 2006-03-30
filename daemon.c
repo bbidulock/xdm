@@ -1,4 +1,4 @@
-/* $XdotOrg: $ */
+/* $XdotOrg: app/xdm/daemon.c,v 1.3 2006/03/16 21:46:55 alanc Exp $ */
 /* $Xorg: daemon.c,v 1.4 2001/02/09 02:05:40 xorgcvs Exp $ */
 /*
 
@@ -40,61 +40,8 @@ from The Open Group.
 #include <stdlib.h>
 #include <string.h>
 
-
-#if defined(USG)
-# include <termios.h>
-#else
-# include <sys/ioctl.h>
-#endif
-#ifdef hpux
-# include <sys/ptyio.h>
-#endif
-
-#ifdef X_NOT_POSIX
-# define Pid_t int
-#else
-# define Pid_t pid_t
-#endif
-
 #include "dm.h"
 #include "dm_error.h"
-
-#ifndef X_NOT_POSIX
-#define HAS_SETSID
-#endif
-
-#ifndef HAS_SETSID
-#define setsid() MySetsid()
-
-static Pid_t
-MySetsid(void)
-{
-#if defined(TIOCNOTTY) || defined(TCCLRCTTY) || defined(TIOCTTY)
-    int fd;
-#endif
-    int stat;
-
-    fd = open("/dev/tty", O_RDWR);
-    if (fd >= 0) {
-#if defined(USG) && defined(TCCLRCTTY)
-       int zero = 0;
-       (void) ioctl (fd, TCCLRCTTY, &zero);
-#elif (defined(SYSV) || defined(SVR4)) && defined(TIOCTTY)
-       int zero = 0;
-       (void) ioctl (i, TIOCTTY, &zero);
-#elif defined(TIOCNOTTY)
-       (void) ioctl (i, TIOCNOTTY, (char *) 0);    /* detach, BSD style */
-#endif
-        close(fd);
-    }
-
-#if defined(SYSV) || defined(__QNXNTO__)
-    return setpgrp();
-#else
-    return setpgid(0, getpid());
-#endif
-}
-#endif /* !HAS_SETSID */
 
 /* detach */
 void
@@ -103,7 +50,11 @@ BecomeDaemon (void)
 
     /* If our C library has the daemon() function, just use it. */
 #ifdef HAVE_DAEMON
-    daemon (0, 0);
+    if (daemon (0, 0) < 0) {
+       /* error */
+       LogError("daemon() failed, %s\n", strerror(errno));
+       exit(1);
+    }
 #else
     switch (fork()) {
     case -1:
@@ -138,5 +89,5 @@ BecomeDaemon (void)
     (void) open ("/dev/null", O_RDWR);
     (void) dup2 (0, 1);
     (void) dup2 (0, 2);
-#endif /* HAS_DAEMON */
+#endif /* HAVE_DAEMON */
 }

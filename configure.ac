@@ -21,7 +21,7 @@ dnl  PERFORMANCE OF THIS SOFTWARE.
 dnl
 dnl Process this file with autoconf to create configure.
 
-dnl $XdotOrg: app/xdm/configure.ac,v 1.35 2006/03/18 03:43:18 alanc Exp $
+dnl $XdotOrg: app/xdm/configure.ac,v 1.36 2006/03/27 23:59:21 alanc Exp $
 
 AC_PREREQ([2.57])
 AC_INIT(xdm,[1.0.2], [https://bugs.freedesktop.org/enter_bug.cgi?product=xorg],xdm)
@@ -43,7 +43,6 @@ AC_PATH_PROG(MKTEMP_COMMAND, mktemp)
 AM_CONDITIONAL(HAVE_MKTEMP_COMMAND, test x$MKTEMP_COMMAND != x)
 
 AC_FUNC_FORK
-AC_FUNC_SETPGRP
 
 dnl If you're looking here because you got a message that said
 dnl 'error: possibly undefined macro: AC_DEFINE', the source of
