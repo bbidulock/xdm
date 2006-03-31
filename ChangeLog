@@ -1,6 +1,10 @@
 2006-03-30  Alan Coopersmith  <alan.coopersmith@sun.com>
 
 	* configure.ac:
+	Version bump: 1.0.3
+
+2006-03-30  Alan Coopersmith  <alan.coopersmith@sun.com>
+	
 	* daemon.c:
 	* util.c:
 	Drop all setpgrp/setpgid silliness and just use setsid everywhere.
