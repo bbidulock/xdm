@@ -1,4 +1,4 @@
-/* $XdotOrg: app/xdm/session.c,v 1.4 2006/02/25 02:21:51 alanc Exp $ */
+/* $XdotOrg: app/xdm/session.c,v 1.5 2006/03/16 21:46:55 alanc Exp $ */
 /* $Xorg: session.c,v 1.8 2001/02/09 02:05:40 xorgcvs Exp $ */
 /*
 
@@ -570,17 +570,6 @@ StartClient (
 
 	/* Do system-dependent login setup here */
 
-#ifdef USE_PAM
-	/* pass in environment variables set by libpam and modules it called */
-	if (pamh) {
-	    long i;
-	    char **pam_env = pam_getenvlist(pamh);
-	    for(i = 0; pam_env && pam_env[i]; i++) {
-		verify->userEnviron = putEnv(pam_env[i], verify->userEnviron);
-	    }
-	}
-#endif
-
 #ifdef USESECUREWARE
         Debug ("set_identity: uid=%d\n", userp->pw.pw_uid);
         ret = smp_set_identity (userp, &reason, &smpenv, &smpshell);
@@ -632,12 +621,22 @@ StartClient (
 #endif   /* QNX4 doesn't support multi-groups, no initgroups() */
 #ifdef USE_PAM
 	if (pamh) {
+	    long i;
+	    char **pam_env;
+
 	    pam_error = pam_setcred (pamh, PAM_ESTABLISH_CRED);
 	    if (pam_error != PAM_SUCCESS) {
 		LogError ("pam_setcred for \"%s\" failed: %s\n",
 			 name, pam_strerror(pamh, pam_error));
 		return(0);
 	    }
+
+	    /* pass in environment variables set by libpam and modules it called */
+	    pam_env = pam_getenvlist(pamh);
+	    for(i = 0; pam_env && pam_env[i]; i++) {
+		verify->userEnviron = putEnv(pam_env[i], verify->userEnviron);
+	    }
+
 	}
 #endif
 	if (setuid(verify->uid) < 0) {
