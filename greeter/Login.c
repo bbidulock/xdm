@@ -1,4 +1,4 @@
-/* $XdotOrg: $ */
+/* $XdotOrg: app/xdm/greeter/Login.c,v 1.3 2006/02/24 18:09:00 alanc Exp $ */
 /* $Xorg: Login.c,v 1.4 2001/02/09 02:05:41 xorgcvs Exp $ */
 /*
 
@@ -675,10 +675,10 @@ EraseToEndOfLine (
     switch (ctx->login.state) {
     case GET_NAME:
 	EraseName (ctx, ctx->login.cursor);
-	ctx->login.data.name[ctx->login.cursor] = '\0';
+	bzero (ctx->login.data.name, NAME_LEN);
 	break;
     case GET_PASSWD:
-	ctx->login.data.passwd[ctx->login.cursor] = '\0';
+	bzero (ctx->login.data.passwd, PASSWORD_LEN);
 	break;
     }
     XorCursor (ctx);
@@ -846,8 +846,8 @@ ResetLogin (LoginWidget w)
 {
     EraseName (w, 0);
     w->login.cursor = 0;
-    w->login.data.name[0] = '\0';
-    w->login.data.passwd[0] = '\0';
+    bzero (w->login.data.name, NAME_LEN);
+    bzero (w->login.data.passwd, PASSWORD_LEN);
     w->login.state = GET_NAME;
 }
 
@@ -1155,8 +1155,8 @@ static void Initialize (
 
 SkipXpmLoad:
 #endif /* XPM */
-    w->login.data.name[0] = '\0';
-    w->login.data.passwd[0] = '\0';
+    bzero (w->login.data.name, NAME_LEN);
+    bzero (w->login.data.passwd, PASSWORD_LEN);
     w->login.state = GET_NAME;
     w->login.cursor = 0;
     w->login.failUp = 0;

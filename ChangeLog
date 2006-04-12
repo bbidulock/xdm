@@ -1,3 +1,10 @@
+2006-04-11  Alan Coopersmith  <alan.coopersmith@sun.com>
+
+	* greeter/Login.c: 
+	When clearing username & password buffers, zero out the entire buffer,
+	not just the first byte, for reduced risk of leaking passwords into
+	core dumps.
+
 2006-04-07  Alan Coopersmith  <alan.coopersmith@sun.com>
 
 	* session.c: 
