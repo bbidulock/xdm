@@ -1,5 +1,5 @@
 /* $Xorg: verify.c,v 1.4 2001/02/09 02:05:41 xorgcvs Exp $ */
-/* $XdotOrg: app/xdm/greeter/verify.c,v 1.6 2005/11/08 06:33:32 jkj Exp $ */
+/* $XdotOrg: app/xdm/greeter/verify.c,v 1.7 2006/03/01 15:48:06 mhopf Exp $ */
 /*
 
 Copyright 1988, 1998  The Open Group
@@ -412,13 +412,22 @@ Verify (struct display *d, struct greet_info *greet, struct verify_info *verify)
 
 	Debug ("Verify %s ...\n", greet->name);
 
+	p = getpwnam (greet->name);
+	endpwent();
+
+	if (!p || strlen (greet->name) == 0) {
+		Debug ("getpwnam() failed.\n");
+		bzero(greet->password, strlen(greet->password));
+		return 0;
+	}
+
 #if defined(sun) && defined(SVR4)
 	/* Solaris: If CONSOLE is set to /dev/console in /etc/default/login, 
 	   then root can only login on system console */
 
 # define SOLARIS_LOGIN_DEFAULTS "/etc/default/login"
 
-	if (strcmp(greet->name, "root") == 0) {
+	if (p->pw_uid == 0) {
 	    char *console = NULL, *tmp = NULL;
 	    FILE *fs;
 
@@ -453,23 +462,14 @@ Verify (struct display *d, struct greet_info *greet, struct verify_info *verify)
 #endif    
 
 #ifndef USE_PAM
-	p = getpwnam (greet->name);
-	endpwent();
-
-	if (!p || strlen (greet->name) == 0) {
-		Debug ("getpwnam() failed.\n");
-		bzero(greet->password, strlen(greet->password));
-		return 0;
-	} else {
 #ifdef linux
-	    if (!strcmp(p->pw_passwd, "!") || !strcmp(p->pw_passwd, "*")) {
-		Debug ("The account is locked, no login allowed.\n");
-		bzero(greet->password, strlen(greet->password));
-		return 0;
-	    }
-#endif
-	    user_pass = p->pw_passwd;
+	if (!strcmp(p->pw_passwd, "!") || !strcmp(p->pw_passwd, "*")) {
+	    Debug ("The account is locked, no login allowed.\n");
+	    bzero(greet->password, strlen(greet->password));
+	    return 0;
 	}
+#endif
+	user_pass = p->pw_passwd;
 #endif
 #ifdef KERBEROS
 	if(strcmp(greet->name, "root") != 0){

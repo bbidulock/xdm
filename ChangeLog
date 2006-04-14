@@ -1,3 +1,10 @@
+2006-04-14  Alan Coopersmith  <alan.coopersmith@sun.com>
+
+	* greeter/verify.c: 
+	<http://bugs.opensolaris.org/bugdatabase/view_bug.do?bug_id=6413255>
+	Sun bug #6413255: xdm should check for uid 0, not for username of 
+	"root", when doing non-console login check
+
 2006-04-13  Alan Coopersmith  <alan.coopersmith@sun.com>
 
 	* configure.ac: 
