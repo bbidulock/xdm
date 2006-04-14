@@ -1,4 +1,4 @@
-/* $XdotOrg: app/xdm/greeter/Login.c,v 1.3 2006/02/24 18:09:00 alanc Exp $ */
+/* $XdotOrg: app/xdm/greeter/Login.c,v 1.4 2006/04/12 01:57:46 alanc Exp $ */
 /* $Xorg: Login.c,v 1.4 2001/02/09 02:05:41 xorgcvs Exp $ */
 /*
 
@@ -248,7 +248,7 @@ static XtResource resources[] = {
 			     FAIL_Y_INC(w)))
 	
 #ifndef max
-static int max (int a, int b) { return a > b ? a : b; }
+static inline int max (int a, int b) { return a > b ? a : b; }
 #endif
 
 static void
