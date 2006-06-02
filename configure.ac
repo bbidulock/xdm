@@ -21,10 +21,10 @@ dnl  PERFORMANCE OF THIS SOFTWARE.
 dnl
 dnl Process this file with autoconf to create configure.
 
-dnl $XdotOrg: app/xdm/configure.ac,v 1.39 2006/04/14 02:52:02 alanc Exp $
+dnl $XdotOrg: app/xdm/configure.ac,v 1.40 2006/04/27 21:21:15 alanc Exp $
 
 AC_PREREQ([2.57])
-AC_INIT(xdm,[1.0.4],[https://bugs.freedesktop.org/enter_bug.cgi?product=xorg],xdm)
+AC_INIT(xdm,[1.0.99],[https://bugs.freedesktop.org/enter_bug.cgi?product=xorg],xdm)
 AM_INIT_AUTOMAKE([dist-bzip2])
 AM_MAINTAINER_MODE
 
