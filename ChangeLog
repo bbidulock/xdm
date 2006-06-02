@@ -1,5 +1,11 @@
 2006-06-02  Alan Coopersmith  <alan.coopersmith@sun.com>
 
+	* dm.c (WaitForChild): 
+	* server.c (serverPause): 
+	Drop pre-waitpid() support since all POSIX.1-1990 systems have waitpid.
+
+2006-06-02  Alan Coopersmith  <alan.coopersmith@sun.com>
+
 	* configure.ac: 
 	Bump version to 1.0.99 for 1.1 branch.
 

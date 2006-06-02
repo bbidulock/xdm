@@ -1,3 +1,4 @@
+/* $XdotOrg: $ */
 /* $Xorg: server.c,v 1.5 2001/02/09 02:05:40 xorgcvs Exp $ */
 /*
 
@@ -189,31 +190,16 @@ serverPause (unsigned t, int serverPid)
 	    Debug ("Already received USR1\n");
 #endif
 	for (;;) {
-#if defined(SYSV) && defined(X_NOT_POSIX)
 	    /*
 	     * wait() is unsafe.  Other Xserver or xdm processes may
 	     * exit at this time and this will remove the wait status.
 	     * This means the main loop will not restart the display.
 	     */
-	    pid = wait ((waitType *) 0);
-#else
 	    if (!receivedUsr1)
-#ifndef X_NOT_POSIX
 		pid = waitpid (serverPid, (int *) 0, 0);
 	    else
 		pid = waitpid (serverPid, (int *) 0, WNOHANG);
-#else
-	    /*
-	     * If you have wait4() but not waitpid(), use that instead
-	     * of wait() and wait3() to make this code safe.  See
-	     * above comment.
-	     */
-	        pid = wait ((waitType *) 0);
-	    else
-		pid = wait3 ((waitType *) 0, WNOHANG,
-			     (struct rusage *) 0);
-#endif /* X_NOT_POSIX */
-#endif /* SYSV */
+
 	    if (pid == serverPid ||
 	       (pid == -1 && errno == ECHILD))
 	    {
@@ -221,12 +207,11 @@ serverPause (unsigned t, int serverPid)
 		serverPauseRet = 1;
 		break;
 	    }
-#if !defined(SYSV) || !defined(X_NOT_POSIX)
+
 	    if (pid == 0) {
 		Debug ("Server alive and kicking\n");
 		break;
 	    }
-#endif
 	}
     }
     (void) alarm ((unsigned) 0);

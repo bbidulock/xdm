@@ -1,3 +1,4 @@
+/* $XdotOrg: $ */
 /* $Xorg: dm.c,v 1.5 2001/02/09 02:05:40 xorgcvs Exp $ */
 /*
 
@@ -455,11 +456,7 @@ WaitForChild (void)
 #else
     sigsetmask (omask);
 #endif
-#ifndef X_NOT_POSIX
     while ((pid = waitpid (-1, &status, WNOHANG)) > 0)
-#else
-    while ((pid = wait3 (&status, WNOHANG, (struct rusage *) 0)) > 0)
-#endif
 #endif
     {
 	Debug ("Manager wait returns pid: %d sig %d core %d code %d\n",
