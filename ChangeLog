@@ -1,5 +1,19 @@
 2006-06-02  Alan Coopersmith  <alan.coopersmith@sun.com>
 
+	* session.c:
+	* greeter/Login.c:
+	* greeter/Login.h:
+	* greeter/LoginP.h:
+	* greeter/greet.c:
+	* greeter/verify.c:
+	Convert PAM code to use full PAM conversation.   Modify greeter to
+	allow PAM to prompt for more than just username and password.
+	Rely on PAM to initialize Secure RPC & Kerberos credentials when it
+	is being used.   (Based on work begun for Sun bug #6398796 
+	"Solaris-10: Unable to login thru xdm once password is aged")
+
+2006-06-02  Alan Coopersmith  <alan.coopersmith@sun.com>	
+
 	* dm.c (WaitForChild): 
 	* server.c (serverPause): 
 	Drop pre-waitpid() support since all POSIX.1-1990 systems have waitpid.

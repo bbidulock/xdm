@@ -1,4 +1,4 @@
-/* $XdotOrg: app/xdm/session.c,v 1.5 2006/03/16 21:46:55 alanc Exp $ */
+/* $XdotOrg: app/xdm/session.c,v 1.6 2006/04/08 00:22:23 alanc Exp $ */
 /* $Xorg: session.c,v 1.8 2001/02/09 02:05:40 xorgcvs Exp $ */
 /*
 
@@ -52,6 +52,8 @@ from The Open Group.
 #ifdef AIXV3
 # include <usersec.h>
 #endif
+
+#ifndef USE_PAM        /* PAM modules should handle these */
 #ifdef SECURE_RPC
 # include <rpc/rpc.h>
 # include <rpc/key_prot.h>
@@ -62,6 +64,7 @@ extern int key_setnet(struct key_netstarg *arg);
 #ifdef K5AUTH
 # include <krb5/krb5.h>
 #endif
+#endif /* USE_PAM */
 
 #ifdef __SCO__
 #include <prot.h>
@@ -473,9 +476,8 @@ void
 SessionExit (struct display *d, int status, int removeAuth)
 {
 #ifdef USE_PAM
-	pam_handle_t *pamh = thepamh();
-#endif
-#ifdef USE_PAM
+    pam_handle_t *pamh = thepamh();
+
     if (pamh) {
         /* shutdown PAM session */
 	pam_close_session(pamh, 0);
@@ -493,7 +495,7 @@ SessionExit (struct display *d, int status, int removeAuth)
 	setgid (verify.gid);
 	setuid (verify.uid);
 	RemoveUserAuthorization (d, &verify);
-#ifdef K5AUTH
+#if defined(K5AUTH) && !defined(USE_PAM)   /* PAM modules should handle this */
 	/* do like "kdestroy" program */
         {
 	    krb5_error_code code;
@@ -673,6 +675,7 @@ StartClient (
 	}
 #endif /* AIXV3 */
 
+#ifndef USE_PAM		/* PAM modules should handle these */
 	/*
 	 * for user-based authorization schemes,
 	 * use the password to get the user's credentials.
@@ -759,7 +762,10 @@ StartClient (
 	    }
 	}
 #endif /* K5AUTH */
-	bzero(passwd, strlen(passwd));
+#endif /* !USE_PAM */
+	if (passwd != NULL)
+	    bzero(passwd, strlen(passwd));
+
 	SetUserAuthorization (d, verify);
 	home = getEnv (verify->userEnviron, "HOME");
 	if (home)
@@ -781,13 +787,15 @@ StartClient (
 	execute (failsafeArgv, verify->userEnviron);
 	exit (1);
     case -1:
-	bzero(passwd, strlen(passwd));
+	if (passwd != NULL)
+	    bzero(passwd, strlen(passwd));
 	Debug ("StartSession, fork failed\n");
 	LogError ("can't start session on \"%s\", fork failed, errno=%d\n",
 		  d->name, errno);
 	return 0;
     default:
-	bzero(passwd, strlen(passwd));
+	if (passwd != NULL)
+	    bzero(passwd, strlen(passwd));
 	Debug ("StartSession, fork succeeded %d\n", pid);
 	*pidp = pid;
 	return 1;

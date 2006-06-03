@@ -1,4 +1,4 @@
-/* $XdotOrg: app/xdm/greeter/Login.c,v 1.4 2006/04/12 01:57:46 alanc Exp $ */
+/* $XdotOrg: app/xdm/greeter/Login.c,v 1.5 2006/04/14 02:52:02 alanc Exp $ */
 /* $Xorg: Login.c,v 1.4 2001/02/09 02:05:41 xorgcvs Exp $ */
 /*
 
@@ -27,6 +27,34 @@ other dealings in this Software without prior written authorization
 from The Open Group.
 
 */
+/* Copyright 2006 Sun Microsystems, Inc.  All rights reserved.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, and/or sell copies of the Software, and to permit persons
+ * to whom the Software is furnished to do so, provided that the above
+ * copyright notice(s) and this permission notice appear in all copies of
+ * the Software and that both the above copyright notice(s) and this
+ * permission notice appear in supporting documentation.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+ * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT
+ * OF THIRD PARTY RIGHTS. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+ * HOLDERS INCLUDED IN THIS NOTICE BE LIABLE FOR ANY CLAIM, OR ANY SPECIAL
+ * INDIRECT OR CONSEQUENTIAL DAMAGES, OR ANY DAMAGES WHATSOEVER RESULTING
+ * FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT,
+ * NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION
+ * WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ *
+ * Except as contained in this notice, the name of a copyright holder
+ * shall not be used in advertising or otherwise to promote the sale, use
+ * or other dealings in this Software without prior written authorization
+ * of the copyright holder.
+ */
+
 /* $XFree86: xc/programs/xdm/greeter/Login.c,v 3.17tsi Exp $ */
 
 /*
@@ -43,9 +71,8 @@ from The Open Group.
 # include <X11/Xfuncs.h>
 
 # include <stdio.h>
-#ifdef XPM
+# include <ctype.h>
 # include <time.h>
-#endif /* XPM */
 
 # include "dm.h"
 # include "dm_error.h"
@@ -65,9 +92,24 @@ from The Open Group.
 #include <X11/extensions/Xinerama.h>
 #endif
 
+#ifndef DEBUG
+# define XDM_ASSERT(a)	/* do nothing */
+#else
+# if defined(__STDC__) && __STDC_VERSION__ - 0 >= 199901L
+#  define XDM_ASSERT(a)	if (!(a)) { \
+	Debug("Assertion failed in %s() at file %s line %d\n", \
+	      __func__, __FILE__, __LINE__); }
+# else
+#  define XDM_ASSERT(a)	if (!(a)) { \
+	Debug("Assertion failed at file %s line %d\n", __FILE__, __LINE__); }
+# endif
+#endif
+
 static void RedrawFail (LoginWidget w);
 static void ResetLogin (LoginWidget w);
 static void failTimeout (XtPointer client_data, XtIntervalId * id);
+static void EraseCursor (LoginWidget w);
+static void XorCursor (LoginWidget w);
 
 #define offset(field) XtOffsetOf(LoginRec, login.field)
 #define goffset(field) XtOffsetOf(WidgetRec, core.field)
@@ -138,12 +180,16 @@ static XtResource resources[] = {
     {XtNpasswdPrompt, XtCPasswdPrompt, XtRString, sizeof (char *),
 	offset(passwdPrompt), XtRString, "Password:  "},
     {XtNfail, XtCFail, XtRString, sizeof (char *),
-	offset(fail), XtRString, 
+	offset(failMsg), XtRString,
 #if defined(sun) && defined(SVR4)
-     "Login incorrect or not on system console if root"},
+     "Login incorrect or not on system console if root"
 #else
-     "Login incorrect"},
+     "Login incorrect"
 #endif
+    },
+    {XtNchangePasswdMessage, XtCChangePasswdMessage, XtRString,
+	sizeof (char *), offset(passwdChangeMsg), XtRString,
+	(XtPointer) "Password Change Required" },
     {XtNfailTimeout, XtCFailTimeout, XtRInt, sizeof (int),
 	offset(failTimeout), XtRImmediate, (XtPointer) 10},
     {XtNnotifyDone, XtCCallback, XtRFunction, sizeof (XtPointer),
@@ -178,27 +224,35 @@ static XtResource resources[] = {
 
 # define Y_INC(w)	max (TEXT_Y_INC(w), PROMPT_Y_INC(w))
 
+
+# define PROMPT_TEXT(w,n) 	((w)->login.prompts[n].promptText)
+# define DEF_PROMPT_TEXT(w,n) 	((w)->login.prompts[n].defaultPrompt)
+# define VALUE_TEXT(w,n) 	((w)->login.prompts[n].valueText)
+# define VALUE_TEXT_MAX(w,n)	((w)->login.prompts[n].valueTextMax)
+# define VALUE_SHOW_START(w,n)	((w)->login.prompts[n].valueShownStart)
+# define VALUE_SHOW_END(w,n)	((w)->login.prompts[n].valueShownEnd)
+# define PROMPT_STATE(w,n) 	((w)->login.prompts[n].state)
+# define PROMPT_CURSOR(w,n)	((w)->login.prompts[n].cursor)
+
+# define CUR_PROMPT_CURSOR(w)	PROMPT_CURSOR(w,w->login.activePrompt)
+
+# define CUR_PROMPT_TEXT(w, n)	(PROMPT_TEXT(w,n) != NULL ? \
+				 PROMPT_TEXT(w,n) : DEF_PROMPT_TEXT(w,n))
+
 #ifndef XPM
-# define LOGIN_PROMPT_W(w) (XTextWidth (w->login.promptFont,\
-				 w->login.namePrompt,\
-				 strlen (w->login.namePrompt)))
+# define TEXT_PROMPT_W(w, m) (XTextWidth (w->login.promptFont,\
+				 m, strlen (m)))
 #else
-# define LOGIN_PROMPT_W(w) (XTextWidth (w->login.promptFont,\
-				 w->login.namePrompt,\
-				 strlen (w->login.namePrompt)) + \
-				 w->login.inframeswidth)
+# define TEXT_PROMPT_W(w, m) (XTextWidth (w->login.promptFont,\
+				 m, strlen (m)) + w->login.inframeswidth)
 #endif /* XPM */
-#ifndef XPM
-# define PASS_PROMPT_W(w) (XTextWidth (w->login.promptFont,\
-				 w->login.passwdPrompt,\
-				 strlen (w->login.passwdPrompt)))
-#else
-# define PASS_PROMPT_W(w) (XTextWidth (w->login.promptFont,\
-				 w->login.passwdPrompt,\
-				 strlen (w->login.passwdPrompt)) + \
-				 w->login.inframeswidth)
-#endif /* XPM */
-# define PROMPT_W(w)	(max(LOGIN_PROMPT_W(w), PASS_PROMPT_W(w)))
+
+# define DEF_PROMPT_W(w,n) TEXT_PROMPT_W(w, w->login.prompts[n].defaultPrompt)
+# define CUR_PROMPT_W(w,n)  (max(MAX_DEF_PROMPT_W(w), PROMPT_TEXT(w,n) ? \
+		     TEXT_PROMPT_W(w, PROMPT_TEXT(w,n)) : 0))
+
+# define MAX_DEF_PROMPT_W(w) (max(DEF_PROMPT_W(w,0), DEF_PROMPT_W(w,1)))
+
 # define GREETING(w)	((w)->login.secure_session  && !(w)->login.allow_access ?\
 				(w)->login.greeting : (w)->login.unsecure_greet)
 # define GREET_X(w)	((int)(w->core.width - XTextWidth (w->login.greetFont,\
@@ -215,34 +269,34 @@ static XtResource resources[] = {
 			      XTextWidth (w->login.greetFont,\
 			      w->login.unsecure_greet, strlen (w->login.unsecure_greet)))) + w->login.logoWidth + (2*w->login.logoPadding)
 #endif /* XPM */
-# define LOGIN_X(w)	(2 * PROMPT_X_INC(w))
-# define LOGIN_Y(w)	(GREET_Y(w) + GREET_Y_INC(w) +\
-			 w->login.greetFont->max_bounds.ascent + Y_INC(w))
-# define LOGIN_W(w)	(w->core.width - 6 * TEXT_X_INC(w))
-# define LOGIN_H(w)	(3 * Y_INC(w) / 2)
-# define LOGIN_TEXT_X(w)(LOGIN_X(w) + PROMPT_W(w))
-# define PASS_X(w)	(LOGIN_X(w))
+# define PROMPT_X(w)	(2 * PROMPT_X_INC(w))
+# define PROMPT_Y(w,n)	((GREET_Y(w) + GREET_Y_INC(w) +\
+			  w->login.greetFont->max_bounds.ascent + Y_INC(w)) + \
+			 (n * PROMPT_SPACE_Y(w)))
+# define PROMPT_W(w)	(w->core.width - 6 * TEXT_X_INC(w))
+# define PROMPT_H(w)	(3 * Y_INC(w) / 2)
+# define VALUE_X(w,n)	(PROMPT_X(w) + CUR_PROMPT_W(w,n))
 #ifndef XPM
-# define PASS_Y(w)	(LOGIN_Y(w) + 8 * Y_INC(w) / 5)
+# define PROMPT_SPACE_Y(w)	(8 * Y_INC(w) / 5)
 #else
-# define PASS_Y(w)	(LOGIN_Y(w) + 10 * Y_INC(w) / 5)
+# define PROMPT_SPACE_Y(w)	(10 * Y_INC(w) / 5)
 #endif /* XPM */
-# define PASS_W(w)	(LOGIN_W(w))
-# define PASS_H(w)	(LOGIN_H(w))
-# define PASS_TEXT_X(w)	(PASS_X(w) + PROMPT_W(w))
-# define FAIL_X(w)	((int)(w->core.width - XTextWidth (w->login.failFont,\
-				w->login.fail, strlen (w->login.fail))) / 2)
-# define FAIL_Y(w)	(PASS_Y(w) + 2 * FAIL_Y_INC (w) +\
+# define ERROR_X(w,m)	((int)(w->core.width - XTextWidth (w->login.failFont,\
+				m, strlen (m))) / 2)
+# define FAIL_X(w)	ERROR_X(w, w->login.fail)
+# define FAIL_Y(w)	(PROMPT_Y(w,1) + 2 * FAIL_Y_INC (w) +\
 			w->login.failFont->max_bounds.ascent)
 #ifndef XPM
-# define FAIL_W(w)	(XTextWidth (w->login.failFont,\
-			 w->login.fail, strlen (w->login.fail)))
+# define ERROR_W(w,m)	(XTextWidth (w->login.failFont, m, strlen(m)))
 #else
-# define FAIL_W(w)	(XTextWidth (w->login.failFont,\
-			 w->login.fail, strlen (w->login.fail))) + w->login.logoWidth + (2*w->login.logoPadding)
+# define ERROR_W(w,m)	(XTextWidth (w->login.failFont, m, strlen(m))\
+			 + w->login.logoWidth + (2*w->login.logoPadding))
 #endif /* XPM */
 
-# define PAD_X(w)	(2 * (LOGIN_X(w) + max (GREET_X_INC(w), FAIL_X_INC(w))))
+# define FAIL_W(w)	max(ERROR_W(w, w->login.failMsg), \
+			    ERROR_W(w, w->login.passwdChangeMsg))
+
+# define PAD_X(w)	(2 * (PROMPT_X(w) + max (GREET_X_INC(w), FAIL_X_INC(w))))
 
 # define PAD_Y(w)	(max (max (Y_INC(w), GREET_Y_INC(w)),\
 			     FAIL_Y_INC(w)))
@@ -252,32 +306,88 @@ static inline int max (int a, int b) { return a > b ? a : b; }
 #endif
 
 static void
-EraseName (LoginWidget w, int cursor)
+realizeValue (LoginWidget w, int cursor, int promptNum, GC gc)
 {
-    int	x;
+    loginPromptState state = w->login.prompts[promptNum].state;
+    char *text = VALUE_TEXT(w, promptNum);
+    int	x, y, height, width, curoff;
 
-    x = LOGIN_TEXT_X (w);
-    if (cursor > 0)
-	x += XTextWidth (w->login.font, w->login.data.name, cursor);
-    XDrawString (XtDisplay(w), XtWindow (w), w->login.bgGC, x, LOGIN_Y(w),
-		w->login.data.name + cursor, strlen (w->login.data.name + cursor));
+    XDM_ASSERT(promptNum >= 0 && promptNum <= LAST_PROMPT);
+
+    x = VALUE_X (w,promptNum);
+    y = PROMPT_Y (w,promptNum);
+
+    height = PROMPT_H(w);
+    width = PROMPT_W(w) - x - 3;
+
+#ifdef XPM
+    height -= (w->login.inframeswidth * 2);
+    width -= (w->login.inframeswidth * 2) +
+	(w->login.logoWidth + 2*(w->login.logoPadding));
+#endif
+    if (cursor > VALUE_SHOW_START(w, promptNum))
+	curoff = XTextWidth (w->login.font, text, cursor);
+    else
+	curoff = 0;
+
+
+    if (gc == w->login.bgGC) {
+	if (curoff < width) {
+	    XFillRectangle (XtDisplay (w), XtWindow (w), gc,
+			    x + curoff, y - TEXT_Y_INC(w),
+			    width - curoff, height);
+	}
+    } else if ((state == LOGIN_PROMPT_ECHO_ON) || (state == LOGIN_TEXT_INFO)) {
+	int textwidth;
+	int offset = max(cursor, VALUE_SHOW_START(w, promptNum));
+	int textlen = strlen (text + offset);
+	
+	textwidth = XTextWidth (w->login.font, text + offset, textlen);
+
+	if (textwidth > (width - curoff)) {
+	    /* Recalculate amount of text that can fit in field */
+	    offset = VALUE_SHOW_START(w, promptNum);
+	    textlen = strlen (text + offset);
+
+	    do
+	    {
+		if (offset < PROMPT_CURSOR(w, promptNum)) {
+		    offset++;
+		}
+		textlen--;
+		textwidth = XTextWidth (w->login.font, text + offset, textlen);
+	    } while ((textlen > 0) && (textwidth > width));
+
+	    VALUE_SHOW_START(w, promptNum) = offset;
+	    VALUE_SHOW_END(w, promptNum) = offset + textlen;
+
+	    /* Erase old string */
+	    XFillRectangle (XtDisplay (w), XtWindow (w), w->login.bgGC,
+			    x, y - TEXT_Y_INC(w), width, height);
+
+	    XDrawString (XtDisplay(w), XtWindow (w), gc,
+			 x, y, text + offset, textlen);
+	} else {
+	    XDrawString (XtDisplay(w), XtWindow (w), gc,
+			 x + curoff, y, text + offset, textlen);
+	}
+    }
 }
 
 static void
-DrawName (LoginWidget w, int cursor)
+EraseValue (LoginWidget w, int cursor, int promptNum)
 {
-    int	x;
+    realizeValue(w, cursor, promptNum, w->login.bgGC);
+}
 
-    x = LOGIN_TEXT_X (w);
-    if (cursor > 0)
-	x += XTextWidth (w->login.font, w->login.data.name, cursor);
-    XDrawString (XtDisplay(w), XtWindow (w), w->login.textGC, x, LOGIN_Y(w),
-		w->login.data.name + cursor, strlen (w->login.data.name + cursor));
-
+static void
+DrawValue (LoginWidget w, int cursor, int promptNum)
+{
+    realizeValue(w, cursor, promptNum, w->login.textGC);
 #ifdef XPM
-	/*as good a place as any Caolan begin*/
-	w->login.lastEventTime = time(NULL);
-	/*as good a place as any Caolan end*/
+    /*as good a place as any Caolan begin*/
+    w->login.lastEventTime = time(NULL);
+    /*as good a place as any Caolan end*/
 #endif /* XPM */
 }
 
@@ -287,28 +397,43 @@ realizeCursor (LoginWidget w, GC gc)
     int	x, y;
     int height, width;
 
-    switch (w->login.state) {
-    case GET_NAME:
-	x = LOGIN_TEXT_X (w);
-	y = LOGIN_Y (w);
-	height = w->login.font->max_bounds.ascent + w->login.font->max_bounds.descent;
-	width = 1;
-	if (w->login.cursor > 0)
-	    x += XTextWidth (w->login.font, w->login.data.name, w->login.cursor);
-	break;
-    case GET_PASSWD:
-	x = PASS_TEXT_X (w);
-	y = PASS_Y (w);
-	height = w->login.font->max_bounds.ascent + w->login.font->max_bounds.descent;
-	width = 1;
-	break;
-    default:
+    static int lastx, lasty;
+    static struct timeval  lastFlash;
+    struct timeval  now, timeout;
+    int sinceLastFlash;
+
+    if (w->login.state != PROMPTING) {
 	return;
     }
-    XFillRectangle (XtDisplay (w), XtWindow (w), gc,
+    
+    x = VALUE_X (w, w->login.activePrompt);
+    y = PROMPT_Y (w, w->login.activePrompt);
+    height = w->login.font->max_bounds.ascent + w->login.font->max_bounds.descent;
+    width = 1;
+
+    switch (PROMPT_STATE(w, w->login.activePrompt)) {
+    case LOGIN_PROMPT_NOT_SHOWN:
+    case LOGIN_TEXT_INFO:
+	return;
+    case LOGIN_PROMPT_ECHO_ON:
+	if (CUR_PROMPT_CURSOR(w) > 0) {
+	    x += XTextWidth (w->login.font,
+			     VALUE_TEXT(w, w->login.activePrompt)
+			     + VALUE_SHOW_START(w, w->login.activePrompt),
+			     PROMPT_CURSOR(w, w->login.activePrompt)
+			     - VALUE_SHOW_START(w, w->login.activePrompt) );
+	}
+	break;
+    case LOGIN_PROMPT_ECHO_OFF:
+	/* Nothing special needed */
+	break;
+    }
+    
 #ifndef XPM
+    XFillRectangle (XtDisplay (w), XtWindow (w), gc,
 		    x, y - w->login.font->max_bounds.ascent, width, height);
 #else
+    XFillRectangle (XtDisplay (w), XtWindow (w), gc,
 		    x, y+1 - w->login.font->max_bounds.ascent, width, height-1);
     XDrawPoint     (XtDisplay (w), XtWindow (w), gc,
     		    x-1 , y - w->login.font->max_bounds.ascent);
@@ -327,19 +452,42 @@ realizeCursor (LoginWidget w, GC gc)
     XDrawPoint     (XtDisplay (w), XtWindow (w), gc,
     		    x+2 , y - w->login.font->max_bounds.ascent+height);
 #endif /* XPM */
+
+
+    /* Force cursor to flash briefly to give user feedback */
+#define FLASH_MILLIS    100000 /* 0.10 seconds */
+#define MILLIS_PER_SEC 1000000    
+    X_GETTIMEOFDAY (&now);
+
+    if ((lastx == x) && (lasty == y)) {
+	if (lastFlash.tv_sec == 0)
+	    sinceLastFlash = 0;
+	else if ((lastFlash.tv_sec + 1) == now.tv_sec)
+	    sinceLastFlash =
+		(now.tv_usec + MILLIS_PER_SEC) - lastFlash.tv_usec;
+	else if (lastFlash.tv_sec == now.tv_sec)
+	    sinceLastFlash = now.tv_usec - lastFlash.tv_usec;
+	else
+	    sinceLastFlash = (now.tv_sec - lastFlash.tv_sec) * MILLIS_PER_SEC;
+
+	if (sinceLastFlash < FLASH_MILLIS) {
+	    timeout.tv_sec = 0;
+	    timeout.tv_usec = FLASH_MILLIS - sinceLastFlash;
+	    select(0, NULL, NULL, NULL, &timeout);
+	}
+    } else {
+	lastx = x; lasty = y;
+    }
+    XFlush (XtDisplay(w));
+    X_GETTIMEOFDAY (&lastFlash);
 }
 
 static void
 EraseFail (LoginWidget w)
 {
-    int x = FAIL_X(w);
-    int y = FAIL_Y(w);
-
     XSetForeground (XtDisplay (w), w->login.failGC,
 			w->core.background_pixel);
-    XDrawString (XtDisplay (w), XtWindow (w), w->login.failGC,
-		x, y,
-		w->login.fail, strlen (w->login.fail));
+    RedrawFail(w);
     w->login.failUp = 0;
     XSetForeground (XtDisplay (w), w->login.failGC,
 			w->login.failpixel);
@@ -370,6 +518,7 @@ static void failTimeout (XtPointer client_data, XtIntervalId * id)
     LoginWidget	w = (LoginWidget)client_data;
 
     Debug ("failTimeout\n");
+    w->login.interval_id = 0;
     EraseFail (w);
 }
 
@@ -382,14 +531,7 @@ DrawFail (Widget ctx)
     XorCursor (w);
     ResetLogin (w);
     XorCursor (w);
-    w->login.failUp = 1;
-    RedrawFail (w);
-    if (w->login.failTimeout > 0) {
-	Debug ("failTimeout: %d\n", w->login.failTimeout);
-	XtAppAddTimeOut(XtWidgetToApplicationContext ((Widget)w),
-			w->login.failTimeout * 1000,
-		        failTimeout, (XtPointer) w);
-    }
+    ErrorMessage(ctx, w->login.failMsg, True);
 }
 
 static void
@@ -397,18 +539,104 @@ RedrawFail (LoginWidget w)
 {
     int x = FAIL_X(w);
     int y = FAIL_Y(w);
+    int maxw = w->core.width - PAD_X(w);
 
-    if (w->login.failUp)
-        XDrawString (XtDisplay (w), XtWindow (w), w->login.failGC,
-		    x, y,
-		    w->login.fail, strlen (w->login.fail));
+    if (w->login.failUp) {
+	Debug("RedrawFail('%s')\n", w->login.fail);
+
+	if (ERROR_W(w, w->login.fail) > maxw) {
+	    /* Too long to fit on one line, break into multiple lines */
+	    char *tempCopy = strdup(w->login.fail);
+	    if (tempCopy != NULL) {
+		char *start, *next;
+		char lastspace;
+
+		y = PROMPT_Y(w,LAST_PROMPT) + (2 * PROMPT_Y_INC(w));
+		
+		for (start = next = tempCopy; start != NULL ; start = next) {
+		    /* search for longest string broken by whitespace that
+		       will fit on a single line */
+		    do {
+			if (next != start) {
+			    *next = lastspace;
+			}
+			for (next = next + 1;
+			     (*next != '\0') && !isspace(*next) ; next++)
+			{
+			    /* this loop intentionally left blank */
+			}
+			if (*next != '\0') {
+			    lastspace = *next;
+			    *next = '\0';
+			} else {
+			    next = NULL;
+			}
+		    } while ((next != NULL) && ERROR_W(w, start) < maxw);
+		    
+		    x = ERROR_X(w, start);
+		    XDrawString (XtDisplay (w), XtWindow (w), w->login.failGC,
+				 x, y, start, strlen(start));
+
+		    if (next != NULL) {
+			next++;
+			y += FAIL_Y_INC(w);
+		    }
+		}
+		free(tempCopy);
+		return;
+	    }
+	    /* if strdup failed, fall through to draw all at once, even
+	       though we know it can't all fit */
+	    LogOutOfMem("RedrawFail");
+	}
+
+	XDrawString (XtDisplay (w), XtWindow (w), w->login.failGC,
+		     x, y,
+		     w->login.fail, strlen (w->login.fail));
+    }
+}
+
+void
+ErrorMessage(Widget ctx, const char *message, Bool timeout)
+{
+    LoginWidget	w = (LoginWidget) ctx;
+
+/*  Debug("ErrorMessage: %s\n", message);   */
+    if (w->login.interval_id != 0) {
+	XtRemoveTimeOut(w->login.interval_id);
+	w->login.interval_id = 0;
+    }
+    RemoveFail(w);
+    if (w->login.fail != w->login.failMsg)
+	free(w->login.fail);
+    w->login.fail = strdup(message);
+    if (w->login.fail == NULL)
+	w->login.fail = (char *) w->login.failMsg;
+    w->login.failUp = 1;
+    RedrawFail (w);
+    if (timeout && (w->login.failTimeout > 0)) {
+	Debug ("failTimeout: %d\n", w->login.failTimeout);
+	w->login.interval_id =
+	    XtAppAddTimeOut(XtWidgetToApplicationContext ((Widget)w),
+			    w->login.failTimeout * 1000,
+			    failTimeout, (XtPointer) w);
+    }
+}
+
+void
+ShowChangePasswdMessage(Widget ctx)
+{
+    LoginWidget	w = (LoginWidget) ctx;
+
+    ErrorMessage(ctx, w->login.passwdChangeMsg, False);
 }
 
 static void
 draw_it (LoginWidget w)
 {
+    int p;
 #ifdef XPM
-    int i,in_frame_x,in_login_y,in_pass_y,in_width,in_height;
+    int i;
     int gr_line_x, gr_line_y, gr_line_w;
 #endif /* XPM */
 
@@ -444,50 +672,47 @@ draw_it (LoginWidget w)
         gr_line_x,           gr_line_y + 2*(w->login.inframeswidth) -i,
         gr_line_x+gr_line_w, gr_line_y + 2*(w->login.inframeswidth) -i);
     }
-    
-    in_frame_x = LOGIN_TEXT_X(w) - w->login.inframeswidth - 3;
-    in_login_y = LOGIN_Y(w) - w->login.inframeswidth - 1 - TEXT_Y_INC(w);
-    in_pass_y  = PASS_Y(w) - w->login.inframeswidth - 1 - TEXT_Y_INC(w);
- 
-    in_width = LOGIN_W(w) - PROMPT_W(w) -
-        (w->login.logoWidth + 2*(w->login.logoPadding));
-    in_height = LOGIN_H(w) + w->login.inframeswidth + 2;
 
-    for(i=1;i<=(w->login.inframeswidth);i++)
+    for (p = 0; p < NUM_PROMPTS ; p++)
     {
-      /* Make top/left sides */
-      XDrawLine(XtDisplay (w), XtWindow (w), w->login.shdGC,
-	in_frame_x + i-1,             in_login_y + i-1,
-	in_frame_x + in_width-i,      in_login_y + i-1); 
+	int in_frame_x = VALUE_X(w,p) - w->login.inframeswidth - 3;
+	int in_frame_y
+	    = PROMPT_Y(w,p) - w->login.inframeswidth - 1 - TEXT_Y_INC(w);
+ 
+	int in_width = PROMPT_W(w) - VALUE_X(w,p) -
+	    (w->login.logoWidth + 2*(w->login.logoPadding));
+	int in_height = PROMPT_H(w) + w->login.inframeswidth + 2;
+	
+	GC topLeftGC, botRightGC;
+	
+	if ((PROMPT_STATE(w, p) == LOGIN_PROMPT_ECHO_ON) ||
+	    (PROMPT_STATE(w, p) == LOGIN_PROMPT_ECHO_OFF)) {
+	    topLeftGC = w->login.shdGC;
+	    botRightGC = w->login.hiGC;
+	} else {
+	    topLeftGC = botRightGC = w->login.bgGC;
+	}
 
-      XDrawLine(XtDisplay (w), XtWindow (w), w->login.shdGC,
-	in_frame_x + i-1,             in_login_y + i-1,
-	in_frame_x + i-1,             in_login_y + in_height-i); 
+	for (i=1; i<=(w->login.inframeswidth); i++)
+	{
+	    /* Make top/left sides */
+	    XDrawLine(XtDisplay (w), XtWindow (w), topLeftGC,
+		      in_frame_x + i-1,         in_frame_y + i-1,
+		      in_frame_x + in_width-i,  in_frame_y + i-1); 
 
-      XDrawLine(XtDisplay (w), XtWindow (w), w->login.hiGC,
-        in_frame_x + in_width-i,      in_login_y + i-1,
-        in_frame_x + in_width-i,      in_login_y + in_height-i); 
-                
-      XDrawLine(XtDisplay (w), XtWindow (w), w->login.hiGC,
-	in_frame_x + i-1,             in_login_y + in_height-i,
-	in_frame_x + in_width-i,      in_login_y + in_height-i);
+	    XDrawLine(XtDisplay (w), XtWindow (w), topLeftGC,
+		      in_frame_x + i-1,         in_frame_y + i-1,
+		      in_frame_x + i-1,         in_frame_y + in_height-i); 
 
-      /* Make bottom/right sides */
-      XDrawLine(XtDisplay (w), XtWindow (w), w->login.shdGC,
-	in_frame_x + i-1,             in_pass_y + i-1,
-	in_frame_x + in_width-i,      in_pass_y + i-1); 
+	    /* Make bottom/right sides */
+	    XDrawLine(XtDisplay (w), XtWindow (w), botRightGC,
+		      in_frame_x + in_width-i,  in_frame_y + i-1,
+		      in_frame_x + in_width-i,  in_frame_y + in_height-i); 
 
-      XDrawLine(XtDisplay (w), XtWindow (w), w->login.shdGC,
-	in_frame_x + i-1,             in_pass_y + i-1,
-	in_frame_x + i-1,             in_pass_y + in_height-i); 
-
-      XDrawLine(XtDisplay (w), XtWindow (w), w->login.hiGC,
-        in_frame_x + in_width-i,      in_pass_y + i-1,
-        in_frame_x + in_width-i,      in_pass_y + in_height-i); 
-                
-      XDrawLine(XtDisplay (w), XtWindow (w), w->login.hiGC,
-	in_frame_x + i-1,             in_pass_y + in_height-i,
-	in_frame_x + in_width-i,      in_pass_y + in_height-i);
+	    XDrawLine(XtDisplay (w), XtWindow (w), botRightGC,
+		      in_frame_x + i-1,         in_frame_y + in_height-i,
+		      in_frame_x + in_width-i,  in_frame_y + in_height-i);
+	}
     }
 #endif /* XPM */
 
@@ -501,14 +726,15 @@ draw_it (LoginWidget w)
                         GREET_Y(w),
 #endif /* XPM */
 			GREETING(w), strlen (GREETING(w)));
-    XDrawString (XtDisplay (w), XtWindow (w), w->login.promptGC,
-		LOGIN_X(w), LOGIN_Y(w),
-		w->login.namePrompt, strlen (w->login.namePrompt));
-    XDrawString (XtDisplay (w), XtWindow (w), w->login.promptGC,
-		PASS_X(w), PASS_Y(w),
-		w->login.passwdPrompt, strlen (w->login.passwdPrompt));
+    for (p = 0; p < NUM_PROMPTS ; p++) {
+	if (PROMPT_STATE(w, p) != LOGIN_PROMPT_NOT_SHOWN) {
+	    XDrawString (XtDisplay (w), XtWindow (w), w->login.promptGC,
+			 PROMPT_X(w), PROMPT_Y(w,p),
+			 CUR_PROMPT_TEXT(w,p), strlen (CUR_PROMPT_TEXT(w,p)));
+	    DrawValue (w, 0, p);
+	}
+    }
     RedrawFail (w);
-    DrawName (w, 0);
     XorCursor (w);
     /*
      * The GrabKeyboard here is needed only because of
@@ -526,28 +752,189 @@ draw_it (LoginWidget w)
     }
 }
 
+/* Returns 0 on success, -1 on failure */
+int
+SetPrompt (Widget ctx, int promptNum, const char *message,
+	   loginPromptState state, Boolean minimumTime)
+{
+    LoginWidget	w = (LoginWidget) ctx;
+    char *prompt;
+    int messageLen, e;
+    const char *stateNames[4] = {
+	"LOGIN_PROMPT_NOT_SHOWN", "LOGIN_PROMPT_ECHO_ON",
+	"LOGIN_PROMPT_ECHO_OFF", "LOGIN_TEXT_INFO" };
+    loginPromptState priorState;
+    
+    Debug("SetPrompt(%d, %s, %s(%d))\n", promptNum,
+	  message ? message : "<NULL>", stateNames[state], state);
+
+    XDM_ASSERT(promptNum >= 0 && promptNum <= LAST_PROMPT);
+    
+    if (PROMPT_TEXT(w, promptNum) != NULL) {
+	XtFree(PROMPT_TEXT(w, promptNum));
+	PROMPT_TEXT(w, promptNum) = NULL;
+    }
+
+    priorState = PROMPT_STATE(w, promptNum);
+    PROMPT_STATE(w, promptNum) = state;
+
+    if (state == LOGIN_PROMPT_NOT_SHOWN) {
+	return 0;
+    }
+
+    if (message == NULL) {
+	message = DEF_PROMPT_TEXT(w, promptNum);
+    }
+
+    messageLen = strlen(message);
+    
+    prompt = XtMalloc(messageLen + 3);
+    if (prompt == NULL) {
+	LogOutOfMem ("SetPrompt");
+	return -1;
+    }
+    
+    strncpy(prompt, message, messageLen);
+    
+    /* Make sure text prompts have at least two spaces at end */
+    e = messageLen;
+	    
+    if (!isspace(message[messageLen - 2])) {
+	prompt[e] = ' ';
+	e++;
+    }
+    if (!isspace(message[messageLen - 1])) {
+	prompt[e] = ' ';
+	e++;
+    }
+    prompt[e] = '\0';
+
+    PROMPT_TEXT(w, promptNum) = prompt;
+
+    if (w->login.state == INITIALIZING) {
+	return 0;
+    }
+    
+    if ((priorState == LOGIN_TEXT_INFO) && (w->login.msgTimeout != 0)) {
+	time_t now = time(NULL);
+	int timeleft = w->login.msgTimeout - now;
+	
+	if (timeleft > 0) {
+	    sleep(timeleft);
+	}
+	w->login.msgTimeout = 0;
+    }
+
+    if (state == LOGIN_TEXT_INFO) {
+	if (minimumTime) {
+	    time_t now = time(NULL);
+	    w->login.msgTimeout = now + w->login.failTimeout;
+	}
+	w->login.state = SHOW_MESSAGE;
+    } else {
+	w->login.activePrompt = promptNum;
+	w->login.state = PROMPTING;
+    }
+    
+    PROMPT_CURSOR(w, promptNum) = 0;
+    XClearArea (XtDisplay(w), XtWindow(w), 0, 0, 0, 0, FALSE);
+    draw_it(w);
+    return 0;
+}
+
+const char *GetPrompt(Widget ctx, int promptNum)
+{
+    LoginWidget	w = (LoginWidget) ctx;
+
+    XDM_ASSERT(promptNum >= 0 && promptNum <= LAST_PROMPT);
+    
+    return CUR_PROMPT_TEXT(w,promptNum);
+}
+
+int
+SetValue(Widget ctx, int promptNum, char *value)
+{
+    LoginWidget	w = (LoginWidget) ctx;
+
+    XDM_ASSERT(promptNum >= 0 && promptNum <= LAST_PROMPT);
+    
+    if ((promptNum < 0) || (promptNum > LAST_PROMPT))
+	return -1;
+
+    XDM_ASSERT(VALUE_TEXT(w, promptNum) != NULL);
+    
+    if (VALUE_TEXT(w, promptNum) == NULL)
+	return -1;
+
+    if (value == NULL) {
+	bzero(VALUE_TEXT(w, promptNum), VALUE_TEXT_MAX(w, promptNum));
+    } else {
+	strncpy(VALUE_TEXT(w, promptNum), value, VALUE_TEXT_MAX(w, promptNum));
+	VALUE_TEXT(w, promptNum)[VALUE_TEXT_MAX(w, promptNum)] = '\0';
+    }
+
+    VALUE_SHOW_START(w, promptNum) = 0;
+    VALUE_SHOW_END(w, promptNum) = 0;
+    PROMPT_CURSOR(w, promptNum) = 0;
+    
+    return 0;
+}
+
+const char *
+GetValue(Widget ctx, int promptNum)
+{
+    LoginWidget	w = (LoginWidget) ctx;
+
+    XDM_ASSERT(promptNum >= 0 && promptNum <= LAST_PROMPT);
+    
+    if ((promptNum < 0) || (promptNum > LAST_PROMPT))
+	return NULL;
+
+    XDM_ASSERT(VALUE_TEXT(w, promptNum) != NULL);
+
+    return VALUE_TEXT(w, promptNum);
+}
+
+
+static void
+realizeDeleteChar (LoginWidget ctx)
+{
+    if (ctx->login.state == PROMPTING) {
+	int promptNum = ctx->login.activePrompt;
+	int redrawFrom = PROMPT_CURSOR(ctx, promptNum);
+	
+	if (PROMPT_CURSOR(ctx,promptNum) <  (int)strlen(VALUE_TEXT(ctx,promptNum))) {
+	    if (redrawFrom < VALUE_SHOW_START(ctx, ctx->login.activePrompt)) {
+		redrawFrom = 0;
+		EraseValue (ctx, redrawFrom, promptNum);
+		VALUE_SHOW_START(ctx, ctx->login.activePrompt)
+		    = PROMPT_CURSOR(ctx,promptNum);
+	    } else {
+		EraseValue (ctx, redrawFrom, promptNum);
+	    }
+	    strcpy(VALUE_TEXT(ctx, promptNum) + PROMPT_CURSOR(ctx, promptNum),
+		   VALUE_TEXT(ctx, promptNum) + PROMPT_CURSOR(ctx, promptNum) + 1);
+	    DrawValue (ctx, redrawFrom, promptNum);
+	}
+    }
+}
+
 /*ARGSUSED*/
 static void
 DeleteBackwardChar (Widget ctxw, XEvent *event, String *params, Cardinal *num_params)
 {
     LoginWidget ctx = (LoginWidget)ctxw;
 
-    XorCursor (ctx);
     RemoveFail (ctx);
-    if (ctx->login.cursor > 0) {
-	ctx->login.cursor--;
-	switch (ctx->login.state) {
-	case GET_NAME:
-	    EraseName (ctx, ctx->login.cursor);
-	    strcpy (ctx->login.data.name + ctx->login.cursor,
-		    ctx->login.data.name + ctx->login.cursor + 1);
-	    DrawName (ctx, ctx->login.cursor);
-	    break;
-	case GET_PASSWD:
-	    strcpy (ctx->login.data.passwd + ctx->login.cursor,
-		    ctx->login.data.passwd + ctx->login.cursor + 1);
-	    break;
-	}
+
+    if (ctx->login.state != PROMPTING) {
+	return;
+    }
+
+    XorCursor (ctx);
+    if (CUR_PROMPT_CURSOR(ctx) > 0) {
+	CUR_PROMPT_CURSOR(ctx) -= 1;
+	realizeDeleteChar(ctx);
     }
     XorCursor (ctx);	
 }
@@ -558,24 +945,14 @@ DeleteForwardChar (Widget ctxw, XEvent *event, String *params, Cardinal *num_par
 {
     LoginWidget ctx = (LoginWidget)ctxw;
 
-    XorCursor (ctx);
     RemoveFail (ctx);
-    switch (ctx->login.state) {
-    case GET_NAME:
-	if (ctx->login.cursor < (int)strlen (ctx->login.data.name)) {
-	    EraseName (ctx, ctx->login.cursor);
-	    strcpy (ctx->login.data.name + ctx->login.cursor,
-		    ctx->login.data.name + ctx->login.cursor + 1);
-	    DrawName (ctx, ctx->login.cursor);
-	}
-	break;
-    case GET_PASSWD:
-    	if (ctx->login.cursor < (int)strlen (ctx->login.data.passwd)) {
-	    strcpy (ctx->login.data.passwd + ctx->login.cursor,
-		    ctx->login.data.passwd + ctx->login.cursor + 1);
-	}
-	break;
+
+    if (ctx->login.state != PROMPTING) {
+	return;
     }
+
+    XorCursor (ctx);
+    realizeDeleteChar(ctx);
     XorCursor (ctx);	
 }
 
@@ -589,10 +966,21 @@ MoveBackwardChar (
 {
     LoginWidget	ctx = (LoginWidget)ctxw;
 
-    XorCursor (ctx);
     RemoveFail (ctx);
-    if (ctx->login.cursor > 0)
-    	ctx->login.cursor--;
+
+    if (ctx->login.state != PROMPTING) {
+	return;
+    }
+
+    XorCursor (ctx);
+    if (CUR_PROMPT_CURSOR(ctx) > 0)
+	CUR_PROMPT_CURSOR(ctx) -= 1;
+    if (CUR_PROMPT_CURSOR(ctx) < VALUE_SHOW_START(ctx, ctx->login.activePrompt)) {
+	EraseValue(ctx, 0, ctx->login.activePrompt);
+	VALUE_SHOW_START(ctx, ctx->login.activePrompt)
+	    = CUR_PROMPT_CURSOR(ctx);
+	DrawValue(ctx, 0, ctx->login.activePrompt);
+    }
     XorCursor (ctx);
 }
 
@@ -606,17 +994,21 @@ MoveForwardChar (
 {
     LoginWidget ctx = (LoginWidget)ctxw;
 
-    XorCursor (ctx);
     RemoveFail (ctx);
-    switch (ctx->login.state) {
-    case GET_NAME:
-    	if (ctx->login.cursor < (int)strlen(ctx->login.data.name))
-	    ++ctx->login.cursor;
-	break;
-    case GET_PASSWD:
-    	if (ctx->login.cursor < (int)strlen(ctx->login.data.passwd))
-	    ++ctx->login.cursor;
-	break;
+
+    if (ctx->login.state != PROMPTING) {
+	return;
+    }
+
+    XorCursor (ctx);
+    if (CUR_PROMPT_CURSOR(ctx) <
+	(int)strlen(VALUE_TEXT(ctx,ctx->login.activePrompt))) {
+	CUR_PROMPT_CURSOR(ctx) += 1;
+	if (VALUE_SHOW_END(ctx, ctx->login.activePrompt)
+	    < CUR_PROMPT_CURSOR(ctx)) {
+	    EraseValue(ctx, 0, ctx->login.activePrompt);
+	    DrawValue(ctx, 0, ctx->login.activePrompt);
+	}
     }
     XorCursor (ctx);
 }
@@ -631,9 +1023,19 @@ MoveToBegining (
 {
     LoginWidget ctx = (LoginWidget)ctxw;
 
-    XorCursor (ctx);
     RemoveFail (ctx);
-    ctx->login.cursor = 0;
+
+    if (ctx->login.state != PROMPTING) {
+	return;
+    }
+
+    XorCursor (ctx);
+    CUR_PROMPT_CURSOR(ctx) = 0;
+    if (VALUE_SHOW_START(ctx, ctx->login.activePrompt) > 0) {
+	EraseValue(ctx, 0, ctx->login.activePrompt);
+	VALUE_SHOW_START(ctx, ctx->login.activePrompt) = 0;
+	DrawValue(ctx, 0, ctx->login.activePrompt);
+    }
     XorCursor (ctx);
 }
 
@@ -647,15 +1049,17 @@ MoveToEnd (
 {
     LoginWidget ctx = (LoginWidget)ctxw;
 
-    XorCursor (ctx);
     RemoveFail (ctx);
-    switch (ctx->login.state) {
-    case GET_NAME:
-    	ctx->login.cursor = strlen (ctx->login.data.name);
-	break;
-    case GET_PASSWD:
-    	ctx->login.cursor = strlen (ctx->login.data.passwd);
-	break;
+
+    if (ctx->login.state != PROMPTING) {
+	return;
+    }
+
+    XorCursor (ctx);
+    CUR_PROMPT_CURSOR(ctx) = strlen (VALUE_TEXT(ctx, ctx->login.activePrompt));
+    if (VALUE_SHOW_END(ctx, ctx->login.activePrompt) < CUR_PROMPT_CURSOR(ctx)) {
+	EraseValue(ctx, 0, ctx->login.activePrompt);
+	DrawValue(ctx, 0, ctx->login.activePrompt);
     }
     XorCursor (ctx);
 }
@@ -670,17 +1074,18 @@ EraseToEndOfLine (
 {
     LoginWidget ctx = (LoginWidget)ctxw;
 
-    XorCursor (ctx);
     RemoveFail (ctx);
-    switch (ctx->login.state) {
-    case GET_NAME:
-	EraseName (ctx, ctx->login.cursor);
-	bzero (ctx->login.data.name, NAME_LEN);
-	break;
-    case GET_PASSWD:
-	bzero (ctx->login.data.passwd, PASSWORD_LEN);
-	break;
+
+    if (ctx->login.state != PROMPTING) {
+	return;
     }
+
+    XorCursor (ctx);
+    EraseValue (ctx, CUR_PROMPT_CURSOR(ctx), ctx->login.activePrompt);
+    bzero(VALUE_TEXT(ctx, ctx->login.activePrompt) +
+	  CUR_PROMPT_CURSOR(ctx),
+	  VALUE_TEXT_MAX(ctx, ctx->login.activePrompt) -
+	  CUR_PROMPT_CURSOR(ctx));
     XorCursor (ctx);
 }
 
@@ -705,45 +1110,64 @@ FinishField (
     Cardinal	*num_params)
 {
     LoginWidget ctx = (LoginWidget)ctxw;
+    int promptNum = ctx->login.activePrompt;
+    int nextPrompt;
+
+    RemoveFail (ctx);
+
+    if (ctx->login.state != PROMPTING) {
+	return;
+    }
 
     XorCursor (ctx);
-    RemoveFail (ctx);
-    switch (ctx->login.state) {
-    case GET_NAME:
-	ctx->login.state = GET_PASSWD;
-	ctx->login.cursor = 0;
-	break;
-    case GET_PASSWD:
-	ctx->login.state = DONE;
-	ctx->login.cursor = 0;
-	(*ctx->login.notify_done) (ctx, &ctx->login.data, NOTIFY_OK);
-	break;
+
+    for (nextPrompt = promptNum + 1; nextPrompt <= LAST_PROMPT; nextPrompt++) {
+	if ((PROMPT_STATE(ctx, nextPrompt) == LOGIN_PROMPT_ECHO_ON) ||
+	    (PROMPT_STATE(ctx, nextPrompt) == LOGIN_PROMPT_ECHO_OFF)) {
+	    ctx->login.activePrompt = nextPrompt;
+	    break;
+	}
     }
+    if (nextPrompt > LAST_PROMPT) {
+	ctx->login.state = DONE;
+	(*ctx->login.notify_done) (ctx, &ctx->login.data, NOTIFY_OK);
+	Debug("FinishField #%d: now DONE\n", promptNum);
+    } else {
+	Debug("FinishField #%d: %d next\n", promptNum, nextPrompt);
+    }
+
     XorCursor (ctx);
 }
 
-#ifdef XPM
 /*ARGSUSED*/
 static void
 TabField(Widget ctxw, XEvent *event, String *params, Cardinal *num_params)
 {
     LoginWidget ctx = (LoginWidget)ctxw;
+    int promptNum = ctx->login.activePrompt;
+    int nextPrompt;
+
+    RemoveFail (ctx);
+
+    if (ctx->login.state != PROMPTING) {
+	return;
+    }
 
     XorCursor (ctx);
-    RemoveFail (ctx);
-    switch (ctx->login.state) {
-    case GET_NAME:
-	ctx->login.state = GET_PASSWD;
-	ctx->login.cursor = 0;
-	break;
-    case GET_PASSWD:
-	ctx->login.state = GET_NAME;
-	ctx->login.cursor = 0;
-	break;
+
+    for (nextPrompt = promptNum + 1; nextPrompt != promptNum; nextPrompt++) {
+	if (nextPrompt > LAST_PROMPT) {
+	    nextPrompt = 0;
+	}
+    
+	if ((PROMPT_STATE(ctx, nextPrompt) == LOGIN_PROMPT_ECHO_ON) ||
+	    (PROMPT_STATE(ctx, nextPrompt) == LOGIN_PROMPT_ECHO_OFF)) {
+	    ctx->login.activePrompt = nextPrompt;
+	    break;
+	}
     }
     XorCursor (ctx);
 }
-#endif /* XPM */
 
 /*ARGSUSED*/
 static void
@@ -800,7 +1224,6 @@ RestartSession (
     XorCursor (ctx);
     RemoveFail (ctx);
     ctx->login.state = DONE;
-    ctx->login.cursor = 0;
     (*ctx->login.notify_done) (ctx, &ctx->login.data, NOTIFY_RESTART);
     XorCursor (ctx);
 }
@@ -818,7 +1241,6 @@ AbortSession (
     XorCursor (ctx);
     RemoveFail (ctx);
     ctx->login.state = DONE;
-    ctx->login.cursor = 0;
     (*ctx->login.notify_done) (ctx, &ctx->login.data, NOTIFY_ABORT);
     XorCursor (ctx);
 }
@@ -836,7 +1258,6 @@ AbortDisplay (
     XorCursor (ctx);
     RemoveFail (ctx);
     ctx->login.state = DONE;
-    ctx->login.cursor = 0;
     (*ctx->login.notify_done) (ctx, &ctx->login.data, NOTIFY_ABORT_DISPLAY);
     XorCursor (ctx);
 }
@@ -844,11 +1265,16 @@ AbortDisplay (
 static void
 ResetLogin (LoginWidget w)
 {
-    EraseName (w, 0);
-    w->login.cursor = 0;
-    bzero (w->login.data.name, NAME_LEN);
-    bzero (w->login.data.passwd, PASSWORD_LEN);
-    w->login.state = GET_NAME;
+    int i;
+
+    for (i = 0; i < NUM_PROMPTS ; i++) {
+	EraseValue(w, 0, i);
+	bzero(VALUE_TEXT(w, i), VALUE_TEXT_MAX(w, i));
+	VALUE_SHOW_START(w, i) = 0;
+	PROMPT_CURSOR(w, i) = 0;
+    }
+    w->login.state = PROMPTING;
+    w->login.activePrompt = 0;
 }
 
 static void
@@ -891,11 +1317,7 @@ InsertChar (
     LoginWidget ctx = (LoginWidget)ctxw;
 
     char strbuf[128];
-#ifndef XPM
-    int  len;
-#else
-    int  len,pixels;
-#endif /* XPM */
+    int  len, promptNum = ctx->login.activePrompt;;
     KeySym  keysym = 0;
 
     if (ctx->login.xic) {
@@ -908,14 +1330,6 @@ InsertChar (
 			     &keysym, &compose_status);
     }
     strbuf[len] = '\0';
-
-#ifdef XPM
-    pixels = 3 + ctx->login.font->max_bounds.width * len +
-    	     XTextWidth(ctx->login.font,
-    	     		ctx->login.data.name,
-    	     		strlen(ctx->login.data.name));
-    	     	/* pixels to be added */
-#endif /* XPM */
 
     /*
      * Note: You can override this default key handling
@@ -963,52 +1377,27 @@ InsertChar (
 	    break;
     }
 
-    switch (ctx->login.state) {
-    case GET_NAME:
-#ifndef XPM
-	if (len + (int)strlen(ctx->login.data.name) >= NAME_LEN - 1)
-#else
-	if (
-	        (len + (int)strlen(ctx->login.data.name) >= NAME_LEN - 1)/* &&
-		(pixels <= LOGIN_W(ctx) - PROMPT_W(ctx))*/
-	   )
-#endif /* XPM */
-	    len = NAME_LEN - strlen(ctx->login.data.name) - 2;
-    case GET_PASSWD:
-	if (len + (int)strlen(ctx->login.data.passwd) >= PASSWORD_LEN - 1)
-	    len = PASSWORD_LEN - strlen(ctx->login.data.passwd) - 2;
+    if (ctx->login.state == PROMPTING) {	
+	if ((len + (int)strlen(VALUE_TEXT(ctx, promptNum)) >=
+	     (VALUE_TEXT_MAX(ctx,promptNum) - 1))) {
+	    len = VALUE_TEXT_MAX(ctx,promptNum) -
+		strlen(VALUE_TEXT(ctx, promptNum)) - 2;
+	}
     }
-#ifndef XPM
-    if (len == 0)
-#else
-    if (len == 0 || pixels >= LOGIN_W(ctx) - PROMPT_W(ctx))
-#endif /* XPM */
-	return;
-    XorCursor (ctx);
+    EraseCursor (ctx);
     RemoveFail (ctx);
-    switch (ctx->login.state) {
-    case GET_NAME:
-	EraseName (ctx, ctx->login.cursor);
-	memmove( ctx->login.data.name + ctx->login.cursor + len,
-	       ctx->login.data.name + ctx->login.cursor,
-	       strlen (ctx->login.data.name + ctx->login.cursor) + 1);
-	memmove( ctx->login.data.name + ctx->login.cursor, strbuf, len);
-	DrawName (ctx, ctx->login.cursor);
-	ctx->login.cursor += len;
-	break;
-    case GET_PASSWD:
-	memmove( ctx->login.data.passwd + ctx->login.cursor + len,
-	       ctx->login.data.passwd + ctx->login.cursor,
-	       strlen (ctx->login.data.passwd + ctx->login.cursor) + 1);
-	memmove( ctx->login.data.passwd + ctx->login.cursor, strbuf, len);
-	ctx->login.cursor += len;
-
-#ifdef XPM
-	/*as good a place as any Caolan begin*/
-	ctx->login.lastEventTime = time(NULL);
-	/*as good a place as any Caolan end*/
-#endif /* XPM */
-	break;
+    if (len != 0)
+    {
+	if (ctx->login.state == PROMPTING) {
+	    EraseValue (ctx, PROMPT_CURSOR(ctx, promptNum), promptNum);
+	    memmove(VALUE_TEXT(ctx, promptNum) + PROMPT_CURSOR(ctx, promptNum) + len,
+		    VALUE_TEXT(ctx, promptNum) + PROMPT_CURSOR(ctx, promptNum),
+		    strlen (VALUE_TEXT(ctx, promptNum) + PROMPT_CURSOR(ctx, promptNum))+1);
+	    memmove(VALUE_TEXT(ctx, promptNum) + PROMPT_CURSOR(ctx, promptNum),
+		     strbuf, len);
+	    DrawValue (ctx, PROMPT_CURSOR(ctx, promptNum), promptNum);
+	    PROMPT_CURSOR(ctx, promptNum) += len;
+	}
     }
     XorCursor (ctx);
 }
@@ -1032,6 +1421,7 @@ static void Initialize (
 
 #ifdef XPM
     int 	rv = 0;
+    XRectangle	cliprect[1];
     
     myXGCV.foreground = w->login.hipixel;
     myXGCV.background = w->core.background_pixel;
@@ -1155,11 +1545,29 @@ static void Initialize (
 
 SkipXpmLoad:
 #endif /* XPM */
-    bzero (w->login.data.name, NAME_LEN);
-    bzero (w->login.data.passwd, PASSWORD_LEN);
-    w->login.state = GET_NAME;
-    w->login.cursor = 0;
+    w->login.data.name[0] = '\0';
+    w->login.data.passwd[0] = '\0';
+    w->login.state = INITIALIZING;
+    w->login.activePrompt = LOGIN_PROMPT_USERNAME;
     w->login.failUp = 0;
+    w->login.fail = (char *) w->login.failMsg;
+
+    /* Set prompt defaults */
+    PROMPT_TEXT(w, LOGIN_PROMPT_USERNAME) 	= NULL;
+    DEF_PROMPT_TEXT(w, LOGIN_PROMPT_USERNAME) 	= w->login.namePrompt;
+    VALUE_TEXT(w, LOGIN_PROMPT_USERNAME) 	= w->login.data.name;
+    VALUE_TEXT_MAX(w, LOGIN_PROMPT_USERNAME)	= sizeof(w->login.data.name);
+    VALUE_SHOW_START(w, LOGIN_PROMPT_USERNAME)	= 0;
+    
+    PROMPT_TEXT(w, LOGIN_PROMPT_PASSWORD) 	= NULL;
+    DEF_PROMPT_TEXT(w, LOGIN_PROMPT_PASSWORD) 	= w->login.passwdPrompt;
+    VALUE_TEXT(w, LOGIN_PROMPT_PASSWORD) 	= w->login.data.passwd;
+    VALUE_TEXT_MAX(w, LOGIN_PROMPT_PASSWORD)	= sizeof(w->login.data.passwd);
+    VALUE_SHOW_START(w, LOGIN_PROMPT_PASSWORD)	= 0;
+
+    SetPrompt(gnew, LOGIN_PROMPT_PASSWORD, NULL, LOGIN_PROMPT_ECHO_OFF, False);
+    SetPrompt(gnew, LOGIN_PROMPT_USERNAME, NULL, LOGIN_PROMPT_ECHO_ON, False);
+    
     if (w->core.width == 0)
 	w->core.width = max (GREET_W(w), FAIL_W(w)) + PAD_X(w);
     if (w->core.height == 0) {
@@ -1200,6 +1608,10 @@ SkipXpmLoad:
     XtSetArg (position[0], XtNx, x);
     XtSetArg (position[1], XtNy, y);
     XtSetValues (XtParent (w), position, (Cardinal) 2);
+
+    
+    
+    w->login.state = PROMPTING;
 }
 
  
@@ -1271,6 +1683,12 @@ static void Destroy (Widget gw)
     LoginWidget w = (LoginWidget)gw;
     bzero (w->login.data.name, NAME_LEN);
     bzero (w->login.data.passwd, PASSWORD_LEN);
+
+    if (PROMPT_TEXT(w,0) != NULL)
+	XtFree(PROMPT_TEXT(w,0));
+    if (PROMPT_TEXT(w,1) != NULL)
+	XtFree(PROMPT_TEXT(w,1));
+
     XtReleaseGC(gw, w->login.textGC);
     XtReleaseGC(gw, w->login.bgGC);
     XtReleaseGC(gw, w->login.xorGC);
@@ -1318,6 +1736,7 @@ static Boolean SetValues (
     return False;
 }
 
+static
 char defaultLoginTranslations [] =
 "Ctrl<Key>H:	delete-previous-character() \n"
 "Ctrl<Key>D:	delete-character() \n"
@@ -1338,14 +1757,11 @@ char defaultLoginTranslations [] =
 "<Key>Delete:	delete-previous-character() \n"
 #endif
 "<Key>Return:	finish-field() \n"
-#ifndef XPM
-"<KeyPress>:	insert-char()"
-#else
 "<Key>Tab:	tab-field() \n"
 "<KeyPress>:	insert-char()"
-#endif /* XPM */
 ;
 
+static
 XtActionsRec loginActionsTable [] = {
   {"delete-previous-character",	DeleteBackwardChar},
   {"delete-character",		DeleteForwardChar},
@@ -1356,9 +1772,7 @@ XtActionsRec loginActionsTable [] = {
   {"erase-to-end-of-line",	EraseToEndOfLine},
   {"erase-line",		EraseLine},
   {"finish-field", 		FinishField},
-#ifdef XPM
   {"tab-field", 		TabField},
-#endif /* XPM */
   {"abort-session",		AbortSession},
   {"abort-display",		AbortDisplay},
   {"restart-session",		RestartSession},
