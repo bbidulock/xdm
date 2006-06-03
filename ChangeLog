@@ -1,5 +1,10 @@
 2006-06-02  Alan Coopersmith  <alan.coopersmith@sun.com>
 
+	* AUTHORS:
+	Make initial pass at an AUTHORS list.
+
+2006-06-02  Alan Coopersmith  <alan.coopersmith@sun.com>
+
 	* session.c:
 	* greeter/Login.c:
 	* greeter/Login.h:
