@@ -1,5 +1,13 @@
 2006-06-02  Alan Coopersmith  <alan.coopersmith@sun.com>
 
+	* greeter/Login.c: 
+	* greeter/greet.c:
+	* greeter/verify.c: 
+	Mark GreetUser (called from xdm) as _X_EXPORT.
+	Make all other non-static functions in libXdmGreet _X_INTERNAL.
+	
+2006-06-02  Alan Coopersmith  <alan.coopersmith@sun.com>
+	
 	* configure.ac:
 	* dm.h: 
 	Replace old Imake-based SIGNALRETURNSINT with AC_TYPE_SIGNAL

@@ -1,4 +1,4 @@
-/* $XdotOrg: app/xdm/greeter/Login.c,v 1.5 2006/04/14 02:52:02 alanc Exp $ */
+/* $XdotOrg: app/xdm/greeter/Login.c,v 1.6 2006/06/03 00:05:24 alanc Exp $ */
 /* $Xorg: Login.c,v 1.4 2001/02/09 02:05:41 xorgcvs Exp $ */
 /*
 
@@ -522,6 +522,7 @@ static void failTimeout (XtPointer client_data, XtIntervalId * id)
     EraseFail (w);
 }
 
+_X_INTERNAL
 void
 DrawFail (Widget ctx)
 {
@@ -596,6 +597,7 @@ RedrawFail (LoginWidget w)
     }
 }
 
+_X_INTERNAL
 void
 ErrorMessage(Widget ctx, const char *message, Bool timeout)
 {
@@ -623,6 +625,7 @@ ErrorMessage(Widget ctx, const char *message, Bool timeout)
     }
 }
 
+_X_INTERNAL
 void
 ShowChangePasswdMessage(Widget ctx)
 {
@@ -753,6 +756,7 @@ draw_it (LoginWidget w)
 }
 
 /* Returns 0 on success, -1 on failure */
+_X_INTERNAL
 int
 SetPrompt (Widget ctx, int promptNum, const char *message,
 	   loginPromptState state, Boolean minimumTime)
@@ -842,7 +846,9 @@ SetPrompt (Widget ctx, int promptNum, const char *message,
     return 0;
 }
 
-const char *GetPrompt(Widget ctx, int promptNum)
+_X_INTERNAL
+const char *
+GetPrompt(Widget ctx, int promptNum)
 {
     LoginWidget	w = (LoginWidget) ctx;
 
@@ -851,6 +857,7 @@ const char *GetPrompt(Widget ctx, int promptNum)
     return CUR_PROMPT_TEXT(w,promptNum);
 }
 
+_X_INTERNAL
 int
 SetValue(Widget ctx, int promptNum, char *value)
 {
@@ -880,6 +887,7 @@ SetValue(Widget ctx, int promptNum, char *value)
     return 0;
 }
 
+_X_INTERNAL
 const char *
 GetValue(Widget ctx, int promptNum)
 {

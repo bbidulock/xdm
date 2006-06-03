@@ -1,5 +1,5 @@
 /* $Xorg: verify.c,v 1.4 2001/02/09 02:05:41 xorgcvs Exp $ */
-/* $XdotOrg: app/xdm/greeter/verify.c,v 1.8 2006/04/14 20:17:31 alanc Exp $ */
+/* $XdotOrg: app/xdm/greeter/verify.c,v 1.9 2006/06/03 00:05:24 alanc Exp $ */
 /*
 
 Copyright 1988, 1998  The Open Group
@@ -121,6 +121,7 @@ userEnv (struct display *d, int useSystemPath, char *user, char *home, char *she
 }
 
 #ifdef USE_BSDAUTH
+_X_INTERNAL
 int
 Verify (struct display *d, struct greet_info *greet, struct verify_info *verify)
 {
@@ -235,6 +236,7 @@ Verify (struct display *d, struct greet_info *greet, struct verify_info *verify)
  */
 struct smp_user_info *userp = 0;
 
+_X_INTERNAL
 int
 Verify (struct display *d, struct greet_info *greet, struct verify_info *verify)
 {
@@ -321,6 +323,7 @@ smp_fail:
     }
   }
 #else /* !USE_BSDAUTH && !USESECUREWARE */
+_X_INTERNAL
 int
 Verify (struct display *d, struct greet_info *greet, struct verify_info *verify)
 {

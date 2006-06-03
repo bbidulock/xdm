@@ -1,5 +1,5 @@
 /* $Xorg: greet.c,v 1.4 2001/02/09 02:05:41 xorgcvs Exp $ */
-/* $XdotOrg: $ */
+/* $XdotOrg: app/xdm/greeter/greet.c,v 1.4 2006/06/03 00:05:24 alanc Exp $ */
 /*
 
 Copyright 1988, 1998  The Open Group
@@ -420,7 +420,7 @@ FailedLogin (struct display *d, struct greet_info *greet)
 #endif
 }
 
-
+_X_EXPORT
 greet_user_rtn GreetUser(
     struct display          *d,
     Display                 ** dpy,
