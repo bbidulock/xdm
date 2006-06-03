@@ -1,4 +1,4 @@
-/* $XdotOrg: app/xdm/util.c,v 1.4 2006/03/16 21:46:55 alanc Exp $ */
+/* $XdotOrg: app/xdm/util.c,v 1.5 2006/03/30 21:14:31 alanc Exp $ */
 /* $Xorg: util.c,v 1.4 2001/02/09 02:05:41 xorgcvs Exp $ */
 /*
 
@@ -265,14 +265,14 @@ localHostname (void)
 
 SIGVAL (*Signal (int sig, SIGFUNC handler))(int)
 {
-#if !defined(X_NOT_POSIX) && !defined(__UNIXOS2__)
+#ifdef HAVE_SIGACTION
     struct sigaction sigact, osigact;
     sigact.sa_handler = handler;
     sigemptyset(&sigact.sa_mask);
     sigact.sa_flags = 0;
     sigaction(sig, &sigact, &osigact);
     return osigact.sa_handler;
-#else
+#else /* __UNIXOS2__ */
     return signal(sig, handler);
 #endif
 }

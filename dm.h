@@ -1,4 +1,4 @@
-/* $XdotOrg: xc/programs/xdm/dm.h,v 1.3 2004/12/15 20:49:08 herrb Exp $ */
+/* $XdotOrg: app/xdm/dm.h,v 1.5 2005/11/08 06:33:31 jkj Exp $ */
 /* $Xorg: dm.h,v 1.4 2001/02/09 02:05:40 xorgcvs Exp $ */
 /*
 
@@ -488,11 +488,7 @@ extern void ProcessRequestSocket(int fd);
 
 #include <stdlib.h>
 
-#if defined(X_NOT_POSIX) && defined(SIGNALRETURNSINT)
-#define SIGVAL int
-#else
-#define SIGVAL void
-#endif
+#define SIGVAL RETSIGTYPE
 
 #if defined(X_NOT_POSIX) || defined(__UNIXOS2__) || defined(__NetBSD__) && defined(__sparc__)
 #if defined(SYSV) || defined(__UNIXOS2__)

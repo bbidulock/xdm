@@ -1,5 +1,15 @@
 2006-06-02  Alan Coopersmith  <alan.coopersmith@sun.com>
 
+	* configure.ac:
+	* dm.h: 
+	Replace old Imake-based SIGNALRETURNSINT with AC_TYPE_SIGNAL
+
+	* configure.ac:
+	* util.c
+	Replace old Imake #ifdefs with AC_CHECK_FUNCS([sigaction])
+	
+2006-06-02  Alan Coopersmith  <alan.coopersmith@sun.com>
+	
 	* AUTHORS:
 	Make initial pass at an AUTHORS list.
 
