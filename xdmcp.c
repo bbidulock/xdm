@@ -1,4 +1,4 @@
-/* $XdotOrg: xc/programs/xdm/xdmcp.c,v 1.4 2004/08/07 19:22:01 alanc Exp $ */
+/* $XdotOrg: app/xdm/xdmcp.c,v 1.5 2005/07/05 18:52:33 alanc Exp $ */
 /* $Xorg: xdmcp.c,v 1.4 2001/02/09 02:05:41 xorgcvs Exp $ */
 /*
 
@@ -960,6 +960,7 @@ request_respond (
     authorizationName.data = 0;
     authorizationData.length = 0;
     authorizationData.data = 0;
+    manufacturerDisplayID.length = 0;
     manufacturerDisplayID.data = 0;
     if (XdmcpReadCARD16 (&buffer, &displayNumber) &&
 	XdmcpReadARRAY16 (&buffer, &connectionTypes) &&
