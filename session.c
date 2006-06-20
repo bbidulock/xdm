@@ -1,4 +1,4 @@
-/* $XdotOrg: app/xdm/session.c,v 1.6 2006/04/08 00:22:23 alanc Exp $ */
+/* $XdotOrg: app/xdm/session.c,v 1.7 2006-06-03 00:05:24 alanc Exp $ */
 /* $Xorg: session.c,v 1.8 2001/02/09 02:05:40 xorgcvs Exp $ */
 /*
 
@@ -492,8 +492,14 @@ SessionExit (struct display *d, int status, int removeAuth)
     else
 	ResetServer (d);
     if (removeAuth) {
-	setgid (verify.gid);
-	setuid (verify.uid);
+	if (setgid (verify.gid) == -1) {
+	    LogError( "SessionExit: setgid: %s\n", strerror(errno));
+	    exit(status);
+	}
+	if (setuid (verify.uid) == -1) {
+	    LogError( "SessionExit: setuid: %s\n", strerror(errno));
+	    exit(status);
+	}
 	RemoveUserAuthorization (d, &verify);
 #if defined(K5AUTH) && !defined(USE_PAM)   /* PAM modules should handle this */
 	/* do like "kdestroy" program */
