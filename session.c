@@ -1,4 +1,4 @@
-/* $XdotOrg: app/xdm/session.c,v 1.5 2006/03/16 21:46:55 alanc Exp $ */
+/* $XdotOrg: app/xdm/session.c,v 1.6 2006/04/08 00:22:23 alanc Exp $ */
 /* $Xorg: session.c,v 1.8 2001/02/09 02:05:40 xorgcvs Exp $ */
 /*
 
@@ -490,8 +490,14 @@ SessionExit (struct display *d, int status, int removeAuth)
     else
 	ResetServer (d);
     if (removeAuth) {
-	setgid (verify.gid);
-	setuid (verify.uid);
+	if (setgid (verify.gid) == -1) {
+	    LogError( "SessionExit: setgid: %s\n", strerror(errno));
+	    exit(status);
+	}
+	if (setuid (verify.uid) == -1) {
+	    LogError( "SessionExit: setuid: %s\n", strerror(errno));
+	    exit(status);
+	}
 	RemoveUserAuthorization (d, &verify);
 #ifdef K5AUTH
 	/* do like "kdestroy" program */

@@ -183,7 +183,11 @@ main (
 #endif
 
     /* make xdm run in a non-setuid environment */
-    setuid (geteuid());
+    if (setuid (geteuid()) == -1) {
+	fprintf(stderr, "%s: cannot setuid (error %d, %s)\r\n",
+		ProgramName, errno, strerror(errno));
+	exit(1);
+    }
 
     /*
      * exec /usr/bin/X11/xdm -nodaemon -udpPort 0
