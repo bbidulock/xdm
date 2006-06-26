@@ -1,3 +1,16 @@
+2006-06-26  Alan Coopersmith  <alan.coopersmith@sun.com>
+
+	* access.c:
+	* chooser.c:
+	* xdmcp.c: 
+	Bugzilla #7332 <https://bugs.freedesktop.org/show_bug.cgi?id=7332>
+	Patch #6046 <https://bugs.freedesktop.org/attachment.cgi?id=6046>
+	(1) Xdm compiled with IPv6 support failed to accept any
+	chooser connections (even when only using IPv4).
+	(2) There should be a one-to-one correspondence between
+	successful getaddrinfo calls and freeaddrinfo calls.
+	(Peter Breitenlohner)
+
 2006-06-20  Matthieu Herrb <matthieu.herrb@laas.fr>
 	* session.c:
 	* xdmshell.c:

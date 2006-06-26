@@ -1,5 +1,5 @@
 /*
- * $XdotOrg: app/xdm/chooser.c,v 1.4 2005/11/08 06:33:31 jkj Exp $
+ * $XdotOrg: app/xdm/chooser.c,v 1.5 2006/03/11 04:07:00 alanc Exp $
  * $Xorg: chooser.c,v 1.4 2001/02/09 02:05:40 xorgcvs Exp $
  *
 Copyright 1990, 1998  The Open Group
@@ -742,6 +742,7 @@ RegisterHostname (char *name)
 			}
 		    }
 		}
+		freeaddrinfo(ai);
 	    }
 	}
 #else

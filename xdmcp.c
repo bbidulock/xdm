@@ -1,4 +1,4 @@
-/* $XdotOrg: app/xdm/xdmcp.c,v 1.5 2005/07/05 18:52:33 alanc Exp $ */
+/* $XdotOrg: app/xdm/xdmcp.c,v 1.6 2006/06/20 01:50:35 alanc Exp $ */
 /* $Xorg: xdmcp.c,v 1.4 2001/02/09 02:05:41 xorgcvs Exp $ */
 /*
 
@@ -578,8 +578,11 @@ NetworkAddressToName(
 	    {
 		if (!strcmp (localhost, hostname))
 		{
-		    if (!getString (name, 10))
-			return 0;
+		    if (!getString (name, 10)) {
+			if (ai)
+			    freeaddrinfo(ai);
+			return NULL;
+		    }
 		    sprintf (name, ":%d", displayNumber);
 		}
 		else
@@ -605,15 +608,21 @@ NetworkAddressToName(
 			}
 		    }
 
-		    if (!getString (name, strlen (hostname) + 10))
-			return 0;
+		    if (!getString (name, strlen (hostname) + 10)) {
+			if (ai)
+			    freeaddrinfo(ai);
+			return NULL;
+		    }
 		    sprintf (name, "%s:%d", hostname, displayNumber);
 		}
 	    }
 	    else
 	    {
-		if (!getString (name, INET6_ADDRSTRLEN + 10))
-		    return 0;
+		if (!getString (name, INET6_ADDRSTRLEN + 10)) {
+		    if (ai)
+			freeaddrinfo(ai);
+		    return NULL;
+		}
 		if (multiHomed) {
 		    if (connectionType == FamilyInternet) {
 			data = (CARD8 *) 
@@ -626,7 +635,9 @@ NetworkAddressToName(
 		}
 		if (inet_ntop(type, data, name, INET6_ADDRSTRLEN) == NULL) {
 		    free(name);
-		    return 0;
+		    if (ai)
+			freeaddrinfo(ai);
+		    return NULL;
 		} 
 		sprintf(name + strlen(name), ":%d", displayNumber);
 	    }
@@ -1435,20 +1446,28 @@ NetworkAddressToHostname (
 		struct addrinfo	*ai = NULL, *nai;
 		if (getaddrinfo(hostent->h_name, NULL, NULL, &ai) == 0) {
 		    for (nai = ai; nai != NULL; nai = nai->ai_next) {
-			if ((af_type == nai->ai_family) &&
-			  (connectionAddress->length == nai->ai_addrlen) &&
-			  (memcmp(connectionAddress->data,nai->ai_addr,
-			    nai->ai_addrlen) == 0) ) {
+			if ((af_type == nai->ai_family) && (
+			  ((nai->ai_family == AF_INET) &&
+			    (connectionAddress->length == sizeof(struct in_addr)) &&
+			    (memcmp(connectionAddress->data,
+				    &((struct sockaddr_in *)nai->ai_addr)->sin_addr,
+				    connectionAddress->length) == 0)) ||
+			  ((nai->ai_family == AF_INET6) &&
+			    (connectionAddress->length == sizeof(struct in6_addr)) &&
+			    (memcmp(connectionAddress->data,
+				    &((struct sockaddr_in6 *)nai->ai_addr)->sin6_addr,
+				    connectionAddress->length) == 0))))
 			    break;
-			}
 		    }
-		    if (ai == NULL) {
+		    if (nai == NULL) {
 			inet_ntop(af_type, connectionAddress->data, 
 			  dotted, sizeof(dotted));
 
-			LogError("Possible DNS spoof attempt %s->%s.", dotted,
+			LogError("Possible DNS spoof attempt %s->%s.\n", dotted,
 			  hostent->h_name);
 			hostent = NULL;
+		    } else {
+		      local_name = hostent->h_name;
 		    }
 		    freeaddrinfo(ai);
 		} else {
@@ -1459,7 +1478,7 @@ NetworkAddressToHostname (
 		if ((hostent = gethostbyname(s))) {
 			if (memcmp((char*)connectionAddress->data, hostent->h_addr,
 			    hostent->h_length) != 0) {
-				LogError("Possible DNS spoof attempt.");
+				LogError("Possible DNS spoof attempt.\n");
 				hostent = NULL; /* so it enters next if() */
 			} else {
 				local_name = hostent->h_name;
