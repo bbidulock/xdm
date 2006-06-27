@@ -1,5 +1,5 @@
 /* $Xorg: greet.c,v 1.4 2001/02/09 02:05:41 xorgcvs Exp $ */
-/* $XdotOrg: app/xdm/greeter/greet.c,v 1.4 2006/06/03 00:05:24 alanc Exp $ */
+/* $XdotOrg: app/xdm/greeter/greet.c,v 1.5 2006/06/03 01:13:44 alanc Exp $ */
 /*
 
 Copyright 1988, 1998  The Open Group
@@ -121,10 +121,12 @@ struct group    *(*__xdm_getgrent)(void) = NULL;
 void    (*__xdm_endgrent)(void) = NULL;
 #ifdef USESHADOW
 struct spwd   *(*__xdm_getspnam)(GETSPNAM_ARGS) = NULL;
+# ifndef QNX4
 void   (*__xdm_endspent)(void) = NULL;
+# endif /* QNX4 doesn't use endspent */
 #endif
 struct passwd   *(*__xdm_getpwnam)(GETPWNAM_ARGS) = NULL;
-#ifdef linux
+#if defined(linux) || defined(__GLIBC__)
 void   (*__xdm_endpwent)(void) = NULL;
 #endif
 char     *(*__xdm_crypt)(CRYPT_ARGS) = NULL;
@@ -458,10 +460,12 @@ greet_user_rtn GreetUser(
     __xdm_endgrent = dlfuncs->_endgrent;
 #ifdef USESHADOW
     __xdm_getspnam = dlfuncs->_getspnam;
+# ifndef QNX4
     __xdm_endspent = dlfuncs->_endspent;
+# endif /* QNX4 doesn't use endspent */
 #endif
     __xdm_getpwnam = dlfuncs->_getpwnam;
-#ifdef linux
+#if defined(linux) || defined(__GLIBC__)
     __xdm_endpwent = dlfuncs->_endpwent;
 #endif
     __xdm_crypt = dlfuncs->_crypt;

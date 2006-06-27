@@ -1,5 +1,13 @@
 2006-06-26  Alan Coopersmith  <alan.coopersmith@sun.com>
 
+	* greet.h:
+	* greeter/greet.c:
+	Bugzilla #7318 <https://bugs.freedesktop.org/show_bug.cgi?id=7318>
+	Patch #6032 <https://bugs.freedesktop.org/attachment.cgi?id=6032>
+	xdm crashes on Hurd because of incongruity in dlfuncs (J.P. Larocque)
+	
+2006-06-26  Alan Coopersmith  <alan.coopersmith@sun.com>	
+
 	* access.c:
 	* chooser.c:
 	* xdmcp.c: 
