@@ -1,3 +1,9 @@
+2006-06-27  Alan Coopersmith  <alan.coopersmith@sun.com>
+
+	* configure.ac: 
+	Bugzilla #7317 <https://bugs.freedesktop.org/show_bug.cgi?id=7317>
+	xdm needs to define _XOPEN_SOURCE to build on Hurd (J.P. Larocque)
+	
 2006-06-26  Alan Coopersmith  <alan.coopersmith@sun.com>
 
 	* greet.h:
