@@ -1227,7 +1227,6 @@ a file \fI\.xsession,\fP
 which contains commands that each user would like to use as a session.
 \fIXsession\fP should also
 implement a system default session if no user-specified session exists.
-See the section \fBTypical Usage\fP.
 .PP
 An argument may be passed to this program from the authentication widget
 using the `set-session-argument' action.  This can be used to select
