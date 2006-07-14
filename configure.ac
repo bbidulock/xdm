@@ -492,6 +492,7 @@ appdefaultdir=$(pkg-config --variable=appdefaultdir xt)
 AC_SUBST(appdefaultdir)
 AC_SUBST(MKTEMP_COMMAND)
 
+XORG_WITH_LINT
 XORG_MANPAGE_SECTIONS
 XORG_RELEASE_VERSION
 

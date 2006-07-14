@@ -164,3 +164,14 @@ appdefault_DATA = $(APPDEFAULTFILES)
 CLEANFILES += $(APPDEFAULTFILES)
 
 EXTRA_DIST += $(APPDEFAULTFILES:%=%.ad)
+
+if LINT
+ALL_LINT_FLAGS=$(LINT_FLAGS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+		$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS)
+
+lint:
+	$(LINT) $(ALL_LINT_FLAGS) $(xdm_CFLAGS) $(xdm_SOURCES) $(xdm_LDADD)
+	$(LINT) $(ALL_LINT_FLAGS) $(xdmshell_CFLAGS) $(xdmshell_SOURCES)
+	$(LINT) $(ALL_LINT_FLAGS) $(chooser_CFLAGS) $(chooser_SOURCES) $(chooser_LDADD)
+	(cd greeter && $(MAKE) $(AM_MAKEFLAGS) lint)
+endif LINT
