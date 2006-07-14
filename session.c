@@ -171,11 +171,11 @@ static	struct dlfuncs	dlfuncs = {
 static Bool StartClient(
     struct verify_info	*verify,
     struct display	*d,
-    int			*pidp,
+    pid_t		*pidp,
     char		*name,
     char		*passwd);
 
-static int			clientPid;
+static pid_t			clientPid;
 static struct greet_info	greet;
 static struct verify_info	verify;
 
@@ -211,11 +211,11 @@ waitAbort (int n)
 #endif
 
 static void
-AbortClient (int pid)
+AbortClient (pid_t pid)
 {
     int	sig = SIGTERM;
     volatile int	i;
-    int	retId;
+    pid_t	retId;
 
     for (i = 0; i < 4; i++) {
 	if (killpg (pid, sig) == -1) {
@@ -281,7 +281,7 @@ ErrorHandler(Display *dpy, XErrorEvent *event)
 void
 ManageSession (struct display *d)
 {
-    static int		pid = 0;
+    static pid_t	pid = 0;
     Display		*dpy;
     greet_user_rtn	greet_stat;
     static GreetUserProc greet_user_proc = NULL;
@@ -534,13 +534,13 @@ static Bool
 StartClient (
     struct verify_info	*verify,
     struct display	*d,
-    int			*pidp,
+    pid_t		*pidp,
     char		*name,
     char		*passwd)
 {
     char	**f, *home;
     char	*failsafeArgv[2];
-    int	pid;
+    pid_t	pid;
 #ifdef HAS_SETUSERCONTEXT
     struct passwd* pwd;
 #endif
@@ -832,7 +832,7 @@ source (char **environ, char *file)
 static int
 runAndWait (char **args, char **environ)
 {
-    int	pid;
+    pid_t	pid;
     waitType	result;
 
     switch (pid = fork ()) {

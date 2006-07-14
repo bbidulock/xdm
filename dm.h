@@ -175,8 +175,8 @@ struct display {
 
 	/* display state */
 	DisplayStatus	status;		/* current status */
-	int		pid;		/* process id of child */
-	int		serverPid;	/* process id of server (-1 if none) */
+	pid_t		pid;		/* process id of child */
+	pid_t		serverPid;	/* process id of server (-1 if none) */
 	FileState	state;		/* state during HUP processing */
 	int		startTries;	/* current start try */
         Time_t          lastCrash;      /* time of last crash */
@@ -331,8 +331,8 @@ extern int	choiceTimeout;	/* chooser choice timeout */
 extern struct display	*FindDisplayByName (char *name),
 			*FindDisplayBySessionID (CARD32 sessionID),
 			*FindDisplayByAddress (XdmcpNetaddr addr, int addrlen, CARD16 displayNumber),
-			*FindDisplayByPid (int pid),
-			*FindDisplayByServerPid (int serverPid),
+			*FindDisplayByPid (pid_t pid),
+			*FindDisplayByServerPid (pid_t serverPid),
 			*NewDisplay (char *name, char *class);
 
 extern struct protoDisplay	*FindProtoDisplay (

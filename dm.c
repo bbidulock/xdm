@@ -88,7 +88,7 @@ static void	ScanServers (void);
 static void	SetAccessFileTime (void);
 static void	SetConfigFileTime (void);
 static void	StartDisplays (void);
-static void	TerminateProcess (int pid, int signal);
+static void	TerminateProcess (pid_t pid, int signal);
 
 volatile int	Rescan;
 static long	ServersModTime, ConfigModTime, AccessFileModTime;
@@ -106,7 +106,7 @@ static SIGVAL ChildNotify (int n);
 
 static int StorePid (void);
 
-static int parent_pid = -1; 	/* PID of parent xdm process */
+static pid_t parent_pid = -1; 	/* PID of parent xdm process */
 
 int
 main (int argc, char **argv)
@@ -422,7 +422,7 @@ ChildNotify (int n)
 void
 WaitForChild (void)
 {
-    int		pid;
+    pid_t		pid;
     struct display	*d;
     waitType	status;
 #if !defined(X_NOT_POSIX) && !defined(__UNIXOS2__)
@@ -625,7 +625,7 @@ StartDisplays (void)
 void
 StartDisplay (struct display *d)
 {
-    int	pid;
+    pid_t	pid;
 
     Debug ("StartDisplay %s\n", d->name);
     LoadServerResources (d);
@@ -695,7 +695,7 @@ StartDisplay (struct display *d)
 }
 
 static void
-TerminateProcess (int pid, int signal)
+TerminateProcess (pid_t pid, int signal)
 {
     kill (pid, signal);
 #ifdef SIGCONT

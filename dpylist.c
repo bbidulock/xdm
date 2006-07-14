@@ -69,7 +69,7 @@ FindDisplayByName (char *name)
 }
 
 struct display *
-FindDisplayByPid (int pid)
+FindDisplayByPid (pid_t pid)
 {
 	struct display	*d;
 
@@ -80,7 +80,7 @@ FindDisplayByPid (int pid)
 }
 
 struct display *
-FindDisplayByServerPid (int serverPid)
+FindDisplayByServerPid (pid_t serverPid)
 {
 	struct display	*d;
 

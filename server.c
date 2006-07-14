@@ -49,7 +49,7 @@ from The Open Group.
 
 static int receivedUsr1;
 
-static int serverPause (unsigned t, int serverPid);
+static int serverPause (unsigned t, pid_t serverPid);
 
 static Display	*dpy;
 
@@ -79,7 +79,7 @@ StartServerOnce (struct display *d)
     char	**f;
     char	**argv;
     char	arg[1024];
-    int		pid;
+    pid_t	pid;
 
     Debug ("StartServer for %s\n", d->name);
     receivedUsr1 = 0;
@@ -170,9 +170,9 @@ serverPauseUsr1 (int n)
 }
 
 static int
-serverPause (unsigned t, int serverPid)
+serverPause (unsigned t, pid_t serverPid)
 {
-    int		pid;
+    pid_t	pid;
 
     serverPauseRet = 0;
     if (!Setjmp (pauseAbort)) {

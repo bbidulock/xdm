@@ -71,7 +71,7 @@ static int exec_args (
     char *filename,
     char **args)
 {
-    int pid;
+    pid_t pid;
     waitType status;
 
     if (!filename) return -1;
