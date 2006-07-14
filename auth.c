@@ -372,7 +372,7 @@ SaveServerAuthorizations (
     int		    count)
 {
     FILE	*auth_file;
-    int		mask;
+    mode_t	mask;
     int		ret;
     int		i;
 
@@ -495,7 +495,7 @@ SetAuthorization (struct display *d)
 static int
 openFiles (char *name, char *new_name, FILE **oldp, FILE **newp)
 {
-	int	mask;
+	mode_t	mask;
 
 	strcpy (new_name, name);
 	strcat (new_name, "-n");

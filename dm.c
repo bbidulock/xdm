@@ -111,7 +111,8 @@ static int parent_pid = -1; 	/* PID of parent xdm process */
 int
 main (int argc, char **argv)
 {
-    int	oldpid, oldumask;
+    int	oldpid;
+    mode_t oldumask;
     char cmdbuf[1024];
 
     /* make sure at least world write access is disabled */
