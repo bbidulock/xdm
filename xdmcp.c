@@ -413,7 +413,7 @@ WaitForSomething (void)
     Debug ("WaitForSomething\n");
     if (AnyWellKnownSockets () && !ChildReady) {
 	reads = WellKnownSocketsMask;
-	nready = select (WellKnownSocketsMax + 1, &reads, 0, 0, 0);
+	nready = select (WellKnownSocketsMax + 1, &reads, NULL, NULL, NULL);
 	Debug ("select returns %d.  Rescan: %d  ChildReady: %d\n",
 		nready, Rescan, ChildReady);
 	if (nready > 0)
@@ -745,11 +745,11 @@ forward_respond (
     
     Debug ("Forward respond %d\n", length);
     clientAddress.length = 0;
-    clientAddress.data = 0;
+    clientAddress.data = NULL;
     clientPort.length = 0;
-    clientPort.data = 0;
+    clientPort.data = NULL;
     authenticationNames.length = 0;
-    authenticationNames.data = 0;
+    authenticationNames.data = NULL;
     if (XdmcpReadARRAY8 (&buffer, &clientAddress) &&
 	XdmcpReadARRAY8 (&buffer, &clientPort) &&
 	XdmcpReadARRAYofARRAY8 (&buffer, &authenticationNames))
@@ -927,7 +927,7 @@ void init_session_id(void)
      * incarnation so we don't say "Alive" to those displays.
      * Start with low digits 0 to make debugging easier.
      */
-    globalSessionID = (time((Time_t)0)&0x7fff) * 16000;
+    globalSessionID = (time((Time_t *)0)&0x7fff) * 16000;
 }
     
 static ARRAY8 outOfMemory = { (CARD16) 13, (CARD8Ptr) "Out of memory" };
@@ -949,30 +949,30 @@ request_respond (
     ARRAY8	    authenticationData;
     ARRAYofARRAY8   authorizationNames;
     ARRAY8	    manufacturerDisplayID;
-    ARRAY8Ptr	    reason = 0;
+    ARRAY8Ptr	    reason = NULL;
     int		    expectlen;
     int		    i, j;
-    struct protoDisplay  *pdpy;
+    struct protoDisplay  *pdpy = NULL;
     ARRAY8	    authorizationName, authorizationData;
     ARRAY8Ptr	    connectionAddress;
 
     Debug ("Request respond %d\n", length);
     connectionTypes.length = 0;
-    connectionTypes.data = 0;
+    connectionTypes.data = NULL;
     connectionAddresses.length = 0;
-    connectionAddresses.data = 0;
+    connectionAddresses.data = NULL;
     authenticationName.length = 0;
-    authenticationName.data = 0;
+    authenticationName.data = NULL;
     authenticationData.length = 0;
-    authenticationData.data = 0;
+    authenticationData.data = NULL;
     authorizationNames.length = 0;
-    authorizationNames.data = 0;
+    authorizationNames.data = NULL;
     authorizationName.length = 0;
-    authorizationName.data = 0;
+    authorizationName.data = NULL;
     authorizationData.length = 0;
-    authorizationData.data = 0;
+    authorizationData.data = NULL;
     manufacturerDisplayID.length = 0;
-    manufacturerDisplayID.data = 0;
+    manufacturerDisplayID.data = NULL;
     if (XdmcpReadCARD16 (&buffer, &displayNumber) &&
 	XdmcpReadARRAY16 (&buffer, &connectionTypes) &&
 	XdmcpReadARRAYofARRAY8 (&buffer, &connectionAddresses) &&
@@ -1002,7 +1002,6 @@ request_respond (
 	    connectionAddresses.length != connectionTypes.length)
 	{
 	    reason = &noValidAddr;
-	    pdpy = 0;
 	    goto decline;
 	}
 	pdpy = FindProtoDisplay ((XdmcpNetaddr) from, fromlen, displayNumber);
@@ -1169,7 +1168,7 @@ manage (
     CARD16		connectionType;
 
     Debug ("Manage %d\n", length);
-    displayClass.data = 0;
+    displayClass.data = NULL;
     displayClass.length = 0;
     if (XdmcpReadCARD32 (&buffer, &sessionID) &&
 	XdmcpReadCARD16 (&buffer, &displayNumber) &&
@@ -1295,7 +1294,7 @@ manage (
 		}
 		d->authorizations[0] = pdpy->fileAuthorization;
 		d->authNum = 1;
-		pdpy->fileAuthorization = 0;
+		pdpy->fileAuthorization = NULL;
 	    }
 	    DisposeProtoDisplay (pdpy);
 	    Debug ("Starting display %s,%s\n", d->name, d->class);

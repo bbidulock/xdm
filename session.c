@@ -382,7 +382,7 @@ void
 LoadXloginResources (struct display *d)
 {
     char	**args;
-    char	**env = 0;
+    char	**env = NULL;
 
     if (d->resources[0] && access (d->resources, 4) == 0) {
 	env = systemEnv (d, (char *) 0, (char *) 0);
@@ -398,7 +398,7 @@ LoadXloginResources (struct display *d)
 void
 SetupDisplay (struct display *d)
 {
-    char	**env = 0;
+    char	**env = NULL;
 
     if (d->setup && d->setup[0]) {
     	env = systemEnv (d, (char *) 0, (char *) 0);
@@ -789,7 +789,7 @@ StartClient (
 		LogError ("Session has no command/arguments\n");
 	}
 	failsafeArgv[0] = d->failsafeClient;
-	failsafeArgv[1] = 0;
+	failsafeArgv[1] = NULL;
 	execute (failsafeArgv, verify->userEnviron);
 	exit (1);
     case -1:
@@ -905,10 +905,10 @@ execute (char **argv, char **environ)
 		    ++optarg;
 		while (*optarg && isspace (*optarg));
 	    } else
-		optarg = 0;
+		optarg = NULL;
 	} else {
 	    p = "/bin/sh";
-	    optarg = 0;
+	    optarg = NULL;
 	}
 	Debug ("Shell script execution: %s (optarg %s)\n",
 		p, optarg ? optarg : "(null)");
@@ -935,7 +935,7 @@ defaultEnv (void)
 {
     char    **env, **exp, *value;
 
-    env = 0;
+    env = NULL;
     for (exp = exportList; exp && *exp; ++exp) {
 	value = getenv (*exp);
 	if (value)

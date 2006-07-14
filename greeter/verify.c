@@ -529,7 +529,7 @@ done:
 	verify->gid = p->pw_gid;
 	home = p->pw_dir;
 	shell = p->pw_shell;
-	argv = 0;
+	argv = NULL;
 	if (d->session)
 		argv = parseArgs (argv, d->session);
 	if (greet->string)

@@ -242,7 +242,7 @@ InitGreet (struct display *d)
     int		i;
     static int	argc;
     Screen		*scrn;
-    static char	*argv[] = { "xlogin", 0 };
+    static char	*argv[] = { "xlogin", NULL };
     Display		*dpy;
 #ifdef USE_XINERAMA
     XineramaScreenInfo *screens;
@@ -253,11 +253,11 @@ InitGreet (struct display *d)
     argc = 1;
     XtToolkitInitialize ();
     context = XtCreateApplicationContext();
-    dpy = XtOpenDisplay (context, d->name, "xlogin", "Xlogin", 0,0,
+    dpy = XtOpenDisplay (context, d->name, "xlogin", "Xlogin", NULL, 0,
 			 &argc, argv);
 
     if (!dpy)
-	return 0;
+	return NULL;
 
 #ifdef XKB
     {

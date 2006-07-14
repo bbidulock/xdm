@@ -197,11 +197,11 @@ static XtResource resources[] = {
     {XtNsessionArgument, XtCSessionArgument, XtRString,	sizeof (char *),
 	offset(sessionArg), XtRString, (XtPointer) 0 },
     {XtNsecureSession, XtCSecureSession, XtRBoolean, sizeof (Boolean),
-	offset(secure_session), XtRImmediate, False },
+	offset(secure_session), XtRImmediate, (XtPointer) False },
     {XtNallowAccess, XtCAllowAccess, XtRBoolean, sizeof (Boolean),
-	offset(allow_access), XtRImmediate, False },
+	offset(allow_access), XtRImmediate, (XtPointer) False },
     {XtNallowNullPasswd, XtCAllowNullPasswd, XtRBoolean, sizeof (Boolean),
-	offset(allow_null_passwd), XtRImmediate, False},
+	offset(allow_null_passwd), XtRImmediate, (XtPointer) False},
     {XtNallowRootLogin, XtCAllowRootLogin, XtRBoolean, sizeof(Boolean),
      offset(allow_root_login), XtRImmediate, (XtPointer) True}
 };
@@ -1209,7 +1209,7 @@ SetSessionArgument (
     RemoveFail (ctx);
     if (ctx->login.sessionArg)
 	XtFree (ctx->login.sessionArg);
-    ctx->login.sessionArg = 0;
+    ctx->login.sessionArg = NULL;
     if (*num_params > 0) {
 	ctx->login.sessionArg = XtMalloc (strlen (params[0]) + 1);
 	if (ctx->login.sessionArg)
@@ -1325,7 +1325,7 @@ InsertChar (
     LoginWidget ctx = (LoginWidget)ctxw;
 
     char strbuf[128];
-    int  len, promptNum = ctx->login.activePrompt;;
+    int  len, promptNum = ctx->login.activePrompt;
     KeySym  keysym = 0;
 
     if (ctx->login.xic) {

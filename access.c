@@ -198,7 +198,7 @@ FreeAccessDatabase (void)
 	next = d->next;
 	FreeDisplayEntry (d);
     }
-    database = 0;
+    database = NULL;
 }
 
 #define WORD_LEN    256
