@@ -531,7 +531,7 @@ greet_user_rtn GreetUser(
 	    if (hostname == NULL) {
 		LogOutOfMem("GreetUser");
 	    } else {
-		char *colon = strrchr(d->name, ':');
+		char *colon = strrchr(hostname, ':');
 		
 		if (colon != NULL)
 		    *colon = '\0';
