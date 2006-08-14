@@ -99,12 +99,20 @@ from The Open Group.
 # define XtNpromptFont		"promptFont"
 # define XtNgreetFont		"greetFont"
 # define XtNfailFont		"failFont"
+# define XtNpromptFace		"promptFace"
+# define XtNgreetFace		"greetFace"
+# define XtNfailFace		"failFace"
 # define XtNfailTimeout		"failTimeout"
 # define XtNsessionArgument	"sessionArgument"
 # define XtNsecureSession	"secureSession"
 # define XtNallowAccess		"allowAccess"
 # define XtNallowNullPasswd	"allowNullPasswd"
 # define XtNallowRootLogin	"allowRootLogin"
+
+# define XtNface 		"face"
+# define XtCFace		"Face"
+# define XtRXftFont		"XftFont"
+# define XtRXftColor		"XftColor"
 
 #ifdef XPM
 /* added by Amit Margalit Oct 1996 */

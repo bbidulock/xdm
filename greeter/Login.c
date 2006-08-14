@@ -124,6 +124,7 @@ static XtResource resources[] = {
 	goffset(x), XtRImmediate,	(XtPointer) -1},
     {XtNy, XtCY, XtRPosition, sizeof (Position),
 	goffset(y), XtRImmediate,	(XtPointer) -1},
+#ifndef USE_XFT    
     {XtNforeground, XtCForeground, XtRPixel, sizeof(Pixel),
         offset(textpixel), XtRString,	XtDefaultForeground},
     {XtNpromptColor, XtCForeground, XtRPixel, sizeof(Pixel),
@@ -132,6 +133,7 @@ static XtResource resources[] = {
         offset(greetpixel), XtRString,	XtDefaultForeground},
     {XtNfailColor, XtCForeground, XtRPixel, sizeof (Pixel),
 	offset(failpixel), XtRString,	XtDefaultForeground},
+#endif
 
 #ifdef XPM
 /* added by Caolan McNamara */
@@ -163,14 +165,33 @@ static XtResource resources[] = {
 /* end (amit) */
 #endif /* XPM */
 
+#ifndef USE_XFT    
     {XtNfont, XtCFont, XtRFontStruct, sizeof (XFontStruct *),
-    	offset (font), XtRString,	"*-new century schoolbook-medium-r-normal-*-180-*"},
+    	offset (textFont), XtRString,	"*-new century schoolbook-medium-r-normal-*-180-*"},
     {XtNpromptFont, XtCFont, XtRFontStruct, sizeof (XFontStruct *),
     	offset (promptFont), XtRString, "*-new century schoolbook-bold-r-normal-*-180-*"},
     {XtNgreetFont, XtCFont, XtRFontStruct, sizeof (XFontStruct *),
     	offset (greetFont), XtRString,	"*-new century schoolbook-bold-i-normal-*-240-*"},
     {XtNfailFont, XtCFont, XtRFontStruct, sizeof (XFontStruct *),
 	offset (failFont), XtRString,	"*-new century schoolbook-bold-r-normal-*-180-*"},
+#else /* USE_XFT */
+    {XtNface, XtCFace, XtRXftFont, sizeof (XftFont *),
+        offset (textFace), XtRString, "Serif-18"},
+    {XtNpromptFace, XtCFace, XtRXftFont, sizeof (XftFont *),
+        offset (promptFace), XtRString, "Serif-18:bold"},
+    {XtNgreetFace, XtCFace, XtRXftFont, sizeof (XftFont *),
+        offset (greetFace), XtRString, "Serif-24:italic"},
+    {XtNfailFace, XtCFace, XtRXftFont, sizeof (XftFont *),
+        offset (failFace), XtRString, "Serif-18:bold"},
+    {XtNforeground, XtCForeground, XtRXftColor, sizeof(XftColor),
+        offset(textcolor), XtRString,	XtDefaultForeground},
+    {XtNpromptColor, XtCForeground, XtRXftColor, sizeof(XftColor),
+        offset(promptcolor), XtRString,	XtDefaultForeground},
+    {XtNgreetColor, XtCForeground, XtRXftColor, sizeof(XftColor),
+        offset(greetcolor), XtRString,	XtDefaultForeground},
+    {XtNfailColor, XtCForeground, XtRXftColor, sizeof (XftColor),
+	offset(failcolor), XtRString,	XtDefaultForeground},
+#endif
     {XtNgreeting, XtCGreeting, XtRString, sizeof (char *),
     	offset(greeting), XtRString, "X Window System"},
     {XtNunsecureGreeting, XtCGreeting, XtRString, sizeof (char *),
@@ -209,18 +230,27 @@ static XtResource resources[] = {
 #undef offset
 #undef goffset
 
-# define TEXT_X_INC(w)	((w)->login.font->max_bounds.width)
-# define TEXT_Y_INC(w)	((w)->login.font->max_bounds.ascent +\
-			 (w)->login.font->max_bounds.descent)
-# define PROMPT_X_INC(w)	((w)->login.promptFont->max_bounds.width)
-# define PROMPT_Y_INC(w)	((w)->login.promptFont->max_bounds.ascent +\
-			 (w)->login.promptFont->max_bounds.descent)
-# define GREET_X_INC(w)	((w)->login.greetFont->max_bounds.width)
-# define GREET_Y_INC(w)	((w)->login.greetFont->max_bounds.ascent +\
-			 (w)->login.greetFont->max_bounds.descent)
-# define FAIL_X_INC(w)	((w)->login.failFont->max_bounds.width)
-# define FAIL_Y_INC(w)	((w)->login.failFont->max_bounds.ascent +\
-			 (w)->login.failFont->max_bounds.descent)
+#ifdef USE_XFT
+# define F_MAX_WIDTH(f)	((w)->login.f##Face->max_advance_width)
+# define F_ASCENT(f)	((w)->login.f##Face->ascent)
+# define F_DESCENT(f)	((w)->login.f##Face->descent)
+#else
+# define F_MAX_WIDTH(f)	((w)->login.f##Font->max_bounds.width)
+# define F_ASCENT(f)	((w)->login.f##Font->max_bounds.ascent)
+# define F_DESCENT(f)	((w)->login.f##Font->max_bounds.descent)
+#endif
+
+# define TEXT_X_INC(w)		F_MAX_WIDTH(text)
+# define TEXT_Y_INC(w)		(F_ASCENT(text) + F_DESCENT(text))
+
+# define PROMPT_X_INC(w)	F_MAX_WIDTH(prompt)
+# define PROMPT_Y_INC(w)	(F_ASCENT(prompt) + F_DESCENT(prompt))
+
+# define GREET_X_INC(w)		F_MAX_WIDTH(greet)
+# define GREET_Y_INC(w)		(F_ASCENT(greet) + F_DESCENT(greet))
+
+# define FAIL_X_INC(w)		F_MAX_WIDTH(fail)
+# define FAIL_Y_INC(w)		(F_ASCENT(fail) + F_DESCENT(fail))
 
 # define Y_INC(w)	max (TEXT_Y_INC(w), PROMPT_Y_INC(w))
 
@@ -239,12 +269,39 @@ static XtResource resources[] = {
 # define CUR_PROMPT_TEXT(w, n)	(PROMPT_TEXT(w,n) != NULL ? \
 				 PROMPT_TEXT(w,n) : DEF_PROMPT_TEXT(w,n))
 
-#ifndef XPM
-# define TEXT_PROMPT_W(w, m) (XTextWidth (w->login.promptFont,\
-				 m, strlen (m)))
+#ifdef USE_XFT
+
+# define TEXT_COLOR(f)		(w->login.f##color.pixel)
+
+# define TEXT_WIDTH(f, m, l) 	XmuXftTextWidth(XtDisplay (w), \
+					w->login.f##Face, (FcChar8 *) m, l)
+static int
+XmuXftTextWidth(Display *dpy, XftFont *font, FcChar8 *string, int len);
+
+# define DRAW_STRING(f, x, y, m, l) \
+	/* Debug("DRAW_STRING(%s, %d, %d, %s, %d)\n", #f, x, y, m, l); */ \
+	XftDrawString8 (w->login.draw, &w->login.f##color, w->login.f##Face, \
+			x, y, (FcChar8 *) m, l)
+
 #else
-# define TEXT_PROMPT_W(w, m) (XTextWidth (w->login.promptFont,\
-				 m, strlen (m)) + w->login.inframeswidth)
+
+# define TEXT_COLOR(f)		(w->login.f##pixel)
+
+# define TEXT_WIDTH(f, m, l) 	(XTextWidth (w->login.f##Font, m, l))
+
+# define DRAW_STRING(f, x, y, m, l) \
+	XDrawString (XtDisplay (w), XtWindow (w), w->login.f##GC, x, y, m, l)
+
+#endif
+
+
+# define STRING_WIDTH(f, s) 	TEXT_WIDTH (f, s, strlen(s))
+
+
+#ifndef XPM
+# define TEXT_PROMPT_W(w, m) STRING_WIDTH(prompt, m)
+#else
+# define TEXT_PROMPT_W(w, m) (STRING_WIDTH(prompt, m) + w->login.inframeswidth)
 #endif /* XPM */
 
 # define DEF_PROMPT_W(w,n) TEXT_PROMPT_W(w, w->login.prompts[n].defaultPrompt)
@@ -255,25 +312,22 @@ static XtResource resources[] = {
 
 # define GREETING(w)	((w)->login.secure_session  && !(w)->login.allow_access ?\
 				(w)->login.greeting : (w)->login.unsecure_greet)
-# define GREET_X(w)	((int)(w->core.width - XTextWidth (w->login.greetFont,\
-			  GREETING(w), strlen (GREETING(w)))) / 2)
+# define GREET_X(w)	((int)((w->core.width - \
+			     	STRING_WIDTH (greet, GREETING(w))) / 2))
 # define GREET_Y(w)	(GREETING(w)[0] ? 2 * GREET_Y_INC (w) : 0)
 #ifndef XPM
-# define GREET_W(w)	(max (XTextWidth (w->login.greetFont,\
-			      w->login.greeting, strlen (w->login.greeting)), \
-			      XTextWidth (w->login.greetFont,\
-			      w->login.unsecure_greet, strlen (w->login.unsecure_greet))))
+# define GREET_W(w)	(max (STRING_WIDTH (greet, w->login.greeting), \
+			      STRING_WIDTH (greet, w->login.unsecure_greet)))
 #else
-# define GREET_W(w)	(max (XTextWidth (w->login.greetFont,\
-			      w->login.greeting, strlen (w->login.greeting)), \
-			      XTextWidth (w->login.greetFont,\
-			      w->login.unsecure_greet, strlen (w->login.unsecure_greet)))) + w->login.logoWidth + (2*w->login.logoPadding)
+# define GREET_W(w)	(max (STRING_WIDTH (greet, w->login.greeting), \
+			      STRING_WIDTH (greet, w->login.unsecure_greet)) \
+			 + w->login.logoWidth + (2*w->login.logoPadding))
 #endif /* XPM */
 # define PROMPT_X(w)	(2 * PROMPT_X_INC(w))
 # define PROMPT_Y(w,n)	((GREET_Y(w) + GREET_Y_INC(w) +\
-			  w->login.greetFont->max_bounds.ascent + Y_INC(w)) + \
+			  F_ASCENT(greet) + Y_INC(w)) + \
 			 (n * PROMPT_SPACE_Y(w)))
-# define PROMPT_W(w)	(w->core.width - 6 * TEXT_X_INC(w))
+# define PROMPT_W(w)	(w->core.width - (2 * TEXT_X_INC(w)))
 # define PROMPT_H(w)	(3 * Y_INC(w) / 2)
 # define VALUE_X(w,n)	(PROMPT_X(w) + CUR_PROMPT_W(w,n))
 #ifndef XPM
@@ -281,15 +335,14 @@ static XtResource resources[] = {
 #else
 # define PROMPT_SPACE_Y(w)	(10 * Y_INC(w) / 5)
 #endif /* XPM */
-# define ERROR_X(w,m)	((int)(w->core.width - XTextWidth (w->login.failFont,\
-				m, strlen (m))) / 2)
+# define ERROR_X(w,m)	((int)(w->core.width - STRING_WIDTH (fail, m)) / 2)
 # define FAIL_X(w)	ERROR_X(w, w->login.fail)
-# define FAIL_Y(w)	(PROMPT_Y(w,1) + 2 * FAIL_Y_INC (w) +\
-			w->login.failFont->max_bounds.ascent)
+# define FAIL_Y(w)	(PROMPT_Y(w,1) + 2 * FAIL_Y_INC (w) + F_ASCENT(fail))
+
 #ifndef XPM
-# define ERROR_W(w,m)	(XTextWidth (w->login.failFont, m, strlen(m)))
+# define ERROR_W(w,m)	STRING_WIDTH (fail, m)
 #else
-# define ERROR_W(w,m)	(XTextWidth (w->login.failFont, m, strlen(m))\
+# define ERROR_W(w,m)	(STRING_WIDTH (fail, m) \
 			 + w->login.logoWidth + (2*w->login.logoPadding))
 #endif /* XPM */
 
@@ -326,7 +379,7 @@ realizeValue (LoginWidget w, int cursor, int promptNum, GC gc)
 	(w->login.logoWidth + 2*(w->login.logoPadding));
 #endif
     if (cursor > VALUE_SHOW_START(w, promptNum))
-	curoff = XTextWidth (w->login.font, text, cursor);
+	curoff = TEXT_WIDTH (text, text, cursor);
     else
 	curoff = 0;
 
@@ -342,7 +395,7 @@ realizeValue (LoginWidget w, int cursor, int promptNum, GC gc)
 	int offset = max(cursor, VALUE_SHOW_START(w, promptNum));
 	int textlen = strlen (text + offset);
 	
-	textwidth = XTextWidth (w->login.font, text + offset, textlen);
+	textwidth = TEXT_WIDTH (text, text + offset, textlen);
 
 	if (textwidth > (width - curoff)) {
 	    /* Recalculate amount of text that can fit in field */
@@ -355,7 +408,7 @@ realizeValue (LoginWidget w, int cursor, int promptNum, GC gc)
 		    offset++;
 		}
 		textlen--;
-		textwidth = XTextWidth (w->login.font, text + offset, textlen);
+		textwidth = TEXT_WIDTH (text, text + offset, textlen);
 	    } while ((textlen > 0) && (textwidth > width));
 
 	    VALUE_SHOW_START(w, promptNum) = offset;
@@ -365,11 +418,9 @@ realizeValue (LoginWidget w, int cursor, int promptNum, GC gc)
 	    XFillRectangle (XtDisplay (w), XtWindow (w), w->login.bgGC,
 			    x, y - TEXT_Y_INC(w), width, height);
 
-	    XDrawString (XtDisplay(w), XtWindow (w), gc,
-			 x, y, text + offset, textlen);
+	    DRAW_STRING(text, x, y, text + offset, textlen);
 	} else {
-	    XDrawString (XtDisplay(w), XtWindow (w), gc,
-			 x + curoff, y, text + offset, textlen);
+	    DRAW_STRING(text, x + curoff, y, text + offset, textlen);
 	}
     }
 }
@@ -408,7 +459,7 @@ realizeCursor (LoginWidget w, GC gc)
     
     x = VALUE_X (w, w->login.activePrompt);
     y = PROMPT_Y (w, w->login.activePrompt);
-    height = w->login.font->max_bounds.ascent + w->login.font->max_bounds.descent;
+    height = (F_ASCENT(text) + F_DESCENT(text));
     width = 1;
 
     switch (PROMPT_STATE(w, w->login.activePrompt)) {
@@ -417,7 +468,7 @@ realizeCursor (LoginWidget w, GC gc)
 	return;
     case LOGIN_PROMPT_ECHO_ON:
 	if (CUR_PROMPT_CURSOR(w) > 0) {
-	    x += XTextWidth (w->login.font,
+	    x += TEXT_WIDTH (text,
 			     VALUE_TEXT(w, w->login.activePrompt)
 			     + VALUE_SHOW_START(w, w->login.activePrompt),
 			     PROMPT_CURSOR(w, w->login.activePrompt)
@@ -431,26 +482,26 @@ realizeCursor (LoginWidget w, GC gc)
     
 #ifndef XPM
     XFillRectangle (XtDisplay (w), XtWindow (w), gc,
-		    x, y - w->login.font->max_bounds.ascent, width, height);
+		    x, y - F_ASCENT(text), width, height);
 #else
     XFillRectangle (XtDisplay (w), XtWindow (w), gc,
-		    x, y+1 - w->login.font->max_bounds.ascent, width, height-1);
+		    x, y+1 - F_ASCENT(text), width, height-1);
     XDrawPoint     (XtDisplay (w), XtWindow (w), gc,
-    		    x-1 , y - w->login.font->max_bounds.ascent);
+    		    x-1 , y - F_ASCENT(text));
     XDrawPoint     (XtDisplay (w), XtWindow (w), gc,
-    		    x+1 , y - w->login.font->max_bounds.ascent);
+    		    x+1 , y - F_ASCENT(text));
     XDrawPoint     (XtDisplay (w), XtWindow (w), gc,
-    		    x-1 , y - w->login.font->max_bounds.ascent+height);
+    		    x-1 , y - F_ASCENT(text)+height);
     XDrawPoint     (XtDisplay (w), XtWindow (w), gc,
-    		    x+1 , y - w->login.font->max_bounds.ascent+height);
+    		    x+1 , y - F_ASCENT(text)+height);
     XDrawPoint     (XtDisplay (w), XtWindow (w), gc,
-    		    x-2 , y - w->login.font->max_bounds.ascent);
+    		    x-2 , y - F_ASCENT(text));
     XDrawPoint     (XtDisplay (w), XtWindow (w), gc,
-    		    x+2 , y - w->login.font->max_bounds.ascent);
+    		    x+2 , y - F_ASCENT(text));
     XDrawPoint     (XtDisplay (w), XtWindow (w), gc,
-    		    x-2 , y - w->login.font->max_bounds.ascent+height);
+    		    x-2 , y - F_ASCENT(text)+height);
     XDrawPoint     (XtDisplay (w), XtWindow (w), gc,
-    		    x+2 , y - w->login.font->max_bounds.ascent+height);
+    		    x+2 , y - F_ASCENT(text)+height);
 #endif /* XPM */
 
 
@@ -485,12 +536,17 @@ realizeCursor (LoginWidget w, GC gc)
 static void
 EraseFail (LoginWidget w)
 {
+#ifdef USE_XFT 
+    w->login.failUp = 0;
+    RedrawFail(w);
+#else    
     XSetForeground (XtDisplay (w), w->login.failGC,
 			w->core.background_pixel);
     RedrawFail(w);
     w->login.failUp = 0;
     XSetForeground (XtDisplay (w), w->login.failGC,
-			w->login.failpixel);
+			TEXT_COLOR(fail));
+#endif    
 }
 
 static void
@@ -542,9 +598,11 @@ RedrawFail (LoginWidget w)
     int y = FAIL_Y(w);
     int maxw = w->core.width - PAD_X(w);
 
-    if (w->login.failUp) {
-	Debug("RedrawFail('%s')\n", w->login.fail);
-
+#ifndef USE_XFT    
+    if (w->login.failUp)
+#endif	
+    {
+	Debug("RedrawFail('%s', %d)\n", w->login.fail, w->login.failUp);
 	if (ERROR_W(w, w->login.fail) > maxw) {
 	    /* Too long to fit on one line, break into multiple lines */
 	    char *tempCopy = strdup(w->login.fail);
@@ -575,8 +633,13 @@ RedrawFail (LoginWidget w)
 		    } while ((next != NULL) && ERROR_W(w, start) < maxw);
 		    
 		    x = ERROR_X(w, start);
-		    XDrawString (XtDisplay (w), XtWindow (w), w->login.failGC,
-				 x, y, start, strlen(start));
+#ifdef USE_XFT
+		    if (w->login.failUp == 0) {
+			XClearArea(XtDisplay(w), XtWindow(w), x, y,
+				   ERROR_W(w, start), FAIL_Y_INC(w), False);
+		    } else
+#endif		    
+			DRAW_STRING (fail, x, y, start, strlen(start));
 
 		    if (next != NULL) {
 			next++;
@@ -591,9 +654,13 @@ RedrawFail (LoginWidget w)
 	    LogOutOfMem("RedrawFail");
 	}
 
-	XDrawString (XtDisplay (w), XtWindow (w), w->login.failGC,
-		     x, y,
-		     w->login.fail, strlen (w->login.fail));
+#ifdef USE_XFT
+	if (w->login.failUp == 0) {
+	    XClearArea(XtDisplay(w), XtWindow(w), x, y,
+		       ERROR_W(w, w->login.fail), FAIL_Y_INC(w), False);
+	} else
+#endif		    
+	    DRAW_STRING (fail, x, y, w->login.fail, strlen (w->login.fail));
     }
 }
 
@@ -719,20 +786,19 @@ draw_it (LoginWidget w)
     }
 #endif /* XPM */
 
-    if (GREETING(w)[0])
-	    XDrawString (XtDisplay (w), XtWindow (w), w->login.greetGC,
-#ifndef XPM
-			GREET_X(w), GREET_Y(w),
+    if (GREETING(w)[0]) {
+	int gx;
+
+#ifdef XPM
+	gx = GREET_X(w) - ((w->login.logoWidth/2) + w->login.logoPadding);
 #else
-			GREET_X(w) -
-                            ((w->login.logoWidth/2) + w->login.logoPadding),
-                        GREET_Y(w),
-#endif /* XPM */
-			GREETING(w), strlen (GREETING(w)));
+	gx = GREET_X(w);
+#endif	
+	DRAW_STRING (greet, gx, GREET_Y(w), GREETING(w), strlen (GREETING(w)));
+    }
     for (p = 0; p < NUM_PROMPTS ; p++) {
 	if (PROMPT_STATE(w, p) != LOGIN_PROMPT_NOT_SHOWN) {
-	    XDrawString (XtDisplay (w), XtWindow (w), w->login.promptGC,
-			 PROMPT_X(w), PROMPT_Y(w,p),
+	    DRAW_STRING (prompt, PROMPT_X(w), PROMPT_Y(w,p),
 			 CUR_PROMPT_TEXT(w,p), strlen (CUR_PROMPT_TEXT(w,p)));
 	    DrawValue (w, 0, p);
 	}
@@ -1410,6 +1476,207 @@ InsertChar (
     XorCursor (ctx);
 }
 
+
+/**** Copied from xclock.c - original author: Keith Packard ****/
+#ifdef USE_XFT
+static XtConvertArgRec xftColorConvertArgs[] = {
+    {XtWidgetBaseOffset, (XtPointer)XtOffsetOf(WidgetRec, core.screen),
+     sizeof(Screen *)},
+    {XtWidgetBaseOffset, (XtPointer)XtOffsetOf(WidgetRec, core.colormap),
+     sizeof(Colormap)}
+};
+
+#define	donestr(type, value, tstr) \
+	{							\
+	    if (toVal->addr != NULL) {				\
+		if (toVal->size < sizeof(type)) {		\
+		    toVal->size = sizeof(type);			\
+		    XtDisplayStringConversionWarning(dpy, 	\
+			(char*) fromVal->addr, tstr);		\
+		    return False;				\
+		}						\
+		*(type*)(toVal->addr) = (value);		\
+	    }							\
+	    else {						\
+		static type static_val;				\
+		static_val = (value);				\
+		toVal->addr = (XPointer)&static_val;		\
+	    }							\
+	    toVal->size = sizeof(type);				\
+	    return True;					\
+	}
+
+static void
+XmuFreeXftColor (XtAppContext app, XrmValuePtr toVal, XtPointer closure,
+		 XrmValuePtr args, Cardinal *num_args)
+{
+    Screen	*screen;
+    Colormap	colormap;
+    XftColor	*color;
+    
+    if (*num_args != 2)
+    {
+	XtAppErrorMsg (app,
+		       "freeXftColor", "wrongParameters",
+		       "XtToolkitError",
+		       "Freeing an XftColor requires screen and colormap arguments",
+		       (String *) NULL, (Cardinal *)NULL);
+	return;
+    }
+
+    screen = *((Screen **) args[0].addr);
+    colormap = *((Colormap *) args[1].addr);
+    color = (XftColor *) toVal->addr;
+    XftColorFree (DisplayOfScreen (screen),
+		  DefaultVisual (DisplayOfScreen (screen),
+				 XScreenNumberOfScreen (screen)),
+		  colormap, color);
+}
+    
+static Boolean
+XmuCvtStringToXftColor(Display *dpy,
+		       XrmValue *args, Cardinal *num_args,
+		       XrmValue *fromVal, XrmValue *toVal,
+		       XtPointer *converter_data)
+{
+    char	    *spec;
+    XRenderColor    renderColor;
+    XftColor	    xftColor;
+    Screen	    *screen;
+    Colormap	    colormap;
+    
+    if (*num_args != 2)
+    {
+	XtAppErrorMsg (XtDisplayToApplicationContext (dpy),
+		       "cvtStringToXftColor", "wrongParameters",
+		       "XtToolkitError",
+		       "String to render color conversion needs screen and colormap arguments",
+		       (String *) NULL, (Cardinal *)NULL);
+	return False;
+    }
+
+    screen = *((Screen **) args[0].addr);
+    colormap = *((Colormap *) args[1].addr);
+
+    spec = (char *) fromVal->addr;
+    if (strcasecmp (spec, XtDefaultForeground) == 0)
+    {
+	renderColor.red = 0;
+	renderColor.green = 0;
+	renderColor.blue = 0;
+	renderColor.alpha = 0xffff;
+    }
+    else if (strcasecmp (spec, XtDefaultBackground) == 0)
+    {
+	renderColor.red = 0xffff;
+	renderColor.green = 0xffff;
+	renderColor.blue = 0xffff;
+	renderColor.alpha = 0xffff;
+    }
+    else if (!XRenderParseColor (dpy, spec, &renderColor))
+	return False;
+    if (!XftColorAllocValue (dpy, 
+			     DefaultVisual (dpy,
+					    XScreenNumberOfScreen (screen)),
+			     colormap,
+			     &renderColor,
+			     &xftColor))
+	return False;
+    
+    donestr (XftColor, xftColor, XtRXftColor);
+}
+
+static void
+XmuFreeXftFont (XtAppContext app, XrmValuePtr toVal, XtPointer closure,
+		XrmValuePtr args, Cardinal *num_args)
+{
+    Screen  *screen;
+    XftFont *font;
+    
+    if (*num_args != 1)
+    {
+	XtAppErrorMsg (app,
+		       "freeXftFont", "wrongParameters",
+		       "XtToolkitError",
+		       "Freeing an XftFont requires screen argument",
+		       (String *) NULL, (Cardinal *)NULL);
+	return;
+    }
+
+    screen = *((Screen **) args[0].addr);
+    font = *((XftFont **) toVal->addr);
+    if (font)
+	XftFontClose (DisplayOfScreen (screen), font);
+}
+
+static Boolean
+XmuCvtStringToXftFont(Display *dpy,
+		      XrmValue *args, Cardinal *num_args,
+		      XrmValue *fromVal, XrmValue *toVal,
+		      XtPointer *converter_data)
+{
+    char    *name;
+    XftFont *font;
+    Screen  *screen;
+    
+    if (*num_args != 1)
+    {
+	XtAppErrorMsg (XtDisplayToApplicationContext (dpy),
+		       "cvtStringToXftFont", "wrongParameters",
+		       "XtToolkitError",
+		       "String to XftFont conversion needs screen argument",
+		       (String *) NULL, (Cardinal *)NULL);
+	return False;
+    }
+
+    screen = *((Screen **) args[0].addr);
+    name = (char *) fromVal->addr;
+    
+    font = XftFontOpenName (dpy,
+			    XScreenNumberOfScreen (screen),
+			    name);
+    if (font)
+    {
+	donestr (XftFont *, font, XtRXftFont);
+    }
+    XtDisplayStringConversionWarning(dpy, (char *) fromVal->addr, XtRXftFont);
+    return False;
+}
+
+static XtConvertArgRec xftFontConvertArgs[] = {
+    {XtWidgetBaseOffset, (XtPointer)XtOffsetOf(WidgetRec, core.screen),
+     sizeof(Screen *)},
+};
+
+
+static int
+XmuXftTextWidth(Display *dpy, XftFont *font, FcChar8 *string, int len)
+{
+    XGlyphInfo  extents;
+
+    XftTextExtents8 (dpy, font, string, len, &extents);
+
+    return extents.xOff;
+}
+
+#endif /* USE_XFT */
+
+static void 
+ClassInitialize(void)
+{
+#ifdef USE_XFT
+    XtSetTypeConverter (XtRString, XtRXftColor, 
+			XmuCvtStringToXftColor, 
+			xftColorConvertArgs, XtNumber(xftColorConvertArgs),
+			XtCacheByDisplay, XmuFreeXftColor);
+    XtSetTypeConverter (XtRString, XtRXftFont,
+			XmuCvtStringToXftFont,
+			xftFontConvertArgs, XtNumber(xftFontConvertArgs),
+			XtCacheByDisplay, XmuFreeXftFont);
+#endif /* USE_XFT */
+}
+/**** End of portion borrowed from xclock ****/
+
 /* ARGSUSED */
 static void Initialize (
     Widget greq,
@@ -1429,7 +1696,6 @@ static void Initialize (
 
 #ifdef XPM
     int 	rv = 0;
-    XRectangle	cliprect[1];
     
     myXGCV.foreground = w->login.hipixel;
     myXGCV.background = w->core.background_pixel;
@@ -1442,60 +1708,63 @@ static void Initialize (
     w->login.shdGC = XtGetGC(gnew, valuemask, &myXGCV);
 #endif /* XPM */
 
-    myXGCV.foreground = w->login.textpixel;
+    myXGCV.foreground = TEXT_COLOR(text);
     myXGCV.background = w->core.background_pixel;
     valuemask = GCForeground | GCBackground;
-    if (w->login.font) {
-	myXGCV.font = w->login.font->fid;
+#ifndef USE_XFT
+    if (w->login.textFont) {
+	myXGCV.font = w->login.textFont->fid;
 	valuemask |= GCFont;
     }
+#endif    
     w->login.textGC = XtGetGC(gnew, valuemask, &myXGCV);
     myXGCV.foreground = w->core.background_pixel;
     w->login.bgGC = XtGetGC(gnew, valuemask, &myXGCV);
 
-    myXGCV.foreground = w->login.textpixel ^ w->core.background_pixel;
+    myXGCV.foreground = TEXT_COLOR(text) ^ w->core.background_pixel;
     myXGCV.function = GXxor;
     xvaluemask = valuemask | GCFunction;
     w->login.xorGC = XtGetGC (gnew, xvaluemask, &myXGCV);
 
+#ifndef USE_XFT
     /*
      * Note that the second argument is a GCid -- QueryFont accepts a GCid and
      * returns the curently contained font.
      */
 
-    if (w->login.font == NULL)
-	w->login.font = XQueryFont (XtDisplay (w),
+    if (w->login.textFont == NULL)
+	w->login.textFont = XQueryFont (XtDisplay (w),
 		XGContextFromGC (XDefaultGCOfScreen (XtScreen (w))));
 
     xvaluemask = valuemask;
     if (w->login.promptFont == NULL)
-        w->login.promptFont = w->login.font;
+        w->login.promptFont = w->login.textFont;
     else
 	xvaluemask |= GCFont;
 
-    myXGCV.foreground = w->login.promptpixel;
+    myXGCV.foreground = TEXT_COLOR(prompt);
     myXGCV.font = w->login.promptFont->fid;
     w->login.promptGC = XtGetGC (gnew, xvaluemask, &myXGCV);
 
     xvaluemask = valuemask;
     if (w->login.greetFont == NULL)
-    	w->login.greetFont = w->login.font;
+    	w->login.greetFont = w->login.textFont;
     else
 	xvaluemask |= GCFont;
 
-    myXGCV.foreground = w->login.greetpixel;
+    myXGCV.foreground = TEXT_COLOR(greet);
     myXGCV.font = w->login.greetFont->fid;
     w->login.greetGC = XtGetGC (gnew, xvaluemask, &myXGCV);
 
     xvaluemask = valuemask;
     if (w->login.failFont == NULL)
-	w->login.failFont = w->login.font;
+	w->login.failFont = w->login.textFont;
     else
 	xvaluemask |= GCFont;
-
-    myXGCV.foreground = w->login.failpixel;
+    myXGCV.foreground = TEXT_COLOR(fail);
     myXGCV.font = w->login.failFont->fid;
     w->login.failGC = XtGetGC (gnew, xvaluemask, &myXGCV);
+#endif /* USE_XFT */
 
 #ifdef XPM
     w->login.logoValid = False;
@@ -1617,8 +1886,6 @@ SkipXpmLoad:
     XtSetArg (position[1], XtNy, y);
     XtSetValues (XtParent (w), position, (Cardinal) 2);
 
-    
-    
     w->login.state = PROMPTING;
 }
 
@@ -1635,6 +1902,14 @@ static void Realize (
     XtCreateWindow( gw, (unsigned)InputOutput, (Visual *)CopyFromParent,
 		     *valueMask, attrs );
     InitI18N(gw);
+
+#ifdef USE_XFT
+    w->login.draw = XftDrawCreate (XtDisplay (w), XtWindow(w),
+	   DefaultVisual (XtDisplay (w), DefaultScreen(XtDisplay (w))),
+				   w->core.colormap);
+
+#endif
+
 #ifdef XPM
     cursor = XCreateFontCursor(XtDisplay(gw), XC_left_ptr);
     XDefineCursor(XtDisplay(gw), XtWindow(gw), cursor);
@@ -1697,12 +1972,21 @@ static void Destroy (Widget gw)
     if (PROMPT_TEXT(w,1) != NULL)
 	XtFree(PROMPT_TEXT(w,1));
 
+#ifdef USE_XFT
+    if (w->login.draw) {
+	XftDrawDestroy(w->login.draw);
+	w->login.draw = NULL;
+    }
+#endif    
+    
     XtReleaseGC(gw, w->login.textGC);
     XtReleaseGC(gw, w->login.bgGC);
     XtReleaseGC(gw, w->login.xorGC);
+#ifndef USE_XFT
     XtReleaseGC(gw, w->login.promptGC);
     XtReleaseGC(gw, w->login.greetGC);
     XtReleaseGC(gw, w->login.failGC);
+#endif
 #ifdef XPM
     XtReleaseGC(gw, w->login.hiGC);
     XtReleaseGC(gw, w->login.shdGC);
@@ -1794,7 +2078,7 @@ LoginClassRec loginClassRec = {
     /* superclass		*/	&widgetClassRec,
     /* class_name		*/	"Login",
     /* size			*/	sizeof(LoginRec),
-    /* class_initialize		*/	NULL,
+    /* class_initialize		*/	ClassInitialize,
     /* class_part_initialize	*/	NULL,
     /* class_inited		*/	FALSE,
     /* initialize		*/	Initialize,

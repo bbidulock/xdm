@@ -70,6 +70,9 @@ from The Open Group.
 #ifdef XPM
 #include <X11/Xlib.h>
 #endif /* XPM */
+#ifdef USE_XFT
+# include <X11/Xft/Xft.h>
+#endif
 
 #define INITIALIZING	0
 #define PROMPTING	1
@@ -94,10 +97,12 @@ typedef struct {
 
 /* New fields for the login widget instance record */
 typedef struct {
+#ifndef USE_XFT    
 	Pixel		textpixel;	/* foreground pixel */
 	Pixel		promptpixel;	/* prompt pixel */
 	Pixel		greetpixel;	/* greeting pixel */
 	Pixel		failpixel;	/* failure pixel */
+#endif
 #ifdef XPM
 	Pixel		hipixel;	/* frame hilite pixel */
 	Pixel		shdpixel;	/* shadow frame pixel */
@@ -105,9 +110,11 @@ typedef struct {
 	GC		textGC;		/* pointer to GraphicsContext */
 	GC		bgGC;		/* pointer to GraphicsContext */
 	GC		xorGC;		/* pointer to GraphicsContext */
+#ifndef USE_XFT
 	GC		promptGC;
 	GC		greetGC;
 	GC		failGC;
+#endif
 #ifdef XPM
 	GC		hiGC;		/* for hilight part of frame */
 	GC		shdGC;		/* for shaded part of frame */
@@ -119,10 +126,12 @@ typedef struct {
     	char		*failMsg;	/* failure message */
 	char		*fail;		/* current error message */
     	char		*passwdChangeMsg; /* message when passwd expires */
-	XFontStruct	*font;		/* font for text */
+#ifndef USE_XFT    
+	XFontStruct	*textFont;	/* font for text */
 	XFontStruct	*promptFont;	/* font for prompts */
 	XFontStruct	*greetFont;	/* font for greeting */
 	XFontStruct	*failFont;	/* font for failure message */
+#endif /* USE_XFT */
 	int		state;		/* state */
     	int		activePrompt;	/* which prompt is active */
 	int		failUp;		/* failure message displayed */
@@ -153,6 +162,17 @@ typedef struct {
         Boolean useShape, logoValid;
         Pixmap logoPixmap, logoMask;
 #endif /* XPM */
+#ifdef USE_XFT
+	XftDraw	       *draw;
+	XftFont        *textFace;	/* font for text */
+	XftFont        *promptFace;	/* font for prompts */
+	XftFont        *greetFace;	/* font for greeting */
+	XftFont        *failFace;  	/* font for failure message */  
+	XftColor	textcolor;	/* foreground color */
+	XftColor	promptcolor;	/* prompt color */
+	XftColor	greetcolor;	/* greeting color */
+	XftColor	failcolor;	/* failure color */
+#endif
    } LoginPart;
 
 /* Full instance record declaration */
