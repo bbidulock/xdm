@@ -581,7 +581,7 @@ greet_user_rtn GreetUser(
 	    SessionExit (d, code, FALSE);
 	}
 	if ((pam_error == PAM_SUCCESS) && (Verify (d, greet, verify))) {
-	    SetPrompt (login, 1, "Login Successful", PAM_TEXT_INFO, False);
+	    SetPrompt (login, 1, "Login Successful", LOGIN_TEXT_INFO, False);
 	    SetValue (login, 1, NULL);
 	    break;
 	} else {
