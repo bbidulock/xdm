@@ -104,7 +104,7 @@ appman_PRE = xdm.man.cpp
 appman_DATA = $(appman_PRE:man.cpp=@APP_MAN_SUFFIX@)
 
 CLEANFILES = $(appman_DATA)
-EXTRA_DIST = $(appman_PRE)
+EXTRA_DIST = $(appman_PRE) ChangeLog
 
 include $(top_srcdir)/cpprules.in
 
@@ -175,3 +175,11 @@ lint:
 	$(LINT) $(ALL_LINT_FLAGS) $(chooser_CFLAGS) $(chooser_SOURCES) $(chooser_LDADD)
 	(cd greeter && $(MAKE) $(AM_MAKEFLAGS) lint)
 endif LINT
+
+.PHONY: ChangeLog
+
+ChangeLog:
+	git-log > ChangeLog
+
+dist-hook: ChangeLog
+
