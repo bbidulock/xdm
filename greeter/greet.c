@@ -540,7 +540,8 @@ greet_user_rtn GreetUser(
 					(*pamhp, PAM_RHOST, hostname));
 		free(hostname);
 	    }
-	}
+	} else
+	    RUN_AND_CHECK_PAM_ERROR(pam_set_item, (*pamhp, PAM_TTY, d->name));
  
 	if (!greet->allow_null_passwd) {
 	    pam_flags |= PAM_DISALLOW_NULL_AUTHTOK;
