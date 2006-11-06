@@ -15,26 +15,26 @@ xdmconfig_DATA = \
 	Xservers
 
 xdmscript_SCRIPTS = \
-	Xsession
+	Xreset \
+	Xsession \
+	Xstartup
 
 dist_xdmscript_SCRIPTS = \
 	GiveConsole \
 	TakeConsole \
 	Xsetup_0 \
-	Xstartup \
-	Xreset \
 	Xwilling
 
 pixmapdir = $(XDM_PIXMAPDIR)
 
 dist_pixmap_DATA = xorg-bw.xpm xorg.xpm
 
-BUILT_SOURCES = Xservers.ws xdm-config Xresources Xsession
+BUILT_SOURCES = Xservers.ws xdm-config Xreset Xresources Xsession Xstartup
 
 CLEANFILES = $(BUILT_SOURCES) Xservers
 
 EXTRA_DIST = Xservers.ws.cpp Xservers.fs \
-	xdm-config.cpp Xresources.cpp Xsession.cpp
+	xdm-config.cpp Xreset.cpp Xresources.cpp Xsession.cpp Xstartup.cpp
 
 Xservers: Xservers.$(SERVERSTYPE)
 	ln -s Xservers.$(SERVERSTYPE) Xservers
