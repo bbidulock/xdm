@@ -812,7 +812,7 @@ forward_respond (
 		    in6_addr.sin6_len = sizeof(in6_addr);
 #endif
 		    in6_addr.sin6_family = AF_INET6;
-		    memmove(&in6_addr,clientAddress.data,clientAddress.length);
+		    memmove(&in6_addr.sin6_addr,clientAddress.data,clientAddress.length);
 		    memmove((char *) &in6_addr.sin6_port, clientPort.data, 2);
 		    client = (struct sockaddr *) &in6_addr;
 		    clientlen = sizeof (in6_addr);
