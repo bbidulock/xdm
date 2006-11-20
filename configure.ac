@@ -122,7 +122,7 @@ fi
 
 
 case $host_os in
-    linux*|gnu*)
+    linux*|gnu*|*-gnu)
         OS_CFLAGS="-D_XOPEN_SOURCE"
 	SU="su"
         ;;
