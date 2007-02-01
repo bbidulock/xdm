@@ -448,10 +448,12 @@ realizeCursor (LoginWidget w, GC gc)
     int	x, y;
     int height, width;
 
+#ifdef FORCE_CURSOR_FLASH    
     static int lastx, lasty;
     static struct timeval  lastFlash;
     struct timeval  now, timeout;
     int sinceLastFlash;
+#endif
 
     if (w->login.state != PROMPTING) {
 	return;
@@ -504,7 +506,7 @@ realizeCursor (LoginWidget w, GC gc)
     		    x+2 , y - F_ASCENT(text)+height);
 #endif /* XPM */
 
-
+#ifdef FORCE_CURSOR_FLASH
     /* Force cursor to flash briefly to give user feedback */
 #define FLASH_MILLIS    100000 /* 0.10 seconds */
 #define MILLIS_PER_SEC 1000000    
@@ -529,8 +531,9 @@ realizeCursor (LoginWidget w, GC gc)
     } else {
 	lastx = x; lasty = y;
     }
-    XFlush (XtDisplay(w));
     X_GETTIMEOFDAY (&lastFlash);
+#endif /* FORCE_CURSOR_FLASH */
+    XFlush (XtDisplay(w));    
 }
 
 static void
