@@ -172,6 +172,7 @@ RemoveDisplay (struct display *old)
 	    IfFree (d->from);
 	    XdmcpDisposeARRAY8 (&d->clientAddr);
 #endif
+	    IfFree (d->windowPath);
 	    free ((char *) d);
 	    break;
 	}
@@ -184,7 +185,7 @@ NewDisplay (char *name, char *class)
 {
     struct display	*d;
 
-    d = (struct display *) malloc (sizeof (struct display));
+    d = (struct display *) calloc (1, sizeof (struct display));
     if (!d) {
 	LogOutOfMem ("NewDisplay");
 	return NULL;
@@ -261,6 +262,9 @@ NewDisplay (char *name, char *class)
     d->xdmcpFd = -1;
 #endif
     d->version = 1;		/* registered with The Open Group */
+    d->willing = NULL;
+    d->dpy = NULL;
+    d->windowPath = NULL;
     displays = d;
     return d;
 }
