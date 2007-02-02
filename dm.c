@@ -68,7 +68,9 @@ from The Open Group.
 # include	<sys/stat.h>
 # include	<errno.h>
 # include	<X11/Xfuncproto.h>
+# include	<X11/Xatom.h>
 # include	<stdarg.h>
+# include	<stdint.h>
 
 #ifndef F_TLOCK
 #ifndef X_NOT_POSIX
@@ -622,6 +624,78 @@ StartDisplays (void)
     ForEachDisplay (CheckDisplayStatus);
 }
 
+static void
+SetWindowPath(struct display *d)
+{
+	/* setting WINDOWPATH for clients */
+	Atom prop;
+	Atom actualtype;
+	int actualformat;
+	unsigned long nitems;
+	unsigned long bytes_after;
+	unsigned char *buf;
+	const char *windowpath;
+	char *newwindowpath;
+	unsigned long num;
+	char nums[10];
+	int numn;
+
+	prop = XInternAtom(d->dpy, "XFree86_VT", False);
+	if (prop == None) {
+		fprintf(stderr, "no XFree86_VT atom\n");
+		return;
+	}
+	if (XGetWindowProperty(d->dpy, DefaultRootWindow(d->dpy), prop, 0, 1, 
+		False, AnyPropertyType, &actualtype, &actualformat, 
+		&nitems, &bytes_after, &buf)) {
+		fprintf(stderr, "no XFree86_VT property\n");
+		return;
+	}
+	if (nitems != 1) {
+		fprintf(stderr, "%lu items in XFree86_VT property!\n", nitems);
+		XFree(buf);
+		return;
+	}
+	switch (actualtype) {
+	case XA_CARDINAL:
+	case XA_INTEGER:
+	case XA_WINDOW:
+		switch (actualformat) {
+		case  8:
+			num = (*(uint8_t  *)(void *)buf);
+			break;
+		case 16:
+			num = (*(uint16_t *)(void *)buf);
+			break;
+		case 32:
+			num = (*(uint32_t *)(void *)buf);
+			break;
+		default:
+			fprintf(stderr, "format %d in XFree86_VT property!\n", actualformat);
+			XFree(buf);
+			return;
+		}
+		break;
+	default:
+		fprintf(stderr, "type %lx in XFree86_VT property!\n", actualtype);
+		XFree(buf);
+		return;
+	}
+	XFree(buf);
+	windowpath = getenv("WINDOWPATH");
+	numn = snprintf(nums, sizeof(nums), "%lu", num);
+	if (!windowpath) {
+		newwindowpath = malloc(numn + 1);
+		sprintf(newwindowpath, "%s", nums);
+	} else {
+		newwindowpath = malloc(strlen(windowpath) + 1 + numn + 1);
+		sprintf(newwindowpath, "%s:%s", windowpath, nums);
+	}
+	if (d->windowPath)
+		free(d->windowPath);
+	d->windowPath = newwindowpath;
+}
+
 void
 StartDisplay (struct display *d)
 {
@@ -677,6 +751,7 @@ StartDisplay (struct display *d)
 	SetAuthorization (d);
 	if (!WaitForServer (d))
 	    exit (OPENFAILED_DISPLAY);
+	SetWindowPath(d);
 #ifdef XDMCP
 	if (d->useChooser)
 	    RunChooser (d);

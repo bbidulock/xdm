@@ -51,8 +51,6 @@ static int receivedUsr1;
 
 static int serverPause (unsigned t, pid_t serverPid);
 
-static Display	*dpy;
-
 /* ARGSUSED */
 static SIGVAL
 CatchUsr1 (int n)
@@ -304,7 +302,7 @@ WaitForServer (struct display *d)
 	    Debug ("Before XOpenDisplay(%s)\n", d->name);
 	    errno = 0;
 	    (void) XSetIOErrorHandler (openErrorHandler);
-	    dpy = XOpenDisplay (d->name);
+	    d->dpy = XOpenDisplay (d->name);
 #ifdef STREAMSCONN
 	    {
 		/* For some reason, the next XOpenDisplay we do is
@@ -320,13 +318,13 @@ WaitForServer (struct display *d)
 	    (void) Signal (SIGALRM, SIG_DFL);
 	    (void) XSetIOErrorHandler ((int (*)(Display *)) 0);
 	    Debug ("After XOpenDisplay(%s)\n", d->name);
-	    if (dpy) {
+	    if (d->dpy) {
 #ifdef XDMCP
 	    	if (d->displayType.location == Foreign)
-		    GetRemoteAddress (d, ConnectionNumber (dpy));
+		    GetRemoteAddress (d, ConnectionNumber (d->dpy));
 #endif
-	    	RegisterCloseOnFork (ConnectionNumber (dpy));
-		(void) fcntl (ConnectionNumber (dpy), F_SETFD, 0);
+	    	RegisterCloseOnFork (ConnectionNumber (d->dpy));
+		(void) fcntl (ConnectionNumber (d->dpy), F_SETFD, 0);
 	    	return 1;
 	    } else {
 	    	Debug ("OpenDisplay failed %d (%s) on \"%s\"\n",
@@ -349,8 +347,8 @@ WaitForServer (struct display *d)
 void
 ResetServer (struct display *d)
 {
-    if (dpy && d->displayType.origin != FromXDMCP)
-	pseudoReset (dpy);
+    if (d->dpy && d->displayType.origin != FromXDMCP)
+	pseudoReset (d->dpy);
 }
 
 static Jmp_buf	pingTime;
@@ -384,7 +382,7 @@ PingServer (struct display *d, Display *alternateDpy)
     int	    oldAlarm;
     static Display *aDpy;
     
-    aDpy = (alternateDpy != NULL ? alternateDpy : dpy);
+    aDpy = (alternateDpy != NULL ? alternateDpy : d->dpy);
     oldError = XSetIOErrorHandler (PingLostIOErr);
     oldAlarm = alarm (0);
     oldSig = Signal (SIGALRM, PingLostSig);

@@ -1092,6 +1092,7 @@ the following environment variables are passed:
 	PATH	the value of \fBDisplayManager.\fP\fIDISPLAY\fP\fB.systemPath\fP
 	SHELL	the value of \fBDisplayManager.\fP\fIDISPLAY\fP\fB.systemShell\fP
 	XAUTHORITY	may be set to an authority file
+	WINDOWPATH	may be set to the "window path" leading to the X server
 
 .fi
 .PP
@@ -1146,6 +1147,7 @@ the following environment variables are passed:
 	SHELL	the user's default shell (from \fIgetpwnam\fP)
 	XAUTHORITY	may be set to a non-standard authority file
 	KRB5CCNAME	may be set to a Kerberos credentials cache name
+	WINDOWPATH	may be set to the "window path" leading to the X server
 
 .fi
 .PP

@@ -242,6 +242,8 @@ struct display {
 
 	/* Hack for making "Willing to manage" configurable */
 	char		*willing;	/* "Willing to manage" program */
+	Display		*dpy;		/* Display */
+	char		*windowPath;	/* path to server "window" */
 };
 
 #ifdef XDMCP
