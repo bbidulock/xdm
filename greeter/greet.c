@@ -503,6 +503,7 @@ greet_user_rtn GreetUser(
 	const char *	  login_prompt;
 
 
+	SetPrompt(login, 0, NULL, LOGIN_PROMPT_NOT_SHOWN, False);
 	login_prompt  = GetPrompt(login, LOGIN_PROMPT_USERNAME);
 	SetPrompt(login, 1, NULL, LOGIN_PROMPT_NOT_SHOWN, False);
 	
