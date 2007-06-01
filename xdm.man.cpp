@@ -994,7 +994,7 @@ the end of the prompt (usually a nice thing), add spaces escaped with
 backslashes.  The default is ``Login:  ''
 .IP "\fBxlogin.Login.passwdPrompt\fP"
 The string displayed to prompt for a password, when not using an authentication
-system such as PAM that provides its own prompts.		 
+system such as PAM that provides its own prompts.
 The default is ``Password:  ''
 .IP "\fBxlogin.Login.promptFace\fP"
 The face used to display prompts when built with Xft support.
@@ -1003,8 +1003,12 @@ The default is ``Serif-18:bold''.
 The font used to display prompts when not built with Xft support.
 .IP "\fBxlogin.Login.promptColor\fP"
 The color used to display prompts.
+.IP "\fBxlogin.Login.changePasswdMessage\fP"
+A message which is displayed when the users password has expired.
+The default is ``Password Change Required''
 .IP "\fBxlogin.Login.fail\fP"
-A message which is displayed when the authentication fails.
+A message which is displayed when the authentication fails, when not using an
+authentication system such as PAM that provides its own prompts.
 The default is ``Login incorrect''
 .IP "\fBxlogin.Login.failFace\fP"
 The face used to display the failure message when built with Xft support.
@@ -1015,7 +1019,36 @@ The font used to display the failure message when not built with Xft support.
 The color used to display the failure message.
 .IP "\fBxlogin.Login.failTimeout\fP"
 The number of seconds that the failure message is displayed.
-The default is 30.
+The default is 10.
+.IP "\fBxlogin.Login.logoFileName\fP"
+Name of an XPM format pixmap to display in the greeter window, if built with
+XPM support.   The default is no pixmap.
+.IP "\fBxlogin.Login.logoPadding\fP"
+Number of pixels of space between the logo pixmap and other elements of the
+greeter window, if the pixmap is displayed.
+The default is 5.
+.IP "\fBxlogin.Login.useShape\fP"
+If set to ``true'', when built with XPM support, attempt to use the
+X Non-Rectangular Window Shape Extension to set the window shape.
+The default is ``true''.
+.IP "\fBxlogin.Login.hiColor\fP, \fBxlogin.Login.shdColor\fP"
+When built with XPM support, raised appearance bezels may be drawn around
+the greeter frame and text input boxes by setting these resources.  hiColor
+is the highlight color, used on the top and left sides of the frame, and the
+bottom and right sides of text input areas.   shdColor is the shadow color,
+used on the bottom and right sides of the frame, and the top and left sides
+of text input areas.
+The default for both is the foreground color, providing a flat appearance.
+.IP "\fBxlogin.Login.frameWidth\fP"
+When built with XPM support, frameWidth is the width in pixels of the area
+around the greeter frame drawn in hiColor and shdColor.
+.IP "\fBxlogin.Login.innerFramesWidth\fP"
+When built with XPM support, innerFramesWidth is the width in pixels of the 
+area around text input areas drawn in hiColor and shdColor.
+.IP "\fBxlogin.Login.sepWidth\fP"
+When built with XPM support, sepWidth is the width in pixels of the 
+bezeled line between the greeting and input areas
+drawn in hiColor and shdColor.
 .IP "\fBxlogin.Login.allowRootLogin\fP"
 If set to ``false'', don't allow root (and any other user with uid = 0) to
 log in directly.
