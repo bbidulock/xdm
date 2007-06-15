@@ -112,7 +112,7 @@ if test "x$USE_PAM" != "xno" ; then
 	AC_CHECK_FUNC(pam_open_session, 
 		[AC_DEFINE(USE_PAM,1,[Use PAM for authentication])],
 		[if test "x$USE_PAM" != "xtry" ; then
-			AC_MSG_ERROR(["PAM support requested, but pam_open_session not found."])
+			AC_MSG_ERROR([PAM support requested, but pam_open_session not found.])
 		 fi])
 fi
 
@@ -155,7 +155,7 @@ if test x$RANDOM_DEVICE = xyes -o x$RANDOM_DEVICE = xtry ; then
 	AC_CHECK_FILE([/dev/urandom], [RANDOM_DEVICE=/dev/urandom],
 		AC_CHECK_FILE([/dev/random], [RANDOM_DEVICE=/dev/random]))
 	if test x$RANDOM_DEVICE = xyes ; then
-		AC_MSG_ERROR(["random device support requested, but no random device was found."])		
+		AC_MSG_ERROR([random device support requested, but no random device was found.])		
 	else 
 		if test x$RANDOM_DEVICE = xtry ; then
 			RANDOM_DEVICE="no"
@@ -370,9 +370,18 @@ XDM_CFLAGS="$XDM_CFLAGS $DMCP_CFLAGS $XLIB_CFLAGS $OS_CFLAGS $AUTH_CFLAGS"
 XDM_LIBS="$XDM_LIBS $DMCP_LIBS"
 
 AC_CHECK_LIB(Xdmcp, XdmcpWrap, [xdmauth="yes"], [xdmauth="no"], [$DMCP_LIBS])
-AC_SEARCH_LIBS(crypt, crypt)
 
-AM_CONDITIONAL(HAS_XDM_AUTH, test x$xdmauth = xyes)
+AC_ARG_ENABLE(xdm-auth,
+	AC_HELP_STRING([--enable-xdm-auth],
+       [Support XDM-AUTHENTICATION-1 and XDM-AUTHORIZATION-1 (default: auto)]),
+	[xdmauth_enable="$enableval"], [xdmauth_enable="auto"])
+if test "x$xdmauth_enable" = "xyes" -a "x$xdmauth" = "xno" ; then
+	AC_MSG_ERROR([XDM-AUTH support requested, but XdmcpWrap not found in libXdmcp.])
+fi
+
+AM_CONDITIONAL(HAS_XDM_AUTH, test x$xdmauth = xyes -a x$xdmauth_enable != xno)
+
+AC_SEARCH_LIBS(crypt, crypt)
 
 AC_SUBST(XDM_CFLAGS)
 AC_SUBST(XDM_LIBS)
