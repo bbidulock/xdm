@@ -5,6 +5,9 @@
 !
 ! $XFree86: xc/programs/xdm/config/Xres.cpp,v 1.6 2003/01/04 03:11:31 dawes Exp $
 !
+
+Xcursor.theme: whiteglass
+
 #define BS \ /* cpp can be trickier than m4 */
 #define NLBS \n\ /* don't remove these comments */
 xlogin*login.translations: #override BS
