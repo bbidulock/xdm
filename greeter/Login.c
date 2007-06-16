@@ -1902,7 +1902,7 @@ static void Realize (
 #endif
 
     cursor = XCreateFontCursor(XtDisplay(gw), XC_left_ptr);
-    XDefineCursor(XtDisplay(gw), XtWindow(gw), cursor);
+    XDefineCursor(XtDisplay(gw), DefaultRootWindow(XtDisplay(gw)), cursor);
 
 #ifdef XPM
     /* 
