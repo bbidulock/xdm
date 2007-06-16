@@ -402,14 +402,14 @@ realizeValue (LoginWidget w, int cursor, int promptNum, GC gc)
 	    offset = VALUE_SHOW_START(w, promptNum);
 	    textlen = strlen (text + offset);
 
-	    do
+	    while ((textlen > 0) && (textwidth > width))
 	    {
 		if (offset < PROMPT_CURSOR(w, promptNum)) {
 		    offset++;
 		}
 		textlen--;
 		textwidth = TEXT_WIDTH (text, text + offset, textlen);
-	    } while ((textlen > 0) && (textwidth > width));
+	    } 
 
 	    VALUE_SHOW_START(w, promptNum) = offset;
 	    VALUE_SHOW_END(w, promptNum) = offset + textlen;
