@@ -22,15 +22,11 @@ xlogin*login.translations: #override BS
 	<Key>KP_Enter: set-session-argument() finish-field()NLBS
 	Ctrl<Key>Return: set-session-argument(failsafe) finish-field()NLBS
 	<Key>Return: set-session-argument() finish-field()
-#ifndef XPM
-xlogin*greeting: CLIENTHOST
-xlogin*namePrompt: login:\040
-#else
+
 xlogin*greeting: Welcome to CLIENTHOST
 xlogin*namePrompt: \040\040\040\040\040\040\040Login:
-#endif /* XPM */
 xlogin*fail: Login incorrect
-#ifdef XPM
+
 XHASHif WIDTH > 800
 xlogin*greetFont: -adobe-helvetica-bold-o-normal--24-240-75-75-p-138-iso8859-1
 xlogin*font: -adobe-helvetica-medium-r-normal--18-180-75-75-p-98-iso8859-1
@@ -40,21 +36,8 @@ xlogin*greetFace:	Serif-24:bold:italic
 xlogin*face: 		Helvetica-18
 xlogin*promptFace: 	Helvetica-18:bold
 xlogin*failFace: 	Helvetica-18:bold
-XHASHelse
-xlogin*greetFont: -adobe-helvetica-bold-o-normal--17-120-100-100-p-92-iso8859-1
-xlogin*font: -adobe-helvetica-medium-r-normal--12-120-75-75-p-67-iso8859-1
-xlogin*promptFont: -adobe-helvetica-bold-r-normal--12-120-75-75-p-70-iso8859-1
-xlogin*failFont: -adobe-helvetica-bold-o-normal--14-140-75-75-p-82-iso8859-1
-xlogin*greetFace:	Serif-18:bold:italic
-xlogin*face: 		Helvetica-12
-xlogin*promptFace: 	Helvetica-12:bold
-xlogin*failFace: 	Helvetica-14:bold
-XHASHendif
-#endif /* XPM */
+
 XHASHifdef COLOR
-#ifndef XPM
-xlogin*greetColor: CadetBlue
-#else
 xlogin*borderWidth: 1
 xlogin*frameWidth: 5
 xlogin*innerFramesWidth: 2
@@ -63,22 +46,15 @@ xlogin*hiColor: grey90
 xlogin*background: grey
 !xlogin*foreground: darkgreen
 xlogin*greetColor: Blue3
-#endif /* XPM */
 xlogin*failColor: red
 *Foreground: black
 *Background: #fffff0
 XHASHelse
-#ifdef XPM
 xlogin*borderWidth: 3
 xlogin*frameWidth: 0
 xlogin*innerFramesWidth: 1
 xlogin*shdColor: black
 xlogin*hiColor: black
-#else
-xlogin*borderWidth: 3
-xlogin*Foreground: black
-xlogin*Background: white
-#endif /* XPM */
 XHASHendif
 #ifdef XPM
 XHASHif PLANES >= 8

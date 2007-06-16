@@ -1032,7 +1032,7 @@ If set to ``true'', when built with XPM support, attempt to use the
 X Non-Rectangular Window Shape Extension to set the window shape.
 The default is ``true''.
 .IP "\fBxlogin.Login.hiColor\fP, \fBxlogin.Login.shdColor\fP"
-When built with XPM support, raised appearance bezels may be drawn around
+Raised appearance bezels may be drawn around
 the greeter frame and text input boxes by setting these resources.  hiColor
 is the highlight color, used on the top and left sides of the frame, and the
 bottom and right sides of text input areas.   shdColor is the shadow color,
@@ -1040,13 +1040,13 @@ used on the bottom and right sides of the frame, and the top and left sides
 of text input areas.
 The default for both is the foreground color, providing a flat appearance.
 .IP "\fBxlogin.Login.frameWidth\fP"
-When built with XPM support, frameWidth is the width in pixels of the area
+frameWidth is the width in pixels of the area
 around the greeter frame drawn in hiColor and shdColor.
 .IP "\fBxlogin.Login.innerFramesWidth\fP"
-When built with XPM support, innerFramesWidth is the width in pixels of the 
+innerFramesWidth is the width in pixels of the 
 area around text input areas drawn in hiColor and shdColor.
 .IP "\fBxlogin.Login.sepWidth\fP"
-When built with XPM support, sepWidth is the width in pixels of the 
+sepWidth is the width in pixels of the 
 bezeled line between the greeting and input areas
 drawn in hiColor and shdColor.
 .IP "\fBxlogin.Login.allowRootLogin\fP"
