@@ -425,14 +425,14 @@ AC_DEFINE_DIR(DEF_SERVER_LINE, DEF_SERVER_LINE,
 # -DXRDB_PROGRAM="$(BINDIR)/xrdb"
 AC_ARG_WITH(xrdb, AC_HELP_STRING([--with-xrdb=path],
 			[Use path for xrdb (default: bindir/xrdb)]),
-	    [XRDB=$withval], [XRDB=bindir/xrdb])
+	    [XRDB=$withval], [XRDB=${bindir}/xrdb])
 AC_DEFINE_DIR(XRDB_PROGRAM, XRDB, 
 	[Define to pathname for xrdb program])
 
 # -DDEF_SESSION="$(BINDIR)/xterm -ls"
 AC_ARG_WITH(default-session, AC_HELP_STRING([--with-default-session=command],
 		[Use command for default session (default: bindir/xterm -ls)]),
-	    [DEF_SESSION=$withval], [DEF_SESSION="bindir/xterm -ls"])
+	    [DEF_SESSION=$withval], [DEF_SESSION="${bindir}/xterm -ls"])
 AC_DEFINE_DIR(DEF_SESSION, DEF_SESSION,
 	[Define to default command to start X session])
 
