@@ -151,7 +151,7 @@ chooser_SOURCES =	\
 
 # App default files  (*.ad)
 
-appdefaultdir = @appdefaultdir@
+appdefaultdir = @DESTDIR@@appdefaultdir@
 
 APPDEFAULTFILES = Chooser
 
