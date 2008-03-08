@@ -151,7 +151,9 @@ chooser_SOURCES =	\
 
 # App default files  (*.ad)
 
-appdefaultdir = @DESTDIR@@appdefaultdir@
+DISTCHECK_CONFIGURE_FLAGS = --with-appdefaultdir=\$${datadir}/X11/app-defaults
+
+appdefaultdir = @appdefaultdir@
 
 APPDEFAULTFILES = Chooser
 
