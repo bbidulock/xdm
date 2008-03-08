@@ -19,4 +19,3 @@ For instance, some packagers/sites may prefer:
 	--with-xdmconfigdir=/etc/X11/xdm --with-xdmlibdir=$(prefix)/lib/xdm
 	--with-xdmscriptdir=/etc/X11/xdm
 
-$Id$
