@@ -76,8 +76,8 @@ if test "x$HAS_SETUSERCONTEXT" = "xyes" ; then
 		[Define to 1 if you have the 'setusercontext' function.])
 fi
 
-AC_CHECK_FUNCS([daemon sigaction])
-AC_CHECK_HEADERS([grp.h])
+AC_CHECK_FUNCS([daemon sigaction openlog])
+AC_CHECK_HEADERS([grp.h syslog.h])
 AC_TYPE_SIGNAL
 
 XTRANS_CONNECTION_FLAGS

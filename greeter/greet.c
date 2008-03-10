@@ -83,8 +83,15 @@ from The Open Group.
 #include "greet.h"
 #include "Login.h"
 
-#ifdef __OpenBSD__
+#ifdef HAVE_OPENLOG && HAVE_SYSLOG_H
+#define USE_SYSLOG
 #include <syslog.h>
+#ifndef LOG_AUTHPRIV
+#define LOG_AUTHPRIV LOG_AUTH
+#endif
+#ifndef LOG_PID
+#define LOG_PID 0
+#endif
 #endif
 
 #if defined(SECURE_RPC) && defined(sun)
@@ -408,9 +415,7 @@ Greet (struct display *d, struct greet_info *greet)
 static void
 FailedLogin (struct display *d, struct greet_info *greet)
 {
-#ifdef __OpenBSD__
-    syslog(LOG_NOTICE, "LOGIN FAILURE ON %s",
-	   d->name);
+#ifdef USE_SYSLOG
     syslog(LOG_AUTHPRIV|LOG_NOTICE,
 	   "LOGIN FAILURE ON %s, %s",
 	   d->name, greet->name);
@@ -485,8 +490,8 @@ greet_user_rtn GreetUser(
 	LogError ("Cannot reopen display %s for greet window\n", d->name);
 	exit (RESERVER_DISPLAY);
     }
-#ifdef __OpenBSD__
-    openlog("xdm", LOG_ODELAY, LOG_AUTH);
+#ifdef USE_SYSLOG
+    openlog("xdm", LOG_ODELAY|LOG_PID, LOG_AUTHPRIV);
 #endif
 
     for (;;) {
