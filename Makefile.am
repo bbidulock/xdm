@@ -155,7 +155,7 @@ DISTCHECK_CONFIGURE_FLAGS = --with-appdefaultdir=\$${datadir}/X11/app-defaults
 
 appdefaultdir = @appdefaultdir@
 
-APPDEFAULTFILES = Chooser
+APPDEFAULTFILES = app-defaults/Chooser
 
 SUFFIXES += .ad
 
