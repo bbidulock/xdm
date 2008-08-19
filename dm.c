@@ -142,6 +142,8 @@ main (int argc, char **argv)
     }
     if (debugLevel == 0 && daemonMode)
 	BecomeDaemon ();
+    if (debugLevel == 0)
+	InitErrorLog ();
     if (debugLevel >= 10)
 	nofork_session = 1;
     /* SUPPRESS 560 */
@@ -154,8 +156,6 @@ main (int argc, char **argv)
 		 pidFile, oldpid);
 	exit (1);
     }
-    if (debugLevel == 0)
-	InitErrorLog ();
 
     if (nofork_session == 0) {
 	/* Clean up any old Authorization files */
