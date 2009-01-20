@@ -41,6 +41,7 @@ in this Software without prior written authorization from The Open Group.
 #include <stdio.h>
 #include "dm.h"
 #include <errno.h>
+#include <unistd.h>
 
 #ifdef macII
 #define ON_CONSOLE_ONLY
@@ -65,7 +66,7 @@ in this Software without prior written authorization from The Open Group.
 #define vfork() fork()
 #endif
 
-char *ProgramName;
+static char *ProgramName;
 
 static int exec_args (
     char *filename,

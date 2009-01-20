@@ -73,6 +73,7 @@ from The Open Group.
 # include <stdio.h>
 # include <ctype.h>
 # include <time.h>
+# include <string.h>
 
 # include "dm.h"
 # include "dm_error.h"
@@ -602,7 +603,7 @@ RedrawFail (LoginWidget w)
 	    char *tempCopy = strdup(w->login.fail);
 	    if (tempCopy != NULL) {
 		char *start, *next;
-		char lastspace;
+		char lastspace = ' ';
 
 		y = PROMPT_Y(w,LAST_PROMPT) + (2 * PROMPT_Y_INC(w));
 		

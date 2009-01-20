@@ -377,7 +377,7 @@ InitXdmcpWrapper (void)
 #endif    
     /*  Try some pseudo-random number genrator daemon next */
     if (prngdSocket != NULL || prngdPort != 0) {
-	    if (get_prngd_bytes(tmpkey, sizeof(tmpkey), prngdPort, 
+	    if (get_prngd_bytes((char *)tmpkey, sizeof(tmpkey), prngdPort, 
 		    prngdSocket) == 0) {
 		    tmpkey[0] = 0;
 		    _XdmcpWrapperToOddParity(tmpkey, key);

@@ -182,7 +182,8 @@ XdmGetXdmcpAuth (struct protoDisplay *pdpy,
     XdmPrintDataHex ("Accept packet auth", xdmcpauth->data, xdmcpauth->data_length);
     XdmPrintDataHex ("Auth file auth", fileauth->data, fileauth->data_length);
     /* encrypt the session key for its trip back to the server */
-    XdmcpWrap (xdmcpauth->data, (unsigned char *)&pdpy->key, xdmcpauth->data, 8);
+    XdmcpWrap ((unsigned char *)xdmcpauth->data, (unsigned char *)&pdpy->key,
+	       (unsigned char *)xdmcpauth->data, 8);
     pdpy->fileAuthorization = fileauth;
     pdpy->xdmcpAuthorization = xdmcpauth;
 }

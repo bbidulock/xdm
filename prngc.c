@@ -48,7 +48,7 @@
 #define INADDR_LOOPBACK 0x7F000001U
 #endif
 
-static ssize_t atomicio(ssize_t (*)(), int, void *, size_t);
+static ssize_t atomicio(ssize_t (*)(int, void *, size_t), int, void *, size_t);
 
 #ifndef offsetof
 #  define offsetof(TYPE, MEMBER) ((size_t) &((TYPE *)0)->MEMBER)
@@ -169,7 +169,7 @@ done:
  * ensure all of data on socket comes through. f==read || f==write
  */
 static ssize_t
-atomicio(ssize_t (*f)(), int fd, void *_s, size_t n)
+atomicio(ssize_t (*f)(int, void *, size_t), int fd, void *_s, size_t n)
 {
 	char *s = _s;
 	ssize_t res, pos = 0;

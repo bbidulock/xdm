@@ -48,8 +48,7 @@ static struct protoDisplay	*protoDisplays;
 
 #ifdef DEBUG
 static
-PrintProtoDisplay (pdpy)
-    struct protoDisplay	*pdpy;
+PrintProtoDisplay (struct protoDisplay *pdpy)
 {
     Debug ("ProtoDisplay 0x%x\n", pdpy);
     Debug ("\taddress: ");
@@ -137,8 +136,7 @@ NewProtoDisplay (
 }
 
 void
-DisposeProtoDisplay (pdpy)
-    struct protoDisplay	*pdpy;
+DisposeProtoDisplay (struct protoDisplay *pdpy)
 {
     struct protoDisplay	*p, *prev;
 

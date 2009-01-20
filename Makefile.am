@@ -30,7 +30,7 @@ xdmlib_PROGRAMS = chooser
 # xdm
 #
 
-xdm_CFLAGS = $(XDM_CFLAGS) -D_BSD_SOURCE
+xdm_CFLAGS = $(XDM_CFLAGS)
 xdm_LDADD = $(XDM_LIBS) $(XDM_LDFLAGS)
 
 xdm_SOURCES =	\
@@ -183,7 +183,7 @@ endif LINT
 .PHONY: ChangeLog
 
 ChangeLog:
-	(GIT_DIR=$(top_srcdir)/.git git-log > .changelog.tmp && mv .changelog.tmp ChangeLog; rm -f .changelog.tmp) || (touch ChangeLog; echo 'git directory not found: installing possibly empty changelog.' >&2)
+	$(CHANGELOG_CMD)
 
 dist-hook: ChangeLog
 

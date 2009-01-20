@@ -27,6 +27,10 @@ AC_INIT(xdm,[1.1.8],[https://bugs.freedesktop.org/enter_bug.cgi?product=xorg],xd
 AM_INIT_AUTOMAKE([dist-bzip2])
 AM_MAINTAINER_MODE
 
+# Require xorg-macros: XORG_CWARNFLAGS, XORG_CHANGELOG
+m4_ifndef([XORG_MACROS_VERSION], [AC_FATAL([must install xorg-macros 1.2 or later before running autoconf/autogen])])
+XORG_MACROS_VERSION(1.2)
+
 AM_CONFIG_HEADER(config.h)
 
 AC_PROG_CC
@@ -37,6 +41,11 @@ AM_PROG_LIBTOOL
 AC_PROG_INSTALL
 
 XORG_PROG_RAWCPP
+XORG_CWARNFLAGS
+
+XDM_CFLAGS="$CWARNFLAGS $XDM_CFLAGS"
+GREETER_CFLAGS="$CWARNFLAGS $GREETER_CFLAGS"
+CHOOSER_CFLAGS="$CWARNFLAGS $CHOOSER_CFLAGS"
 
 # Check for mktemp to prevent security issue noted in Xorg bug #5898
 # See https://bugs.freedesktop.org/show_bug.cgi?id=5898 for details.
@@ -123,7 +132,7 @@ fi
 
 case $host_os in
     linux*|gnu*|*-gnu)
-        OS_CFLAGS="-D_XOPEN_SOURCE"
+        OS_CFLAGS="-D_XOPEN_SOURCE -D_BSD_SOURCE"
 	SU="su"
         ;;
     darwin*)
@@ -392,7 +401,7 @@ AC_SUBST(XDM_LDFLAGS)
 #
 
 PKG_CHECK_MODULES(XT, xt)
-XDMSHELL_CFLAGS="$XDM_CFLAGS $XDM_PRINT_CFLAGS $AUTH_CFLAGS $DMCP_CFLAGS $XLIB_CFLAGS $XT_CFLAGS $OS_CFLAGS"
+XDMSHELL_CFLAGS="$XDM_CFLAGS $XDM_PRINT_CFLAGS $AUTH_CFLAGS $DMCP_CFLAGS $XLIB_CFLAGS $XT_CFLAGS"
 XDMSHELL_LIBS="$XDM_LIBS $XDM_PRINT_LIBS $DMCP_LIBS"
 
 AC_SUBST(XDMSHELL_CFLAGS)
@@ -530,5 +539,6 @@ AC_SUBST(MKTEMP_COMMAND)
 XORG_WITH_LINT
 XORG_MANPAGE_SECTIONS
 XORG_RELEASE_VERSION
+XORG_CHANGELOG
 
 AC_OUTPUT([Makefile config/Makefile greeter/Makefile])

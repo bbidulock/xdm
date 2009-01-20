@@ -83,7 +83,7 @@ from The Open Group.
 #include "greet.h"
 #include "Login.h"
 
-#ifdef HAVE_OPENLOG && HAVE_SYSLOG_H
+#if defined(HAVE_OPENLOG) && defined(HAVE_SYSLOG_H)
 #define USE_SYSLOG
 #include <syslog.h>
 #ifndef LOG_AUTHPRIV
@@ -93,6 +93,8 @@ from The Open Group.
 #define LOG_PID 0
 #endif
 #endif
+
+#include <string.h>
 
 #if defined(SECURE_RPC) && defined(sun)
 /* Go figure, there's no getdomainname() prototype available */
@@ -699,7 +701,7 @@ static int pamconv(int num_msg,
     if (*response == NULL)
 	return (PAM_BUF_ERR);
 
-    m = *msg;
+    m = (struct pam_message *)*msg;
     r = *response;
 
     for (i = 0; i < num_msg; i++ , m++ , r++) {

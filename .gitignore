@@ -24,3 +24,7 @@ xdm
 xdm.1
 xdmshell
 *~
+*.o
+xdm-*.tar.*
+ChangeLog
+tags
