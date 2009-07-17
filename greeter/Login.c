@@ -442,13 +442,6 @@ realizeCursor (LoginWidget w, GC gc)
     int	x, y;
     int height, width;
 
-#ifdef FORCE_CURSOR_FLASH    
-    static int lastx, lasty;
-    static struct timeval  lastFlash;
-    struct timeval  now, timeout;
-    int sinceLastFlash;
-#endif
-
     if (w->login.state != PROMPTING) {
 	return;
     }
@@ -472,7 +465,9 @@ realizeCursor (LoginWidget w, GC gc)
 	}
 	break;
     case LOGIN_PROMPT_ECHO_OFF:
-	/* Nothing special needed */
+	/* Move cursor one pixel per character to give some feedback without
+	   giving away the password length */
+	x += PROMPT_CURSOR(w, w->login.activePrompt);
 	break;
     }
     
@@ -495,33 +490,6 @@ realizeCursor (LoginWidget w, GC gc)
     XDrawPoint     (XtDisplay (w), XtWindow (w), gc,
     		    x+2 , y - F_ASCENT(text)+height);
 
-#ifdef FORCE_CURSOR_FLASH
-    /* Force cursor to flash briefly to give user feedback */
-#define FLASH_MILLIS    100000 /* 0.10 seconds */
-#define MILLIS_PER_SEC 1000000    
-    X_GETTIMEOFDAY (&now);
-
-    if ((lastx == x) && (lasty == y)) {
-	if (lastFlash.tv_sec == 0)
-	    sinceLastFlash = 0;
-	else if ((lastFlash.tv_sec + 1) == now.tv_sec)
-	    sinceLastFlash =
-		(now.tv_usec + MILLIS_PER_SEC) - lastFlash.tv_usec;
-	else if (lastFlash.tv_sec == now.tv_sec)
-	    sinceLastFlash = now.tv_usec - lastFlash.tv_usec;
-	else
-	    sinceLastFlash = (now.tv_sec - lastFlash.tv_sec) * MILLIS_PER_SEC;
-
-	if (sinceLastFlash < FLASH_MILLIS) {
-	    timeout.tv_sec = 0;
-	    timeout.tv_usec = FLASH_MILLIS - sinceLastFlash;
-	    select(0, NULL, NULL, NULL, &timeout);
-	}
-    } else {
-	lastx = x; lasty = y;
-    }
-    X_GETTIMEOFDAY (&lastFlash);
-#endif /* FORCE_CURSOR_FLASH */
     XFlush (XtDisplay(w));    
 }
 
