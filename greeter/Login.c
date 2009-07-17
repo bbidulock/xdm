@@ -1,5 +1,3 @@
-/* $XdotOrg: app/xdm/greeter/Login.c,v 1.6 2006/06/03 00:05:24 alanc Exp $ */
-/* $Xorg: Login.c,v 1.4 2001/02/09 02:05:41 xorgcvs Exp $ */
 /*
 
 Copyright 1988, 1998  The Open Group
@@ -55,7 +53,6 @@ from The Open Group.
  * of the copyright holder.
  */
 
-/* $XFree86: xc/programs/xdm/greeter/Login.c,v 3.17tsi Exp $ */
 
 /*
  * xdm - display manager daemon

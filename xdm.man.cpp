@@ -1,5 +1,3 @@
-.\" $XdotOrg: xc/programs/xdm/xdm.man,v 1.3 2004/07/26 22:56:33 herrb Exp $
-.\" $Xorg: xdm.man,v 1.4 2001/02/09 02:05:41 xorgcvs Exp $
 .\" Copyright 1988, 1994, 1998  The Open Group
 .\"
 .\" Permission to use, copy, modify, distribute, and sell this software and its
@@ -24,7 +22,6 @@
 .\" other dealings in this Software without prior written authorization
 .\" from The Open Group.
 .\"
-.\" $XFree86: xc/programs/xdm/xdm.man,v 3.28 2004/01/09 00:25:23 dawes Exp $
 .\"
 .TH XDM 1 __xorgversion__
 .SH NAME

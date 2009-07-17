@@ -1,5 +1,3 @@
-/* $Xorg: verify.c,v 1.4 2001/02/09 02:05:41 xorgcvs Exp $ */
-/* $XdotOrg: app/xdm/greeter/verify.c,v 1.9 2006/06/03 00:05:24 alanc Exp $ */
 /*
 
 Copyright 1988, 1998  The Open Group
@@ -27,7 +25,6 @@ other dealings in this Software without prior written authorization
 from The Open Group.
 
 */
-/* $XFree86: xc/programs/xdm/greeter/verify.c,v 3.26 2003/11/19 04:44:00 dawes Exp $ */
 
 /*
  * xdm - display manager daemon

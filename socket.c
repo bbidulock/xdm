@@ -1,5 +1,3 @@
-/* $XdotOrg: app/xdm/socket.c,v 1.5 2006/03/10 00:48:16 alanc Exp $ */
-/* $Xorg: socket.c,v 1.4 2001/02/09 02:05:40 xorgcvs Exp $ */
 /*
 
 Copyright 1988, 1998  The Open Group
@@ -28,7 +26,6 @@ other dealings in this Software without prior written authorization
 from the copyright holder.
 
 */
-/* $XFree86: xc/programs/xdm/socket.c,v 3.13 2003/07/18 15:39:52 tsi Exp $ */
 
 /*
  * xdm - display manager daemon

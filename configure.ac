@@ -20,7 +20,6 @@ dnl  PERFORMANCE OF THIS SOFTWARE.
 dnl
 dnl Process this file with autoconf to create configure.
 
-dnl $XdotOrg: app/xdm/configure.ac,v 1.42 2006/06/03 01:01:21 alanc Exp $
 
 AC_PREREQ([2.57])
 AC_INIT(xdm,[1.1.8],[https://bugs.freedesktop.org/enter_bug.cgi?product=xorg],xdm)

@@ -1,5 +1,3 @@
-/* $XdotOrg: $ */
-/* $Xorg: dm.c,v 1.5 2001/02/09 02:05:40 xorgcvs Exp $ */
 /*
 
 Copyright 1988, 1998  The Open Group
@@ -27,7 +25,6 @@ other dealings in this Software without prior written authorization
 from The Open Group.
 
 */
-/* $XFree86: xc/programs/xdm/dm.c,v 3.23 2003/09/17 05:48:32 herrb Exp $ */
 
 /*
  * xdm - display manager daemon

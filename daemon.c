@@ -1,5 +1,3 @@
-/* $XdotOrg: app/xdm/daemon.c,v 1.3 2006/03/16 21:46:55 alanc Exp $ */
-/* $Xorg: daemon.c,v 1.4 2001/02/09 02:05:40 xorgcvs Exp $ */
 /*
 
 Copyright 1988, 1998  The Open Group
@@ -27,7 +25,6 @@ other dealings in this Software without prior written authorization
 from The Open Group.
 
 */
-/* $XFree86: xc/programs/xdm/daemon.c,v 3.21 2004/01/10 21:26:29 herrb Exp $ */
 
 /*
  * xdm - display manager daemon

@@ -1,5 +1,3 @@
-/* $XdotOrg: $ */
-/* $Xorg: LoginP.h,v 1.4 2001/02/09 02:05:41 xorgcvs Exp $ */
 /*
 
 Copyright 1988, 1998  The Open Group
@@ -54,7 +52,6 @@ from The Open Group.
  * or other dealings in this Software without prior written authorization
  * of the copyright holder.
  */
-/* $XFree86: xc/programs/xdm/greeter/LoginP.h,v 3.8 2001/12/14 20:01:29 dawes Exp $ */
 
 /*
  * xdm - display manager daemon

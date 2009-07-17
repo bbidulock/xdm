@@ -1,4 +1,3 @@
-/* $Xorg: policy.c,v 1.4 2001/02/09 02:05:40 xorgcvs Exp $ */
 /*
 
 Copyright 1988, 1998  The Open Group
@@ -33,7 +32,6 @@ from The Open Group.
  *
  * policy.c.  Implement site-dependent policy for XDMCP connections
  */
-/* $XFree86: policy.c,v 3.8 2002/12/07 20:31:04 herrb Exp $ */
 
 # include "dm.h"
 # include "dm_auth.h"

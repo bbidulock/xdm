@@ -1,5 +1,3 @@
-/* $XdotOrg: xc/programs/xdm/resource.c,v 1.2 2004/04/23 19:54:42 eich Exp $ */
-/* $Xorg: resource.c,v 1.4 2001/02/09 02:05:40 xorgcvs Exp $ */
 /*
 
 Copyright 1988, 1998  The Open Group
@@ -27,7 +25,6 @@ other dealings in this Software without prior written authorization
 from The Open Group.
 
 */
-/* $XFree86: xc/programs/xdm/resource.c,v 3.11 2003/07/09 15:27:39 tsi Exp $ */
 
 /*
  * xdm - display manager daemon

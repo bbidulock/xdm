@@ -1,4 +1,3 @@
-# $XdotOrg: $
 #
 
 include $(top_srcdir)/cpprules.in

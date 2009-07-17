@@ -1,10 +1,7 @@
-! $Xorg: xdm-conf.cpp,v 1.3 2000/08/17 19:54:17 cpqbld Exp $
-! $XdotOrg: $    
 !
 !
 !
 !
-! $XFree86: xc/programs/xdm/config/xdm-conf.cpp,v 1.10 2002/11/30 19:11:32 herrb Exp $
 !
 #ifndef XDMCONFIGDIR
 #define XDMCONFIGDIR XDMDIR

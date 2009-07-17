@@ -1,4 +1,3 @@
-# $XdotOrg: app/xdm/greeter/Makefile.am,v $
 
 if DYNAMIC_GREETER
 xdmlibdir = $(XDMLIBDIR)
