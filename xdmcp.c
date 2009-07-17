@@ -244,8 +244,8 @@ all_query_respond (
     int			fd)
 {
     ARRAY8Ptr	authenticationName;
-    ARRAY8	status;
-    ARRAY8	addr;
+    ARRAY8	status = {0, NULL};
+    ARRAY8	addr  = {0, NULL};
     CARD16	connectionType;
     int		family;
     int		length;
@@ -299,9 +299,9 @@ indirect_respond (
     int		    length,
     int		    fd)
 {
-    ARRAYofARRAY8   queryAuthenticationNames;
-    ARRAY8	    clientAddress;
-    ARRAY8	    clientPort;
+    ARRAYofARRAY8   queryAuthenticationNames = {0, NULL};
+    ARRAY8	    clientAddress = {0, NULL};
+    ARRAY8	    clientPort = {0, NULL};
     CARD16	    connectionType;
     int		    expectedLen;
     int		    i;
@@ -478,7 +478,7 @@ direct_query_respond (
     xdmOpCode	    type,
     int		    fd)
 {
-    ARRAYofARRAY8   queryAuthenticationNames;
+    ARRAYofARRAY8   queryAuthenticationNames = {0, NULL};
     int		    expectedLen;
     int		    i;
     
@@ -732,21 +732,15 @@ forward_respond (
     int			length,
     int			fd)
 {
-    ARRAY8	    clientAddress;
-    ARRAY8	    clientPort;
-    ARRAYofARRAY8   authenticationNames;
+    ARRAY8	    clientAddress = {0, NULL};
+    ARRAY8	    clientPort = {0, NULL};
+    ARRAYofARRAY8   authenticationNames = {0, NULL};
     struct sockaddr *client;
     int		    clientlen;
     int		    expectedLen;
     int		    i;
     
     Debug ("Forward respond %d\n", length);
-    clientAddress.length = 0;
-    clientAddress.data = NULL;
-    clientPort.length = 0;
-    clientPort.data = NULL;
-    authenticationNames.length = 0;
-    authenticationNames.data = NULL;
     if (XdmcpReadARRAY8 (&buffer, &clientAddress) &&
 	XdmcpReadARRAY8 (&buffer, &clientPort) &&
 	XdmcpReadARRAYofARRAY8 (&buffer, &authenticationNames))
@@ -940,36 +934,21 @@ request_respond (
     int		    fd)
 {
     CARD16	    displayNumber;
-    ARRAY16	    connectionTypes;
-    ARRAYofARRAY8   connectionAddresses;
-    ARRAY8	    authenticationName;
-    ARRAY8	    authenticationData;
-    ARRAYofARRAY8   authorizationNames;
-    ARRAY8	    manufacturerDisplayID;
+    ARRAY16	    connectionTypes = {0, NULL};
+    ARRAYofARRAY8   connectionAddresses = {0, NULL};
+    ARRAY8	    authenticationName = {0, NULL};
+    ARRAY8	    authenticationData = {0, NULL};
+    ARRAYofARRAY8   authorizationNames = {0, NULL};
+    ARRAY8	    manufacturerDisplayID = {0, NULL};
     ARRAY8Ptr	    reason = NULL;
     int		    expectlen;
     int		    i, j;
     struct protoDisplay  *pdpy = NULL;
-    ARRAY8	    authorizationName, authorizationData;
+    ARRAY8	    authorizationName = {0, NULL},
+		    authorizationData = {0, NULL};
     ARRAY8Ptr	    connectionAddress;
 
     Debug ("Request respond %d\n", length);
-    connectionTypes.length = 0;
-    connectionTypes.data = NULL;
-    connectionAddresses.length = 0;
-    connectionAddresses.data = NULL;
-    authenticationName.length = 0;
-    authenticationName.data = NULL;
-    authenticationData.length = 0;
-    authenticationData.data = NULL;
-    authorizationNames.length = 0;
-    authorizationNames.data = NULL;
-    authorizationName.length = 0;
-    authorizationName.data = NULL;
-    authorizationData.length = 0;
-    authorizationData.data = NULL;
-    manufacturerDisplayID.length = 0;
-    manufacturerDisplayID.data = NULL;
     if (XdmcpReadCARD16 (&buffer, &displayNumber) &&
 	XdmcpReadARRAY16 (&buffer, &connectionTypes) &&
 	XdmcpReadARRAYofARRAY8 (&buffer, &connectionAddresses) &&
@@ -1154,19 +1133,18 @@ manage (
 {
     CARD32		sessionID;
     CARD16		displayNumber;
-    ARRAY8		displayClass;
+    ARRAY8		displayClass = {0, NULL};
     int			expectlen;
     struct protoDisplay	*pdpy;
     struct display	*d;
     char		*name = NULL;
     char		*class = NULL;
     XdmcpNetaddr	from_save;
-    ARRAY8		clientAddress, clientPort;
+    ARRAY8		clientAddress = {0, NULL},
+			clientPort = {0, NULL};
     CARD16		connectionType;
 
     Debug ("Manage %d\n", length);
-    displayClass.data = NULL;
-    displayClass.length = 0;
     if (XdmcpReadCARD32 (&buffer, &sessionID) &&
 	XdmcpReadCARD16 (&buffer, &displayNumber) &&
 	XdmcpReadARRAY8 (&buffer, &displayClass))

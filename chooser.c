@@ -320,7 +320,7 @@ static int
 AddHostname (ARRAY8Ptr hostname, ARRAY8Ptr status, struct sockaddr *addr, int willing)
 {
     HostName	*new, **names, *name;
-    ARRAY8	hostAddr;
+    ARRAY8	hostAddr = {0, NULL};
     CARD16	connectionType;
     int		fulllen;
 
@@ -480,9 +480,9 @@ static void
 ReceivePacket (XtPointer closure, int *source, XtInputId *id)
 {
     XdmcpHeader	    header;
-    ARRAY8	    authenticationName;
-    ARRAY8	    hostname;
-    ARRAY8	    status;
+    ARRAY8	    authenticationName = {0, NULL};
+    ARRAY8	    hostname = {0, NULL};
+    ARRAY8	    status = {0, NULL};
     int		    saveHostname = 0;
 #if defined(IPv6) && defined(AF_INET6)
     struct sockaddr_storage addr;
@@ -499,9 +499,6 @@ ReceivePacket (XtPointer closure, int *source, XtInputId *id)
 	return;
     if (header.version != XDM_PROTOCOL_VERSION)
 	return;
-    hostname.data = NULL;
-    status.data = NULL;
-    authenticationName.data = NULL;
     switch (header.opcode) {
     case WILLING:
     	if (XdmcpReadARRAY8 (&buffer, &authenticationName) &&

@@ -405,9 +405,9 @@ ProcessChooserSocket (int fd)
     char	buf[1024];
     int		len;
     XdmcpBuffer	buffer;
-    ARRAY8	clientAddress;
+    ARRAY8	clientAddress = {0, NULL};
     CARD16	connectionType;
-    ARRAY8	choice;
+    ARRAY8	choice = {0, NULL};
 #if defined(STREAMSCONN)
     struct t_call *call;
     int flags=0;
@@ -477,10 +477,6 @@ ProcessChooserSocket (int fd)
     	buffer.size = sizeof (buf);
     	buffer.count = len;
     	buffer.pointer = 0;
-	clientAddress.data = NULL;
-	clientAddress.length = 0;
-	choice.data = NULL;
-	choice.length = 0;
 	if (XdmcpReadARRAY8 (&buffer, &clientAddress)) {
 	    if (XdmcpReadCARD16 (&buffer, &connectionType)) {
 		if (XdmcpReadARRAY8 (&buffer, &choice)) {
