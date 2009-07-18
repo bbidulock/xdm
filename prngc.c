@@ -27,11 +27,11 @@
 #include <sys/socket.h>
 #include <X11/Xos.h>
 #ifndef X_NO_SYS_UN
-#ifndef Lynx
-#include	<sys/un.h>
-#else
-#include	<un.h>
-#endif
+# ifndef Lynx
+#  include	<sys/un.h>
+# else
+#  include	<un.h>
+# endif
 #endif
 #include <netinet/in.h>
 #include <errno.h>
@@ -44,25 +44,25 @@
 #include "dm_error.h"
 
 #ifndef INADDR_LOOPBACK
-#define INADDR_LOOPBACK 0x7F000001U
+# define INADDR_LOOPBACK 0x7F000001U
 #endif
 
 static ssize_t atomicio(ssize_t (*)(int, void *, size_t), int, void *, size_t);
 
 #ifndef offsetof
-#  define offsetof(TYPE, MEMBER) ((size_t) &((TYPE *)0)->MEMBER)
+# define offsetof(TYPE, MEMBER) ((size_t) &((TYPE *)0)->MEMBER)
 #endif
 
 /*
  * Collect 'len' bytes of entropy into 'buf' from PRNGD/EGD daemon
  * listening either on 'tcp_port', or via Unix domain socket at *
  * 'socket_path'.
- * Either a non-zero tcp_port or a non-null socket_path must be 
+ * Either a non-zero tcp_port or a non-null socket_path must be
  * supplied.
  * Returns 0 on success, -1 on error
  */
 int
-get_prngd_bytes(char *buf, int len, 
+get_prngd_bytes(char *buf, int len,
     unsigned short tcp_port, char *socket_path)
 {
 	int fd, addr_len, rval, errors;
@@ -178,7 +178,7 @@ atomicio(ssize_t (*f)(int, void *, size_t), int fd, void *_s, size_t n)
 		switch (res) {
 		case -1:
 #ifdef EWOULDBLOCK
-			if (errno == EINTR || errno == EAGAIN 
+			if (errno == EINTR || errno == EAGAIN
 			    || errno == EWOULDBLOCK)
 #else
 			if (errno == EINTR || errno == EAGAIN)

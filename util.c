@@ -35,23 +35,23 @@ from The Open Group.
  * various utility routines
  */
 
-# include   "dm.h"
-# include   "dm_error.h"
+#include   "dm.h"
+#include   "dm_error.h"
 
 #include <X11/Xmu/SysUtil.h>	/* for XmuGetHostname */
 
 #ifdef X_POSIX_C_SOURCE
-#define _POSIX_C_SOURCE X_POSIX_C_SOURCE
-#include <signal.h>
-#undef _POSIX_C_SOURCE
+# define _POSIX_C_SOURCE X_POSIX_C_SOURCE
+# include <signal.h>
+# undef _POSIX_C_SOURCE
 #else
-#if defined(X_NOT_POSIX) || defined(_POSIX_SOURCE)
-#include <signal.h>
-#else
-#define _POSIX_SOURCE
-#include <signal.h>
-#undef _POSIX_SOURCE
-#endif
+# if defined(X_NOT_POSIX) || defined(_POSIX_SOURCE)
+#  include <signal.h>
+# else
+#  define _POSIX_SOURCE
+#  include <signal.h>
+#  undef _POSIX_SOURCE
+# endif
 #endif
 
 #ifndef HAVE_ASPRINTF
@@ -171,21 +171,21 @@ putEnv(const char *string, char **env)
 {
     char *v, *b, *n;
     int nl;
-  
+
     if ((b = strchr(string, '=')) == NULL)
 	return NULL;
     v = b + 1;
-  
+
     nl = b - string;
     if ((n = malloc(nl + 1)) == NULL)
     {
 	LogOutOfMem ("putAllEnv");
 	return NULL;
     }
-  
+
     strncpy(n, string,nl + 1);
     n[nl] = 0;
-  
+
     env = setEnv(env,n,v);
     free(n);
     return env;
@@ -204,7 +204,7 @@ freeEnv (char **env)
     }
 }
 
-# define isblank(c)	((c) == ' ' || c == '\t')
+#define isblank(c)	((c) == ' ' || c == '\t')
 
 char **
 parseArgs (char **argv, char *string)

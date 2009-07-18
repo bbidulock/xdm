@@ -36,11 +36,11 @@ from The Open Group.
  * we generally do not have a terminal to talk to
  */
 
-# include <stdio.h>
-# include <stdarg.h>
+#include <stdio.h>
+#include <stdarg.h>
 
-# include "dm.h"
-# include "dm_error.h"
+#include "dm.h"
+#include "dm_error.h"
 
 #define WRITES(fd, buf) write(fd, buf, strlen(buf))
 

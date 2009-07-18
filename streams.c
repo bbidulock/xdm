@@ -37,12 +37,12 @@ from The Open Group.
 #include "dm_error.h"
 
 #ifdef XDMCP
-#ifdef STREAMSCONN
+# ifdef STREAMSCONN
 
-#include <fcntl.h>
-#include <tiuser.h>
-#include <netconfig.h>
-#include <netdir.h>
+#  include <fcntl.h>
+#  include <tiuser.h>
+#  include <netconfig.h>
+#  include <netdir.h>
 
 extern int	xdmcpFd;
 extern int	chooserFd;
@@ -163,5 +163,5 @@ void ProcessListenSockets (fd_set *readmask)
     return;
 }
 
-#endif /* STREAMSCONN */
+# endif /* STREAMSCONN */
 #endif /* XDMCP */

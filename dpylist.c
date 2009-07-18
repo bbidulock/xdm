@@ -33,8 +33,8 @@ from The Open Group.
  * a simple linked list of known displays
  */
 
-# include "dm.h"
-# include "dm_error.h"
+#include "dm.h"
+#include "dm_error.h"
 
 static struct display	*displays;
 
@@ -119,7 +119,7 @@ FindDisplayByAddress (XdmcpNetaddr addr, int addrlen, CARD16 displayNumber)
 #endif /* XDMCP */
 
 #define IfFree(x)  if (x) free ((char *) x)
-    
+
 void
 RemoveDisplay (struct display *old)
 {

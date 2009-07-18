@@ -1,7 +1,7 @@
 /*
  * xdmshell - simple program for running xdm from login
  *
- * 
+ *
 Copyright 1988, 1998  The Open Group
 
 Permission to use, copy, modify, distribute, and sell this software and its
@@ -40,7 +40,7 @@ in this Software without prior written authorization from The Open Group.
 #include <unistd.h>
 
 #ifndef BINDIR
-#define BINDIR "/usr/bin/X11"
+# define BINDIR "/usr/bin/X11"
 #endif
 
 /*
@@ -51,7 +51,7 @@ in this Software without prior written authorization from The Open Group.
 #endif
 
 #ifndef HAS_VFORK
-#define vfork() fork()
+# define vfork() fork()
 #endif
 
 static char *ProgramName;
@@ -66,7 +66,7 @@ static int exec_args (
     if (!filename) return -1;
 
     if (filename[0] != '/') {
-	fprintf (stderr, 
+	fprintf (stderr,
 	       "%s:  attempt to execute program with relative pathname:  %s\n",
 		 ProgramName, filename);
 	return -1;
@@ -119,13 +119,13 @@ main (
 
     ttyfd = open ("/dev/tty", O_RDWR, 0);
     if (ttyfd < 3) {			/* stdin = 0, stdout = 1, stderr = 2 */
-	fprintf (stderr, 
+	fprintf (stderr,
 		 "%s:  must be run directly from the console.\r\n",
 		 ProgramName);
 	exit (1);
     }
     (void) close (ttyfd);
-    
+
     /* make xdm run in a non-setuid environment */
     if (setuid (geteuid()) == -1) {
 	fprintf(stderr, "%s: cannot setuid (error %d, %s)\r\n",

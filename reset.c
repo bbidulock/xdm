@@ -35,11 +35,11 @@ from The Open Group.
  * a client remains connected with no windows.
  */
 
-# include	"dm.h"
-# include	"dm_error.h"
+#include	"dm.h"
+#include	"dm_error.h"
 
-# include	<X11/Xlib.h>
-# include	<signal.h>
+#include	<X11/Xlib.h>
+#include	<signal.h>
 
 /*ARGSUSED*/
 static int
@@ -61,7 +61,7 @@ killWindows (Display *dpy, Window window)
 	Window	root, parent, *children;
 	int	child;
 	unsigned int nchildren = 0;
-	
+
 	while (XQueryTree (dpy, window, &root, &parent, &children, &nchildren)
 	       && nchildren > 0)
 	{
@@ -85,7 +85,7 @@ abortReset (int n)
 /*
  * this display connection better not have any windows...
  */
- 
+
 void
 pseudoReset (Display *dpy)
 {

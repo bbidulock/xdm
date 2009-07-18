@@ -37,29 +37,29 @@ in this Software without prior written authorization from The Open Group.
 
 #ifdef XDMCP
 
-#include <X11/X.h>
-#include <sys/types.h>
+# include <X11/X.h>
+# include <sys/types.h>
 
-#include "dm_socket.h"
-#include <arpa/inet.h>
+# include "dm_socket.h"
+# include <arpa/inet.h>
 
-#ifndef X_NO_SYS_UN
-#ifndef Lynx
-#include <sys/un.h>
-#else
-#include <un.h>
-#endif
-#endif
+# ifndef X_NO_SYS_UN
+#  ifndef Lynx
+#   include <sys/un.h>
+#  else
+#   include <un.h>
+#  endif
+# endif
 
-#include <ctype.h>
-#include <errno.h>
+# include <ctype.h>
+# include <errno.h>
 
-#if defined(STREAMSCONN)
-# include       <tiuser.h>
-#endif
+# if defined(STREAMSCONN)
+#  include       <tiuser.h>
+# endif
 
-#include <time.h>
-#define Time_t time_t
+# include <time.h>
+# define Time_t time_t
 
 static int
 FormatBytes (
@@ -200,35 +200,35 @@ FormatChooserArgument (char *buf, int len)
     netfamily = NetaddrFamily((XdmcpNetaddr)addr_buf);
     switch (netfamily) {
     case AF_INET:
-#if defined(IPv6) && defined(AF_INET6)
+# if defined(IPv6) && defined(AF_INET6)
     case AF_INET6:
-#endif
+# endif
 	{
 	    char *port;
 	    int portlen;
 	    ARRAY8Ptr localAddress = getLocalAddress ();
 
-#if defined(IPv6) && defined(AF_INET6)
+# if defined(IPv6) && defined(AF_INET6)
 	    if (localAddress->length == 16)
 		netfamily = AF_INET6;
 	    else
 		netfamily = AF_INET;
-#endif
+# endif
 
 	    port = NetaddrPort((XdmcpNetaddr)addr_buf, &portlen);
 	    result_buf[0] = netfamily >> 8;
 	    result_buf[1] = netfamily & 0xFF;
 	    result_buf[2] = port[0];
 	    result_buf[3] = port[1];
-	    memmove( (char *)result_buf+4, (char *)localAddress->data, 
+	    memmove( (char *)result_buf+4, (char *)localAddress->data,
 	      localAddress->length);
 	    result_len = 4 + localAddress->length;
 	}
 	break;
-#ifdef AF_DECnet
+# ifdef AF_DECnet
     case AF_DECnet:
 	break;
-#endif
+# endif
     default:
 	Debug ("Chooser family %d isn't known\n", netfamily);
 	return 0;
@@ -293,24 +293,24 @@ RegisterIndirectChoice (
 {
     ChoicePtr	c;
     int		insert;
-#if 0
+# if 0
     int		found = 0;
-#endif
+# endif
 
     Debug ("Got indirect choice back\n");
     for (c = choices; c; c = c->next) {
 	if (XdmcpARRAY8Equal (clientAddress, &c->client) &&
 	    connectionType == c->connectionType) {
-#if 0
+# if 0
 	    found = 1;
-#endif
+# endif
 	    break;
 	}
     }
-#if 0
+# if 0
     if (!found)
 	return 0;
-#endif
+# endif
 
     insert = 0;
     if (!c)
@@ -345,7 +345,7 @@ RegisterIndirectChoice (
     return 1;
 }
 
-#ifdef notdef
+# ifdef notdef
 static
 RemoveIndirectChoice (clientAddress, connectionType)
     ARRAY8Ptr	clientAddress;
@@ -371,7 +371,7 @@ RemoveIndirectChoice (clientAddress, connectionType)
 	prev = c;
     }
 }
-#endif
+# endif
 
 /*ARGSUSED*/
 static void
@@ -389,13 +389,13 @@ AddChooserHost (
     {
 	*argp = parseArgs (*argp, "BROADCAST");
     }
-#if defined(IPv6) && defined(AF_INET6)
-    else if ( (addr->length == 16) && 
+# if defined(IPv6) && defined(AF_INET6)
+    else if ( (addr->length == 16) &&
       (inet_ntop(AF_INET6, addr->data, hostbuf, sizeof(hostbuf))))
     {
 	*argp = parseArgs (*argp, hostbuf);
     }
-#endif
+# endif
     else if (ARRAY8ToDottedDecimal (addr, hostbuf, sizeof (hostbuf)))
     {
 	*argp = parseArgs (*argp, hostbuf);
@@ -412,14 +412,14 @@ ProcessChooserSocket (int fd)
     ARRAY8	clientAddress = {0, NULL};
     CARD16	connectionType;
     ARRAY8	choice = {0, NULL};
-#if defined(STREAMSCONN)
+# if defined(STREAMSCONN)
     struct t_call *call;
     int flags=0;
-#endif
+# endif
 
     Debug ("Process chooser socket\n");
     len = sizeof (buf);
-#if defined(STREAMSCONN)
+# if defined(STREAMSCONN)
     call = (struct t_call *)t_alloc( fd, T_CALL, T_ALL );
     if( call == NULL )
     {
@@ -459,21 +459,21 @@ ProcessChooserSocket (int fd)
         t_close (client_fd);
 	return;
     }
-#else
+# else
     client_fd = accept (fd, (struct sockaddr *)buf, (void *)&len);
     if (client_fd == -1)
     {
 	LogError ("Cannot accept chooser connection\n");
 	return;
     }
-#endif
+# endif
     Debug ("Accepted %d\n", client_fd);
-    
-#if defined(STREAMSCONN)
+
+# if defined(STREAMSCONN)
     len = t_rcv (client_fd, buf, sizeof (buf),&flags);
-#else
+# else
     len = read (client_fd, buf, sizeof (buf));
-#endif
+# endif
     Debug ("Read returns %d\n", len);
     if (len > 0)
     {
@@ -503,13 +503,13 @@ ProcessChooserSocket (int fd)
 	LogError ("Choice response read error: %s\n", strerror(errno));
     }
 
-#if defined(STREAMSCONN)
+# if defined(STREAMSCONN)
     t_unbind (client_fd);
     t_free( (char *)call, T_CALL );
     t_close (client_fd);
-#else
+# else
     close (client_fd);
-#endif
+# endif
 }
 
 void
@@ -520,11 +520,11 @@ RunChooser (struct display *d)
     char    **env;
 
     Debug ("RunChooser %s\n", d->name);
-#ifndef HAS_SETPROCTITLE
+# ifndef HAS_SETPROCTITLE
     SetTitle (d->name, "chooser", (char *) 0);
-#else
+# else
     setproctitle("chooser %s", d->name);
-#endif
+# endif
     LoadXloginResources (d);
     args = parseArgs ((char **) 0, d->chooser);
     strcpy (buf, "-xdmaddress ");

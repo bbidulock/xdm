@@ -33,10 +33,10 @@ from The Open Group.
  * file.c
  */
 
-# include	"dm.h"
-# include	"dm_error.h"
+#include	"dm.h"
+#include	"dm_error.h"
 
-# include	<ctype.h>
+#include	<ctype.h>
 
 static int
 DisplayTypeMatch (DisplayType d1, DisplayType d2)
@@ -214,7 +214,7 @@ ParseDisplay (char *source, DisplayType *acceptableTypes, int numAcceptable)
     else
     {
 	d = NewDisplay (name, class);
-	Debug ("Found new display:  %s %s %s", 
+	Debug ("Found new display:  %s %s %s",
 		d->name, d->class ? d->class : "", type);
     }
     d->displayType = displayType;

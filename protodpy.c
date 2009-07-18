@@ -38,13 +38,13 @@ in this Software without prior written authorization from The Open Group.
 
 #ifdef XDMCP
 
-#include <sys/types.h>
-#include <time.h>
-#define Time_t time_t
+# include <sys/types.h>
+# include <time.h>
+# define Time_t time_t
 
 static struct protoDisplay	*protoDisplays;
 
-#ifdef DEBUG
+# ifdef DEBUG
 static
 PrintProtoDisplay (struct protoDisplay *pdpy)
 {
@@ -55,7 +55,7 @@ PrintProtoDisplay (struct protoDisplay *pdpy)
     Debug ("\tdisplay Number %d\n", pdpy->displayNumber);
     Debug ("\tsessionID %d\n", pdpy->sessionID);
 }
-#endif
+# endif
 
 struct protoDisplay *
 FindProtoDisplay (

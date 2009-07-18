@@ -54,13 +54,13 @@ XdmPrintDataHex (char *s, char *a, int l)
     Debug ("\n");
 }
 
-#ifdef XDMCP
+# ifdef XDMCP
 static void
 XdmPrintArray8Hex (char *s, ARRAY8Ptr a)
 {
     XdmPrintDataHex (s, (char *) a->data, a->length);
 }
-#endif
+# endif
 
 void
 XdmInitAuth (unsigned short name_len, char *name)
@@ -72,7 +72,7 @@ XdmInitAuth (unsigned short name_len, char *name)
 }
 
 /*
- * Generate authorization for XDM-AUTHORIZATION-1 
+ * Generate authorization for XDM-AUTHORIZATION-1
  *
  * When being used with XDMCP, 8 bytes are generated for the session key
  * (sigma), as the random number (rho) is already shared between xdm and
@@ -135,10 +135,10 @@ XdmGetAuth (unsigned short namelen, char *name)
     return XdmGetAuthHelper (namelen, name, TRUE);
 }
 
-#ifdef XDMCP
+# ifdef XDMCP
 
 void
-XdmGetXdmcpAuth (struct protoDisplay *pdpy, 
+XdmGetXdmcpAuth (struct protoDisplay *pdpy,
     unsigned short authorizationNameLen, char *authorizationName)
 {
     Xauth   *fileauth, *xdmcpauth;
@@ -186,7 +186,7 @@ XdmGetXdmcpAuth (struct protoDisplay *pdpy,
     pdpy->xdmcpAuthorization = xdmcpauth;
 }
 
-#define atox(c)	('0' <= c && c <= '9' ? c - '0' : \
+#  define atox(c)	('0' <= c && c <= '9' ? c - '0' : \
 		 'a' <= c && c <= 'f' ? c - 'a' + 10 : \
 		 'A' <= c && c <= 'F' ? c - 'A' + 10 : -1)
 
@@ -261,7 +261,7 @@ XdmGetKey(struct protoDisplay *pdpy, ARRAY8Ptr displayID)
 
 /*ARGSUSED*/
 int
-XdmCheckAuthentication(struct protoDisplay *pdpy, ARRAY8Ptr displayID, 
+XdmCheckAuthentication(struct protoDisplay *pdpy, ARRAY8Ptr displayID,
     ARRAY8Ptr authenticationName, ARRAY8Ptr authenticationData)
 {
     XdmAuthKeyPtr   incoming;
@@ -282,5 +282,5 @@ XdmCheckAuthentication(struct protoDisplay *pdpy, ARRAY8Ptr displayID,
     return TRUE;
 }
 
-#endif /* XDMCP */
+# endif /* XDMCP */
 #endif /* HASXDMAUTH (covering the entire file) */

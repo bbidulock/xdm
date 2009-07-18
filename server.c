@@ -33,16 +33,16 @@ from The Open Group.
  * server.c - manage the X server
  */
 
-# include	"dm.h"
-# include	"dm_error.h"
-# include 	"dm_socket.h"
+#include	"dm.h"
+#include	"dm_error.h"
+#include 	"dm_socket.h"
 
-# include	<X11/Xlib.h>
-# include	<X11/Xos.h>
-# include	<stdio.h>
-# include	<signal.h>
-# include	<errno.h>
-# include 	<sys/socket.h>
+#include	<X11/Xlib.h>
+#include	<X11/Xos.h>
+#include	<stdio.h>
+#include	<signal.h>
+#include	<errno.h>
+#include 	<sys/socket.h>
 
 static int receivedUsr1;
 
@@ -239,30 +239,30 @@ abortOpen (int n)
 
 #ifdef XDMCP
 
-#ifdef STREAMSCONN
-#include <tiuser.h>
-#endif
+# ifdef STREAMSCONN
+#  include <tiuser.h>
+# endif
 
 static void
 GetRemoteAddress (struct display *d, int fd)
 {
     char    buf[512];
     int	    len = sizeof (buf);
-#ifdef STREAMSCONN
+# ifdef STREAMSCONN
     struct netbuf	netb;
-#endif
+# endif
 
     if (d->peer)
 	free ((char *) d->peer);
-#ifdef STREAMSCONN
+# ifdef STREAMSCONN
     netb.maxlen = sizeof(buf);
     netb.buf = buf;
     t_getname(fd, &netb, REMOTENAME);
     len = 8;
     /* lucky for us, t_getname returns something that looks like a sockaddr */
-#else
+# else
     getpeername (fd, (struct sockaddr *) buf, (void *)&len);
-#endif
+# endif
     d->peerlen = 0;
     if (len)
     {
@@ -378,7 +378,7 @@ PingServer (struct display *d, Display *alternateDpy)
     SIGVAL  (*oldSig)(int);
     int	    oldAlarm;
     static Display *aDpy;
-    
+
     aDpy = (alternateDpy != NULL ? alternateDpy : d->dpy);
     oldError = XSetIOErrorHandler (PingLostIOErr);
     oldAlarm = alarm (0);

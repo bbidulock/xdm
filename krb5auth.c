@@ -145,7 +145,7 @@ Krb5GetAuth (unsigned short namelen, char *name)
 }
 
 int preauth_search_list[] = {
-	0,			
+	0,
 	KRB5_PADATA_ENC_TIMESTAMP,
 	-1
 	};

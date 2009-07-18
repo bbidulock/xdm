@@ -33,8 +33,8 @@ from The Open Group.
  * policy.c.  Implement site-dependent policy for XDMCP connections
  */
 
-# include "dm.h"
-# include "dm_auth.h"
+#include "dm.h"
+#include "dm_auth.h"
 
 #include <errno.h>
 
@@ -52,17 +52,17 @@ typedef struct _XdmAuth {
 } XdmAuthRec, *XdmAuthPtr;
 
 static XdmAuthRec auth[] = {
-#ifdef HASXDMAUTH
+# ifdef HASXDMAUTH
 { {(CARD16) 20, (CARD8 *) "XDM-AUTHENTICATION-1"},
   {(CARD16) 19, (CARD8 *) "XDM-AUTHORIZATION-1"},
 },
-#endif
+# endif
 { {(CARD16) 0, (CARD8 *) 0},
   {(CARD16) 0, (CARD8 *) 0},
 }
 };
 
-#define NumAuth	(sizeof auth / sizeof auth[0])
+# define NumAuth	(sizeof auth / sizeof auth[0])
 
 ARRAY8Ptr
 ChooseAuthentication (ARRAYofARRAY8Ptr authenticationNames)
@@ -84,10 +84,10 @@ CheckAuthentication (
     ARRAY8Ptr		name,
     ARRAY8Ptr		data)
 {
-#ifdef HASXDMAUTH
+# ifdef HASXDMAUTH
     if (name->length && !strncmp ((char *)name->data, "XDM-AUTHENTICATION-1", 20))
 	return XdmCheckAuthentication (pdpy, displayID, name, data);
-#endif
+# endif
     return TRUE;
 }
 
@@ -127,7 +127,7 @@ Willing (
 {
     char	statusBuf[256];
     int		ret;
-    
+
     ret = AcceptableDisplayAddress (addr, connectionType, type);
     if (!ret)
 	snprintf (statusBuf, sizeof(statusBuf),
@@ -183,22 +183,22 @@ SelectConnectionTypeIndex (
 {
     int i;
 
-    /* 
-     * Select one supported connection type 
+    /*
+     * Select one supported connection type
      */
 
     for (i = 0; i < connectionTypes->length; i++) {
 	switch (connectionTypes->data[i]) {
 	  case FamilyLocal:
-#if defined(TCPCONN)
+# if defined(TCPCONN)
 	  case FamilyInternet:
-#if defined(IPv6) && defined(AF_INET6) 
+#  if defined(IPv6) && defined(AF_INET6)
 	  case FamilyInternet6:
-#endif /* IPv6 */
-#endif /* TCPCONN */
-#if defined(DNETCONN)
+#  endif /* IPv6 */
+# endif /* TCPCONN */
+# if defined(DNETCONN)
 	  case FamilyDECnet:
-#endif /* DNETCONN */
+# endif /* DNETCONN */
 	    return i;
 	}
     } /* for */
