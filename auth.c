@@ -88,17 +88,10 @@ from The Open Group.
 # include <netinet/in.h>
 #endif
 
-/* Solaris provides an extended interface SIOCGLIFCONF.  Other systems
- * may have this as well, but the code has only been tested on Solaris
- * so far, so we only enable it there.  Other platforms may be added as
- * needed.
- *
- * Test for Solaris commented out  --  TSI @ UQV 2003.06.13
+/* Solaris provides an extended interface SIOCGLIFCONF for IPv6 support.
  */
 #ifdef SIOCGLIFCONF
-/* #if defined(sun) */
 # define USE_SIOCGLIFCONF
-/* #endif */
 #endif
 
 #if ((defined(SVR4) && !defined(sun)) || defined(ISC)) && \
