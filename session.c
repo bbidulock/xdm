@@ -677,7 +677,8 @@ StartClient (
 	 * audit classes, user limits, and umask.
 	 */
 	if (setpcred(name, NULL) == -1) {
-	    LogError ("setpcred for \"%s\" failed, errno=%d\n", name, errno);
+	    LogError ("setpcred for \"%s\" failed: %s\n", name,
+		      _SysErrorMsg (errno));
 	    return (0);
 	}
 #endif /* AIXV3 */
@@ -801,8 +802,8 @@ StartClient (
 	if (passwd != NULL)
 	    bzero(passwd, strlen(passwd));
 	Debug ("StartSession, fork failed\n");
-	LogError ("can't start session on \"%s\", fork failed, errno=%d\n",
-		  d->name, errno);
+	LogError ("can't start session on \"%s\", fork failed: %s\n",
+		  d->name, _SysErrorMsg (errno));
 	return 0;
     default:
 	if (passwd != NULL)

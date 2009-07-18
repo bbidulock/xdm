@@ -444,7 +444,7 @@ Verify (struct display *d, struct greet_info *greet, struct verify_info *verify)
 	errno = 0;
 	sp = getspnam(greet->name);
 	if (sp == NULL) {
-	    Debug ("getspnam() failed, errno=%d.  Are you root?\n", errno);
+	    Debug ("getspnam() failed: %s\n", _SysErrorMsg (errno));
 	} else {
 	    user_pass = sp->sp_pwdp;
 	}
