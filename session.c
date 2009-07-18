@@ -866,18 +866,22 @@ runAndWait (char **args, char **environ)
 void
 execute (char **argv, char **environ)
 {
+    int err;
     /* give /dev/null as stdin */
     (void) close (0);
     open ("/dev/null", O_RDONLY);
     /* make stdout follow stderr to the log file */
     dup2 (2,1);
+    Debug ("attempting to execve() %s\n", argv[0]);
     execve (argv[0], argv, environ);
+    err = errno;
+    Debug ("execve() of %s failed: %s\n", argv[0], _SysErrorMsg (errno));
     /*
      * In case this is a shell script which hasn't been
      * made executable (or this is a SYSV box), do
      * a reasonable thing
      */
-    if (errno != ENOENT) {
+    if (err != ENOENT) {
 	char	program[1024], *e, *p, *optarg;
 	FILE	*f;
 	char	**newargv, **av;
@@ -935,6 +939,7 @@ execute (char **argv, char **environ)
 	while ((*av++ = *argv++))
 	    /* SUPPRESS 530 */
 	    ;
+	Debug ("Attempting to execve() %s\n", newargv[0]);
 	execve (newargv[0], newargv, environ);
     }
 }
