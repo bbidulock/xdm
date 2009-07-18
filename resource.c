@@ -76,9 +76,8 @@ int	choiceTimeout;	/* chooser choice timeout */
 # define DM_ARGV	3
 
 /*
- * the following constants are supposed to be set in the makefile from
- * parameters set util/imake.includes/site.def (or *.macros in that directory
- * if it is server-specific).  DO NOT CHANGE THESE DEFINITIONS!
+ * The following constants are supposed to be set in Makefile or config.h
+ * from parameters set in configure.  DO NOT CHANGE THESE DEFINITIONS!
  */
 #ifndef DEF_SERVER_LINE 
 #define DEF_SERVER_LINE ":0 local /usr/bin/X11/X :0"

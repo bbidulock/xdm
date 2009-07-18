@@ -205,10 +205,10 @@ for a description of this resource.
 Specifies the value for the \fBDisplayManager.requestPort\fP resource.  This
 sets the port-number which
 .I xdm
-will monitor for XDMCP requests.  As XDMCP
-uses the registered well-known UDP port 177, this resource should
-not be changed except for debugging. If set to 0 xdm will not listen
-for XDMCP or Chooser requests.
+will monitor for XDMCP requests.  If set to 0, xdm will not listen
+for XDMCP or Chooser requests.  As XDMCP uses the registered well-known
+UDP port 177, this resource should not be changed to a value other than 0,
+except for debugging.
 .IP "\fB\-session\fP \fIsession_program\fP"
 Specifies the value for the \fBDisplayManager*session\fP resource.  This
 indicates the program to run as the session after the user has logged in.
@@ -303,7 +303,7 @@ uses the \fIlockf\fP library call, while on BSD it uses \fIflock.\fP
 This names a directory under which
 .I xdm
 stores authorization files while initializing the session.  The
-default value is \fI XDMDIR.\fP
+default value is \fI XDMXAUTHDIR.\fP
 Can be overridden for specific displays by
 DisplayManager.\fIDISPLAY\fP.authFile.
 .IP \fBDisplayManager.autoRescan\fP
@@ -494,16 +494,11 @@ sets the PATH environment variable for the session to this value.  It should
 be a colon separated list of directories; see
 .IR sh (1)
 for a full description.
-``:/bin:/usr/bin:BINDIR:/usr/ucb''
-is a common setting.
-The default value can be specified at build time in the X system
-configuration file with DefaultUserPath.
+The default value is ``DEF_USER_PATH''.
 .IP "\fBDisplayManager.\fP\fIDISPLAY\fP\fB.systemPath\fP"
 .I Xdm
 sets the PATH environment variable for the startup and reset scripts to the
-value of this resource.  The default for this resource is specified
-at build time by the DefaultSystemPath entry in the system configuration file;
-``/etc:/bin:/usr/bin:BINDIR:/usr/ucb'' is a common choice.
+value of this resource.  The default for this resource is ``DEF_SYSTEM_PATH''.
 Note the absence of ``.'' from this entry.  This is a good practice to
 follow for root; it avoids many common Trojan Horse system penetration
 schemes.
@@ -549,7 +544,7 @@ authorization mechanisms are supported, so
 \fBauthName\fP is ignored in this case.  When \fBauthorize\fP is set for a
 display and authorization is not available, the user is informed by having a
 different message displayed in the login widget.  By default, \fBauthorize\fP
-is ``true.''  \fBauthName\fP is ``MIT-MAGIC-COOKIE-1,'' or, if
+is ``true,''  \fBauthName\fP is ``MIT-MAGIC-COOKIE-1,'' or, if
 XDM-AUTHORIZATION-1 is available, ``XDM-AUTHORIZATION-1\0MIT-MAGIC-COOKIE-1.''
 .IP \fBDisplayManager.\fP\fIDISPLAY\fP\fB.authFile\fP
 This file is used to communicate the authorization data from
@@ -794,13 +789,13 @@ LISTEN 10.11.12.13	# Listen only on this interface, as long
 .fi
 .SH "IPv6 MULTICAST ADDRESS SPECIFICATION"
 .PP
-The Internet Assigned Numbers Authority has has assigned 
-ff0\fIX\fP:0:0:0:0:0:0:12b as the permanently assigned range of 
+The Internet Assigned Numbers Authority has has assigned
+ff0\fIX\fP:0:0:0:0:0:0:12b as the permanently assigned range of
 multicast addresses for XDMCP. The \fIX\fP in the prefix may be replaced
-by any valid scope identifier, such as 1 for Node-Local, 2 for Link-Local,
-5 for Site-Local, and so on.  (See IETF RFC 2373 or its replacement for 
+by any valid scope identifier, such as 1 for Interface-Local, 2 for Link-Local,
+5 for Site-Local, and so on.  (See IETF RFC 4291 or its replacement for
 further details and scope definitions.)  xdm defaults to listening on the
-Link-Local scope address ff02:0:0:0:0:0:0:12b to most closely match the 
+Link-Local scope address ff02:0:0:0:0:0:0:12b to most closely match the
 old IPv4 subnet broadcast behavior.
 .SH "LOCAL SERVER SPECIFICATION"
 .PP
@@ -943,20 +938,20 @@ statements to produce different displays depending on color depth or other
 variables.
 .PP
 .I Xdm
-can be compiled with support for the 
-.IR Xft (__libmansuffix__) 
-library for font rendering.   If this support is present, font faces are 
-specified using the resources with names ending in "face" in the
-fontconfig face format described in the 
+can be compiled with support for the
+.IR Xft (__libmansuffix__)
+library for font rendering.   If this support is present, font faces are
+specified using the resources with names ending in ``face'' in the
+fontconfig face format described in the
 .I Font Names
 section of
 .IR fonts.conf (__filemansuffix__).
-If not, then fonts are specified using the resources with names ending in 
-"font" in the traditional 
-.I X Logical Font Description 
-format described in the 
+If not, then fonts are specified using the resources with names ending
+in ``font'' in the traditional
+.I X Logical Font Description
+format described in the
 .I Font Names
-section of 
+section of
 .IR X (__miscmansuffix__).
 .IP "\fBxlogin.Login.width, xlogin.Login.height, xlogin.Login.x, xlogin.Login.y\fP"
 The geometry of the Login widget is normally computed automatically.  If you
@@ -964,7 +959,7 @@ wish to position it elsewhere, specify each of these resources.
 .IP "\fBxlogin.Login.foreground\fP"
 The color used to display the input typed by the user.
 .IP "\fBxlogin.Login.face\fP"
-The face used to display the input typed by the user when built with Xft 
+The face used to display the input typed by the user when built with Xft
 support.  The default is ``Serif-18''.
 .IP "\fBxlogin.Login.font\fP"
 The font used to display the input typed by the user when not built with Xft
@@ -1040,10 +1035,10 @@ The default for both is the foreground color, providing a flat appearance.
 frameWidth is the width in pixels of the area
 around the greeter frame drawn in hiColor and shdColor.
 .IP "\fBxlogin.Login.innerFramesWidth\fP"
-innerFramesWidth is the width in pixels of the 
+innerFramesWidth is the width in pixels of the
 area around text input areas drawn in hiColor and shdColor.
 .IP "\fBxlogin.Login.sepWidth\fP"
-sepWidth is the width in pixels of the 
+sepWidth is the width in pixels of the
 bezeled line between the greeting and input areas
 drawn in hiColor and shdColor.
 .IP "\fBxlogin.Login.allowRootLogin\fP"
@@ -1428,7 +1423,7 @@ the default server
 .I BINDIR/xterm
 the default session program and failsafe client
 .TP 20
-.I XDMDIR/A<display>\-<suffix>
+.I XDMXAUTHDIR/A<display>\-<suffix>
 the default place for authorization files
 .TP 20
 .I /tmp/K5C<display>
@@ -1446,5 +1441,7 @@ Kerberos credentials cache
 .IR fonts.conf (__filemansuffix__).
 .br
 .I "X Display Manager Control Protocol"
+.br
+.RI "IETF RFC 4291: " "IP Version 6 Addressing Architecture" .
 .SH AUTHOR
 Keith Packard, MIT X Consortium
