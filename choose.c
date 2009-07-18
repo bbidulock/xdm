@@ -44,11 +44,7 @@ in this Software without prior written authorization from The Open Group.
 # include <arpa/inet.h>
 
 # ifndef X_NO_SYS_UN
-#  ifndef Lynx
-#   include <sys/un.h>
-#  else
-#   include <un.h>
-#  endif
+#  include <sys/un.h>
 # endif
 
 # include <ctype.h>

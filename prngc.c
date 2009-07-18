@@ -27,11 +27,7 @@
 #include <sys/socket.h>
 #include <X11/Xos.h>
 #ifndef X_NO_SYS_UN
-# ifndef Lynx
-#  include	<sys/un.h>
-# else
-#  include	<un.h>
-# endif
+# include	<sys/un.h>
 #endif
 #include <netinet/in.h>
 #include <errno.h>

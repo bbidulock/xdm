@@ -44,11 +44,7 @@ from the copyright holder.
 #  include "dm_socket.h"
 
 #  ifndef X_NO_SYS_UN
-#   ifndef Lynx
-#    include <sys/un.h>
-#   else
-#    include <un.h>
-#   endif
+#   include <sys/un.h>
 #  endif
 #  include <netdb.h>
 #  include <arpa/inet.h>

@@ -43,11 +43,7 @@ from The Open Group.
 
 # ifdef UNIXCONN
 #  ifndef X_NO_SYS_UN
-#   ifndef Lynx
-#    include <sys/un.h>		/* struct sockaddr_un */
-#   else
-#    include <un.h>			/* struct sockaddr_un */
-#   endif
+#   include <sys/un.h>		/* struct sockaddr_un */
 #  endif
 # endif
 # ifdef DNETCONN

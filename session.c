@@ -974,10 +974,3 @@ systemEnv (struct display *d, char *user, char *home)
 	    env = setEnv (env, "WINDOWPATH", d->windowPath);
     return env;
 }
-
-#if (defined(Lynx) && !defined(HAS_CRYPT))
-char *crypt(char *s1, char *s2)
-{
-	return(s2);
-}
-#endif

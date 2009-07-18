@@ -47,11 +47,7 @@ from The Open Group.
 # include	"dm_socket.h"
 
 # ifndef X_NO_SYS_UN
-#  ifndef Lynx
-#   include	<sys/un.h>
-#  else
-#   include	<un.h>
-#  endif
+#  include	<sys/un.h>
 # endif
 # include	<netdb.h>
 # include	<arpa/inet.h>
@@ -826,7 +822,7 @@ forward_respond (
 		    memmove( un_addr.sun_path, clientAddress.data, clientAddress.length);
 		    un_addr.sun_path[clientAddress.length] = '\0';
 		    client = (struct sockaddr *) &un_addr;
-#  if defined(BSD44SOCKETS) && !defined(Lynx) && defined(UNIXCONN)
+#  if defined(BSD44SOCKETS) && defined(UNIXCONN)
 		    un_addr.sun_len = strlen(un_addr.sun_path);
 		    clientlen = SUN_LEN(&un_addr);
 #  else

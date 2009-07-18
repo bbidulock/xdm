@@ -36,11 +36,7 @@ authorization.
 # include <X11/Xmd.h>
 # include <X11/Xdmcp.h>
 
-# ifndef Lynx
-#  include <sys/socket.h>
-# else
-#  include <socket.h>
-# endif
+# include <sys/socket.h>
 # include <netinet/in.h>
 
 /* ugly, but we need this after socket.h */
