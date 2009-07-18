@@ -71,7 +71,7 @@ CreateWellKnownSockets (void)
     Debug ("Created chooser socket %d\n", chooserFd);
     if (chooserFd == -1)
     {
-	LogError ("chooser socket creation failed, errno %d\n", errno);
+	LogError ("chooser socket creation failed: %s\n", _SysErrorMsg (errno));
 	return;
     }
     listen (chooserFd, 5);
@@ -149,14 +149,15 @@ CreateListeningSocket (struct sockaddr *sock_addr, int salen)
     fd = socket (sock_addr->sa_family, SOCK_DGRAM, 0);
 
     if (fd == -1) {
-	LogError ("XDMCP socket creation failed, errno %d\n", errno);
+	LogError ("XDMCP socket creation failed: %s\n", _SysErrorMsg (errno));
 	return fd;
     }
     RegisterCloseOnFork (fd);
 
     if (bind (fd, sock_addr, salen) == -1)
     {
-	LogError ("error %d binding socket address %d\n", errno, request_port);
+	LogError ("error binding socket address %d: %s\n", request_port,
+		  _SysErrorMsg (errno));
 	close (fd);
 	fd = -1;
 	return fd;

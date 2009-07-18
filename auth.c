@@ -865,7 +865,8 @@ DefineSelf (int fd, FILE *file, Xauth *auth)
     int	len, ipfd;
 
     if ((ipfd = open ("/dev/ip", O_RDWR, 0 )) < 0)
-        LogError ("Getting interface configuration");
+        LogError ("cannot get interface configuration; cannot open /dev/ip: "
+		  "%s\n", _SysErrorMsg (errno));
 
     /* Indicate that we want to start at the begining */
     ifnet.ib_next = (struct ipb *) 1;
@@ -879,8 +880,9 @@ DefineSelf (int fd, FILE *file, Xauth *auth)
 
 	if (ioctl (ipfd, (int) I_STR, (char *) &str) < 0)
 	{
+	    LogError ("cannot get interface configuration; ioctl failed: %s\n",
+		      _SysErrorMsg (errno));
 	    close (ipfd);
-	    LogError ("Getting interface configuration");
 	}
 
 	ifaddr.ia_next = (struct in_ifaddr *) ifnet.if_addrlist;
@@ -891,8 +893,9 @@ DefineSelf (int fd, FILE *file, Xauth *auth)
 
 	if (ioctl (ipfd, (int) I_STR, (char *) &str) < 0)
 	{
+	    LogError ("cannot get interface configuration; ioctl failed: %s\n",
+		      _SysErrorMsg (errno));
 	    close (ipfd);
-	    LogError ("Getting interface configuration");
 	}
 
 	/*
@@ -1350,16 +1353,22 @@ SetUserAuthorization (struct display *d, struct verify_info *verify)
 	doneAddrs ();
 	fclose (new);
 	if (unlink (name) == -1)
-	    Debug ("unlink %s failed\n", name);
+	    if (errno != ENOENT)
+		LogError ("cannot remove old authorization file %s: %s\n",
+			  name, _SysErrorMsg (errno));
 	envname = name;
 	if (link (new_name, name) == -1) {
-	    Debug ("link failed %s %s\n", new_name, name);
-	    LogError ("Can't move authorization into place\n");
+	    LogError ("cannot link temporary authorization file %s to old "
+		      "location %s: %s\n", new_name, name,
+		      _SysErrorMsg (errno));
 	    setenv = 1;
 	    envname = new_name;
 	} else {
-	    Debug ("new is in place, go for it!\n");
-	    unlink (new_name);
+	    Debug ("authorization file %s successfully updated\n", name);
+	    if (unlink (new_name))
+		if (errno != ENOENT)
+		    LogError ("cannot remove new authorization file %s:"
+			      " %s\n", new_name, _SysErrorMsg (errno));
 	}
 	if (setenv) {
 	    verify->userEnviron = setEnv (verify->userEnviron,
@@ -1429,13 +1438,19 @@ RemoveUserAuthorization (struct display *d, struct verify_info *verify)
 	doneAddrs ();
 	fclose (new);
 	if (unlink (name) == -1)
-	    Debug ("unlink %s failed\n", name);
+	    if (errno != ENOENT)
+		LogError ("cannot remove new authorization file %s: %s\n",
+			  name, _SysErrorMsg (errno));
 	if (link (new_name, name) == -1) {
-	    Debug ("link failed %s %s\n", new_name, name);
-	    LogError ("Can't move authorization into place\n");
+	    LogError ("cannot link temporary authorization file %s to old "
+		      "location %s: %s\n", new_name, name,
+		      _SysErrorMsg (errno));
 	} else {
-	    Debug ("new is in place, go for it!\n");
-	    unlink (new_name);
+	    Debug ("authorization file %s successfully updated\n", name);
+	    if (unlink (new_name))
+		if (errno != ENOENT)
+		    LogError ("cannot remove new authorization file %s:"
+			      " %s\n", new_name, _SysErrorMsg (errno));
 	}
     }
     XauUnlockAuth (name);

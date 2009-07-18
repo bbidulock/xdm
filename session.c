@@ -607,20 +607,22 @@ StartClient (
 
 #ifndef AIXV3
 # ifndef HAS_SETUSERCONTEXT
-	if (setgid(verify->gid) < 0) {
-	    LogError ("setgid %d (user \"%s\") failed, errno=%d\n",
-		     verify->gid, name, errno);
+	if (setgid (verify->gid) < 0) {
+	    LogError ("setgid %d (user \"%s\") failed: %s\n",
+		      verify->gid, name, _SysErrorMsg (errno));
 	    return (0);
 	}
 #  if defined(BSD) && (BSD >= 199103)
-	if (setlogin(name) < 0) {
-	    LogError ("setlogin for \"%s\" failed, errno=%d", name, errno);
-	    return(0);
+	if (setlogin (name) < 0) {
+	    LogError ("setlogin for \"%s\" failed: %s\n",
+		      name, _SysErrorMsg (errno));
+	    return (0);
 	}
 #  endif
 #  ifndef QNX4
-	if (initgroups(name, verify->gid) < 0) {
-	    LogError ("initgroups for \"%s\" failed, errno=%d\n", name, errno);
+	if (initgroups (name, verify->gid) < 0) {
+	    LogError ("initgroups for \"%s\" failed: %s\n",
+		      name, _SysErrorMsg (errno));
 	    return (0);
 	}
 #  endif   /* QNX4 doesn't support multi-groups, no initgroups() */
@@ -649,8 +651,8 @@ StartClient (
 
 # ifndef HAS_SETUSERCONTEXT
 	if (setuid(verify->uid) < 0) {
-	    LogError ("setuid %d (user \"%s\") failed, errno=%d\n",
-		     verify->uid, name, errno);
+	    LogError ("setuid %d (user \"%s\") failed: %s\n",
+		      verify->uid, name, _SysErrorMsg (errno));
 	    return (0);
 	}
 # else /* HAS_SETUSERCONTEXT */
@@ -661,13 +663,14 @@ StartClient (
 	pwd = getpwnam(name);
 	if (pwd) {
 	    if (setusercontext(NULL, pwd, pwd->pw_uid, LOGIN_SETALL) < 0) {
-		LogError ("setusercontext for \"%s\" failed, errno=%d\n", name,
-		    errno);
+		LogError ("setusercontext for \"%s\" failed: %s\n",
+			  name, _SysErrorMsg (errno));
 		return (0);
 	    }
 	    endpwent();
 	} else {
-	    LogError ("getpwnam for \"%s\" failed, errno=%d\n", name, errno);
+	    LogError ("getpwnam for \"%s\" failed: %s\n",
+		      name, _SysErrorMsg (errno));
 	    return (0);
 	}
 # endif /* HAS_SETUSERCONTEXT */
@@ -677,8 +680,8 @@ StartClient (
 	 * audit classes, user limits, and umask.
 	 */
 	if (setpcred(name, NULL) == -1) {
-	    LogError ("setpcred for \"%s\" failed: %s\n", name,
-		      _SysErrorMsg (errno));
+	    LogError ("setpcred for \"%s\" failed: %s\n",
+		      name, _SysErrorMsg (errno));
 	    return (0);
 	}
 #endif /* AIXV3 */
