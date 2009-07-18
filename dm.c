@@ -157,6 +157,8 @@ main (int argc, char **argv)
 	exit (1);
     }
 
+    LogInfo ("Starting\n");
+
     if (nofork_session == 0) {
 	/* Clean up any old Authorization files */
 	/* AUD: all good? */
@@ -196,6 +198,7 @@ main (int argc, char **argv)
 #ifndef UNRELIABLE_SIGNALS
     (void) Signal (SIGCHLD, ChildNotify);
 #endif
+    Debug ("startup successful; entering main loop\n");
     while (
 #ifdef XDMCP
 	   AnyWellKnownSockets() ||
@@ -214,6 +217,7 @@ main (int argc, char **argv)
 #endif
     }
     Debug ("Nothing left to do, exiting\n");
+    LogInfo ("Exiting\n");
     exit(0);
     /*NOTREACHED*/
 }
@@ -384,6 +388,7 @@ StopAll (int n)
 	return;
     }
     Debug ("Shutting down entire manager\n");
+    LogInfo ("Shutting down\n");
 #ifdef XDMCP
     DestroyWellKnownSockets ();
 #endif
@@ -694,6 +699,7 @@ StartDisplay (struct display *d)
     pid_t	pid;
 
     Debug ("StartDisplay %s\n", d->name);
+    LogInfo ("Starting X server on %s\n", d->name);
     LoadServerResources (d);
     if (d->displayType.location == Local)
     {
