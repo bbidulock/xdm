@@ -496,7 +496,7 @@ ProcessChooserSocket (int fd)
     }
     else
     {
-	LogError ("Choice response read error: %s\n", strerror(errno));
+	LogError ("Choice response read error: %s\n", _SysErrorMsg(errno));
     }
 
 # if defined(STREAMSCONN)

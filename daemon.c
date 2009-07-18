@@ -49,14 +49,14 @@ BecomeDaemon (void)
 #ifdef HAVE_DAEMON
     if (daemon (0, 0) < 0) {
        /* error */
-       LogError("daemon() failed, %s\n", strerror(errno));
+       LogError("daemon() failed, %s\n", _SysErrorMsg (errno));
        exit(1);
     }
 #else
     switch (fork()) {
     case -1:
        /* error */
-       LogError("daemon fork failed, %s\n", strerror(errno));
+       LogError("daemon fork failed, %s\n", _SysErrorMsg (errno));
        exit(1);
        break;
     case 0:
@@ -69,7 +69,7 @@ BecomeDaemon (void)
 
     if (setsid() == -1) {
        LogError("setting session id for daemon failed: %s\n",
-                  strerror(errno));
+                  _SysErrorMsg (errno));
        exit(1);
     }
 
