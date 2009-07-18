@@ -201,11 +201,10 @@ ParseDisplay (char *source, DisplayType *acceptableTypes, int numAcceptable)
 	{
 	    char    *newclass;
 
-	    newclass = malloc ((unsigned) (strlen (class) + 1));
+	    newclass = strdup (class);
 	    if (newclass)
 	    {
 		free (d->class);
-		strcpy (newclass, class);
 		d->class = newclass;
 	    }
 	}

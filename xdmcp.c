@@ -1480,9 +1480,7 @@ NetworkAddressToHostname (
 		LogError ("Cannot convert Internet address %s to host name\n",
 			  dotted);
 	    }
-	    if (!getString (name, strlen (local_name)))
-		break;
-	    strcpy (name, local_name);
+	    name = strdup (local_name);
 	    break;
 	}
 #ifdef DNET

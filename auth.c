@@ -299,21 +299,18 @@ MakeServerAuthFile (struct display *d, FILE ** file)
     *file = NULL;
 
     if (!d->authFile) {
-	if (d->clientAuthFile && *d->clientAuthFile)
-	    len = strlen (d->clientAuthFile) + 1;
-	else
-	{
+	if (d->clientAuthFile && *d->clientAuthFile) {
+	    d->authFile = strdup(d->clientAuthFile);
+	    if (!d->authFile)
+		return FALSE;
+	} else {
 	    CleanUpFileName (d->name, cleanname, NAMELEN - 8);
 	    len = strlen (authDir) + strlen (authdir1) + strlen (authdir2)
 		+ strlen (cleanname) + 14;
-	}
-	d->authFile = malloc (len);
-	if (!d->authFile)
-	    return FALSE;
-	if (d->clientAuthFile && *d->clientAuthFile)
-	    strcpy (d->authFile, d->clientAuthFile);
-	else
-	{
+	    d->authFile = malloc (len);
+	    if (!d->authFile)
+		return FALSE;
+
 	    snprintf (d->authFile, len, "%s/%s", authDir, authdir1);
 	    r = stat(d->authFile, &statb);
 	    if (r == 0) {

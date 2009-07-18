@@ -287,12 +287,11 @@ tryagain:
     if (*hostOrAlias == ALIAS_CHARACTER)
     {
 	h->type = HOST_ALIAS;
-	h->entry.aliasName = malloc (strlen (hostOrAlias) + 1);
+	h->entry.aliasName = strdup (hostOrAlias);
 	if (!h->entry.aliasName) {
 	    free ((char *) h);
 	    return NULL;
 	}
-	strcpy (h->entry.aliasName, hostOrAlias);
     }
     else if (!strcmp (hostOrAlias, CHOOSER_STRING))
     {
@@ -408,13 +407,12 @@ ReadDisplayEntry (FILE *file)
     if (*displayOrAlias == ALIAS_CHARACTER)
     {
 	d->type = DISPLAY_ALIAS;
-	d->entry.aliasName = malloc (strlen (displayOrAlias) + 1);
+	d->entry.aliasName = strdup (displayOrAlias);
 	if (!d->entry.aliasName)
 	{
 	    free ((char *) d);
 	    return NULL;
 	}
-	strcpy (d->entry.aliasName, displayOrAlias);
     }
     else if (!strcmp(displayOrAlias, LISTEN_STRING)) 
     {
@@ -430,13 +428,12 @@ ReadDisplayEntry (FILE *file)
     	if (HasGlobCharacters (displayOrAlias))
     	{
 	    d->type = DISPLAY_PATTERN;
-	    d->entry.displayPattern = malloc (strlen (displayOrAlias) + 1);
+	    d->entry.displayPattern = strdup (displayOrAlias);
 	    if (!d->entry.displayPattern)
 	    {
 	    	free ((char *) d);
 	    	return NULL;
 	    }
-	    strcpy (d->entry.displayPattern, displayOrAlias);
     	}
     	else
     	{

@@ -189,27 +189,25 @@ NewDisplay (char *name, char *class)
 	return NULL;
     }
     d->next = displays;
-    d->name = malloc ((unsigned) (strlen (name) + 1));
+    d->name = strdup (name);
     if (!d->name) {
 	LogOutOfMem ("NewDisplay");
 	free ((char *) d);
 	return NULL;
     }
-    strcpy (d->name, name);
     if (class)
     {
-	d->class = malloc ((unsigned) (strlen (class) + 1));
+	d->class = strdup (class);
 	if (!d->class) {
 	    LogOutOfMem ("NewDisplay");
 	    free (d->name);
 	    free ((char *) d);
 	    return NULL;
 	}
-	strcpy (d->class, class);
     }
     else
     {
-	d->class = (char *) 0;
+	d->class = NULL;
     }
     /* initialize every field to avoid possible problems */
     d->argv = NULL;
