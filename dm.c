@@ -377,7 +377,7 @@ StopAll (int n)
 	 *
 	 * See defect XWSog08655 for more information.
 	 */
-	Debug ("Child xdm caught SIGTERM before it remove that signal.\n");
+	Debug ("Child xdm caught SIGTERM before it removed that signal.\n");
 	(void) Signal (n, SIG_DFL);
 	TerminateProcess (getpid(), SIGTERM);
 	errno = olderrno;
