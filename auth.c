@@ -314,7 +314,7 @@ MakeServerAuthFile (struct display *d, FILE ** file)
 	    strcpy (d->authFile, d->clientAuthFile);
 	else
 	{
-	    sprintf (d->authFile, "%s/%s", authDir, authdir1);
+	    snprintf (d->authFile, len, "%s/%s", authDir, authdir1);
 	    r = stat(d->authFile, &statb);
 	    if (r == 0) {
 		if (statb.st_uid != 0)
@@ -330,15 +330,16 @@ MakeServerAuthFile (struct display *d, FILE ** file)
 		    return FALSE;
 		}
 	    }
-	    sprintf (d->authFile, "%s/%s/%s", authDir, authdir1, authdir2);
+	    snprintf (d->authFile, len, "%s/%s/%s",
+		      authDir, authdir1, authdir2);
 	    r = mkdir(d->authFile, 0700);
 	    if (r < 0  &&  errno != EEXIST) {
 		free (d->authFile);
 		d->authFile = NULL;
 		return FALSE;
 	    }
-	    sprintf (d->authFile, "%s/%s/%s/A%s-XXXXXX",
-		     authDir, authdir1, authdir2, cleanname);
+	    snprintf (d->authFile, len, "%s/%s/%s/A%s-XXXXXX",
+		      authDir, authdir1, authdir2, cleanname);
 #ifdef HAS_MKSTEMP
 	    fd = mkstemp (d->authFile);
 	    if (fd < 0) {

@@ -88,7 +88,7 @@ StartServerOnce (struct display *d)
 	DestroyWellKnownSockets();
 #endif
 	if (d->authFile) {
-	    sprintf (arg, "-auth %s", d->authFile);
+	    snprintf (arg, sizeof(arg), "-auth %s", d->authFile);
 	    argv = parseArgs (argv, arg);
 	}
 	if (!argv) {

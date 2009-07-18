@@ -82,7 +82,7 @@ CreateWellKnownSockets (void)
     RegisterCloseOnFork (xdmcpFd);
 
     service.h_host = HOST_SELF;
-    sprintf(bindbuf, "%d", request_port);
+    snprintf(bindbuf, sizeof(bindbuf), "%d", request_port);
     service.h_serv = bindbuf;
     netdir_getbyname(nconf, &service, &servaddrs);
     freenetconfigent(nconf);

@@ -411,7 +411,8 @@ Verify (struct display *d, struct greet_info *greet, struct verify_info *verify)
 			Debug ("Can't get Kerberos realm.\n");
 		} else {
 
-		    sprintf(krbtkfile, "%s.%s", TKT_ROOT, d->name);
+		    snprintf(krbtkfile, sizeof(krbktfile), "%s.%s",
+			     TKT_ROOT, d->name);
 		    krb_set_tkt_string(krbtkfile);
 		    unlink(krbtkfile);
            

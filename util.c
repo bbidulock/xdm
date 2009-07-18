@@ -54,6 +54,41 @@ from The Open Group.
 #endif
 #endif
 
+#ifndef HAVE_ASPRINTF
+# include <stdarg.h>
+/* Allocating sprintf found in many newer libc's
+ * Since xdm is single threaded, assumes arguments don't change
+ * between initial length calculation and copy to result buffer.
+ */
+int
+Asprintf(char ** ret, const char *restrict format, ...)
+{
+    va_list ap;
+    int len;
+    char buf[256];
+
+    va_start(ap, format);
+    len = vsnprintf(buf, sizeof(buf), format, ap);
+    if (len >= 0) {
+	*ret = malloc(len + 1);
+	if (*ret) {
+	    if (len < sizeof(buf)) {
+		memcpy(*ret, buf, len + 1);
+	    } else {
+		vsnprintf(*ret, len + 1, format, ap);
+	    }
+	} else {
+	    len = -1;
+	}
+    } else {
+	*ret = NULL;
+    }
+    va_end(ap);
+
+    return len;
+}
+#endif /* !HAVE_ASPRINTF */
+
 void
 printEnv (char **e)
 {
@@ -66,12 +101,12 @@ makeEnv (char *name, char *value)
 {
 	char	*result;
 
-	result = malloc ((unsigned) (strlen (name) + strlen (value) + 2));
+	asprintf(&result, "%s=%s", name, value);
+
 	if (!result) {
 		LogOutOfMem ("makeEnv");
 		return NULL;
 	}
-	sprintf (result, "%s=%s", name, value);
 	return result;
 }
 

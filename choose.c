@@ -101,10 +101,14 @@ ARRAY8ToDottedDecimal (
     char	*buf,
     int		buflen)
 {
-    if (a->length != 4  ||  buflen < 20)
+    int outlen;
+    if (a->length != 4)
 	return 0;
-    sprintf(buf, "%d.%d.%d.%d",
-	    a->data[0], a->data[1], a->data[2], a->data[3]);
+    outlen = snprintf(buf, buflen, "%d.%d.%d.%d",
+		      a->data[0], a->data[1], a->data[2], a->data[3]);
+    if (outlen >= buflen) {
+	return 0;
+    }
     return 1;
 }
 
@@ -529,7 +533,7 @@ RunChooser (struct display *d)
     strcpy (buf, "-clientaddress ");
     if (FormatARRAY8 (&d->clientAddr, buf + strlen (buf), sizeof (buf) - strlen (buf)))
 	args = parseArgs (args, buf);
-    sprintf (buf, "-connectionType %d", d->connectionType);
+    snprintf (buf, sizeof(buf), "-connectionType %d", d->connectionType);
     args = parseArgs (args, buf);
     ForEachChooserHost (&d->clientAddr, d->connectionType, AddChooserHost,
 			(char *) &args);

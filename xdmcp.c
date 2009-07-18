@@ -575,12 +575,11 @@ NetworkAddressToName(
 	    {
 		if (!strcmp (localhost, hostname))
 		{
-		    if (!getString (name, 10)) {
+		    if (asprintf(&name, ":%d", displayNumber) < 0) {
 			if (ai)
 			    freeaddrinfo(ai);
 			return NULL;
 		    }
-		    sprintf (name, ":%d", displayNumber);
 		}
 		else
 		{
@@ -605,12 +604,12 @@ NetworkAddressToName(
 			}
 		    }
 
-		    if (!getString (name, strlen (hostname) + 10)) {
+		    if (asprintf (&name, "%s:%d",
+				  hostname, displayNumber) < 0) {
 			if (ai)
 			    freeaddrinfo(ai);
 			return NULL;
 		    }
-		    sprintf (name, "%s:%d", hostname, displayNumber);
 		}
 	    }
 	    else
@@ -636,7 +635,7 @@ NetworkAddressToName(
 			freeaddrinfo(ai);
 		    return NULL;
 		} 
-		sprintf(name + strlen(name), ":%d", displayNumber);
+		snprintf(name + strlen(name), 10, ":%d", displayNumber);
 	    }
 	    if (ai)
 		freeaddrinfo(ai);
@@ -670,9 +669,9 @@ NetworkAddressToName(
 	    {
 		if (!strcmp (localhost, hostent->h_name))
 		{
-		    if (!getString (name, 10))
-			return 0;
-		    sprintf (name, ":%d", displayNumber);
+		    if (asprintf(&name, ":%d", displayNumber) < 0) {
+			return NULL;
+		    }
 		}
 		else
 		{
@@ -697,20 +696,23 @@ NetworkAddressToName(
 			}
 		    }
 
-		    if (!getString (name, strlen (hostent->h_name) + 10))
-			return 0;
-		    sprintf (name, "%s:%d", hostent->h_name, displayNumber);
+		    if (asprintf(&name, "%s:%d",
+				 hostent->h_name, displayNumber) < 0) {
+			return NULL;
+		    }
 		}
 	    }
 	    else
 	    {
-		if (!getString (name, 25))
-		    return 0;
 		if (multiHomed)
 		    data = (CARD8 *) &((struct sockaddr_in *)originalAddress)->
 				sin_addr.s_addr;
-		sprintf(name, "%d.%d.%d.%d:%d",
-			data[0], data[1], data[2], data[3], displayNumber);
+
+		if (asprintf(&name, "%d.%d.%d.%d:%d",
+			     data[0], data[1], data[2], data[3],
+			     displayNumber) < 0)) {
+		    return NULL;
+		}
 	    }
 	    return name;
 	}
@@ -1305,8 +1307,8 @@ send_failed (
     XdmcpHeader	header;
     ARRAY8	status;
 
-    sprintf (buf, "Session %ld failed for display %.100s: %.100s",
-	     (long) sessionID, name, reason);
+    snprintf (buf, sizeof(buf), "Session %ld failed for display %.100s: %s",
+	      (long) sessionID, name, reason);
     Debug ("Send failed %ld %s\n", (long) sessionID, buf);
     status.length = strlen (buf);
     status.data = (CARD8Ptr) buf;
@@ -1468,11 +1470,11 @@ NetworkAddressToHostname (
 		inet_ntop(af_type, connectionAddress->data, 
 		  	  dotted, sizeof(dotted));
 #else
-		sprintf(dotted, "%d.%d.%d.%d",
-			connectionAddress->data[0],
-			connectionAddress->data[1],
-			connectionAddress->data[2],
-			connectionAddress->data[3]);
+		snprintf(dotted, sizeof(dotted), "%d.%d.%d.%d",
+			 connectionAddress->data[0],
+			 connectionAddress->data[1],
+			 connectionAddress->data[2],
+			 connectionAddress->data[3]);
 #endif
 		local_name = dotted;
 		LogError ("Cannot convert Internet address %s to host name\n",

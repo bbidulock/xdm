@@ -130,7 +130,8 @@ Willing (
     
     ret = AcceptableDisplayAddress (addr, connectionType, type);
     if (!ret)
-	sprintf (statusBuf, "Display not authorized to connect");
+	snprintf (statusBuf, sizeof(statusBuf),
+		  "Display not authorized to connect");
     else
     {
         if (*willing)
@@ -144,14 +145,16 @@ Willing (
 		if (s && strlen(statusBuf) > 0)
 			statusBuf[strlen(statusBuf)-1] = 0; /* chop newline */
 		else
-			snprintf (statusBuf, sizeof(statusBuf), "Willing, but %s failed",willing);
+			snprintf (statusBuf, sizeof(statusBuf),
+				  "Willing, but %s failed", willing);
 	    }
 	    else
-	        snprintf (statusBuf, sizeof(statusBuf), "Willing, but %s failed",willing);
+	        snprintf (statusBuf, sizeof(statusBuf),
+			  "Willing, but %s failed", willing);
 	    if (fd) pclose(fd);
 	}
 	else
-	    sprintf (statusBuf, "Willing to manage");
+	    snprintf (statusBuf, sizeof(statusBuf), "Willing to manage");
     }
     status->length = strlen (statusBuf);
     status->data = (CARD8Ptr) malloc (status->length);

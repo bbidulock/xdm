@@ -634,8 +634,6 @@ SetWindowPath(struct display *d)
 	const char *windowpath;
 	char *newwindowpath;
 	unsigned long num;
-	char nums[10];
-	int numn;
 
 	prop = XInternAtom(d->dpy, "XFree86_VT", False);
 	if (prop == None) {
@@ -680,13 +678,10 @@ SetWindowPath(struct display *d)
 	}
 	XFree(buf);
 	windowpath = getenv("WINDOWPATH");
-	numn = snprintf(nums, sizeof(nums), "%lu", num);
 	if (!windowpath) {
-		newwindowpath = malloc(numn + 1);
-		sprintf(newwindowpath, "%s", nums);
+		asprintf(&newwindowpath, "%lu", num);
 	} else {
-		newwindowpath = malloc(strlen(windowpath) + 1 + numn + 1);
-		sprintf(newwindowpath, "%s:%s", windowpath, nums);
+		asprintf(&newwindowpath, "%s:%lu", windowpath, num);
 	}
 	if (d->windowPath)
 		free(d->windowPath);

@@ -44,6 +44,7 @@ from The Open Group.
 
 #include <X11/Xos.h>
 #include <X11/Xfuncs.h>
+#include <X11/Xfuncproto.h>
 #include <X11/Xmd.h>
 #include <X11/Xauth.h>
 #include <X11/Intrinsic.h>
@@ -453,6 +454,11 @@ extern void CloseListenSockets (void);
 extern void ProcessListenSockets (fd_set *readmask);
 
 /* in util.c */
+#ifndef HAVE_ASPRINTF
+# define asprintf Asprintf
+extern int Asprintf(char ** ret, const char *restrict format, ...)
+    _X_ATTRIBUTE_PRINTF(2,3);
+#endif
 extern char *localHostname (void);
 extern char **parseArgs (char **argv, char *string);
 extern char **setEnv (char **e, char *name, char *value);

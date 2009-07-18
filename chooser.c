@@ -413,14 +413,15 @@ AddHostname (ARRAY8Ptr hostname, ARRAY8Ptr status, struct sockaddr *addr, int wi
     fulllen = hostname->length;
     if (fulllen < 30)
 	fulllen = 30;
-    new->fullname = malloc (fulllen + status->length + 10);
+    fulllen += status->length + 10;
+    new->fullname = malloc (fulllen);
     if (!new->fullname)
     {
 	new->fullname = "Unknown";
     }
     else
     {
-	sprintf (new->fullname, "%-30.*s %*.*s",
+	snprintf(new->fullname, fulllen, "%-30.*s %*.*s",
 		 hostname->length, hostname->data,
 		 status->length, status->length, status->data);
     }
@@ -715,7 +716,7 @@ RegisterHostname (char *name)
 	    struct addrinfo *ai, *nai, hints;
 	    bzero(&hints,sizeof(hints));
 	    hints.ai_socktype = SOCK_DGRAM;
-	    sprintf(sport, "%d", XDM_UDP_PORT);
+	    snprintf(sport, sizeof(sport), "%d", XDM_UDP_PORT);
 	    if (getaddrinfo(name, sport, &hints, &ai) == 0) {
 		for (nai = ai ; nai != NULL ; nai = nai->ai_next) {
 		    if ((nai->ai_family == AF_INET) || 
