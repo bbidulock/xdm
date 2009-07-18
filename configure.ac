@@ -517,7 +517,13 @@ AC_DEFINE_DIR(DEF_CHOOSER, XDMLIBDIR/chooser,
 
 # -DDEF_AUTH_DIR="$(XDMDIR)"
 
-AC_DEFINE_DIR(DEF_AUTH_DIR, XDMCONFIGDIR, 
+AC_ARG_WITH(authdir,
+	AC_HELP_STRING([--with-authdir=<pathname>],
+	  [specify directory for X auth files (default=/var/lib/xdm)]),
+	[XDMXAUTHDIR="$withval"], [XDMXAUTHDIR="/var/lib/xdm"])
+AC_SUBST(XDMXAUTHDIR)
+
+AC_DEFINE_DIR(DEF_AUTH_DIR, XDMXAUTHDIR,
 	[Define to pathname where authentication cookie files should be stored])
 
 # -DDEF_GREETER_LIB="$(XDMDIR)/libXdmGreet.so"

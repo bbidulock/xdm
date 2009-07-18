@@ -9,6 +9,7 @@
 #ifndef XDMSCRIPTDIR
 #define XDMSCRIPTDIR XDMDIR
 #endif
+DisplayManager.authDir:	XDMXAUTHDIR
 DisplayManager.errorLogFile:	XDMLOGDIR/xdm.log
 DisplayManager.pidFile:		XDMPIDDIR/xdm.pid
 DisplayManager.keyFile:		XDMCONFIGDIR/xdm-keys
