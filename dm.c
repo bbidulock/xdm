@@ -104,6 +104,7 @@ static SIGVAL ChildNotify (int n);
 #endif
 
 static int StorePid (void);
+static void RemovePid (void);
 
 static pid_t parent_pid = -1; 	/* PID of parent xdm process */
 
@@ -158,6 +159,9 @@ main (int argc, char **argv)
     }
 
     LogInfo ("Starting\n");
+
+    if (atexit (RemovePid))
+	LogError ("could not register RemovePid() with atexit()\n");
 
     if (nofork_session == 0) {
 	/* Clean up any old Authorization files */
@@ -911,6 +915,19 @@ StorePid (void)
 	RegisterCloseOnFork (pidFd);
     }
     return 0;
+}
+
+/*
+ * Remove process ID file.  This function is registered with atexit().
+ */
+static void
+RemovePid (void)
+{
+    Debug ("unlinking process ID file %s\n", pidFile);
+    if (unlink (pidFile))
+	if (errno != ENOENT)
+	    LogError ("cannot remove process ID file %s: %s\n", pidFile,
+		      _SysErrorMsg (errno));
 }
 
 #if 0
