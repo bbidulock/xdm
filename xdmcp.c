@@ -706,7 +706,7 @@ NetworkAddressToName(
 
 		if (asprintf(&name, "%d.%d.%d.%d:%d",
 			     data[0], data[1], data[2], data[3],
-			     displayNumber) < 0)) {
+			     displayNumber) < 0) {
 		    return NULL;
 		}
 	    }
