@@ -591,9 +591,18 @@ greet_user_rtn GreetUser(
 	    SetValue (login, 1, NULL);
 	    break;
 	} else {
+	    /* Try to fill in username for failed login error log */
+	    if (greet->name == NULL) {
+		if (username == NULL) {
+		    RUN_AND_CHECK_PAM_ERROR(pam_get_item,
+					    (*pamhp, PAM_USER,
+					     (void *) &username));
+		}
+		greet->name = username;
+	    }
+	    FailedLogin (d, greet);
 	    RUN_AND_CHECK_PAM_ERROR(pam_end,
 				    (*pamhp, pam_error));
-	    FailedLogin (d, greet);
 	}
 #else /* not PAM */
 	/*
