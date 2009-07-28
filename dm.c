@@ -910,6 +910,7 @@ StorePid (void)
 # endif
 #endif
 	}
+	ftruncate(pidFd, 0);
 	fprintf (pidFilePtr, "%5ld\n", (long)getpid ());
 	(void) fflush (pidFilePtr);
 	RegisterCloseOnFork (pidFd);
