@@ -397,6 +397,7 @@ ReadDisplayEntry (FILE *file)
     struct _display *display;
     HostEntry	    *h, **prev;
 
+tryagain:
     displayOrAlias = ReadWord (file, FALSE);
     if (!displayOrAlias)
     	return NULL;
@@ -473,7 +474,7 @@ ReadDisplayEntry (FILE *file)
 		if (ai)
 		    freeaddrinfo(ai);
 # endif
-		return NULL;
+		goto tryagain;
 	    }
 	    d->type = DISPLAY_ADDRESS;
 	    display = &d->entry.displayAddress;
