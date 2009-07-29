@@ -1137,7 +1137,7 @@ root when the user logs in.
 It is typically a shell script.
 Since it is run as root, \fIXstartup\fP should be
 very careful about security.  This is the place to put commands which add
-entries to \fI/etc/utmp\fP
+entries to \fIutmp\fP or \fIwtmp\fP files,
 (the \fIsessreg\fP program may be useful here),
 mount users' home directories from file servers,
 or abort the session if logins are not
@@ -1286,8 +1286,8 @@ example.  Don't forget that the file must have execute permission.
 Symmetrical with \fIXstartup\fP,
 the \fIXreset\fP script is run after the user session has
 terminated.  Run as root, it should contain commands that undo
-the effects of commands in \fIXstartup,\fP removing entries
-from \fI/etc/utmp\fP
+the effects of commands in \fIXstartup,\fP updating entries
+in \fIutmp\fP or \fIwtmp\fP files,
 or unmounting directories from file servers.  The environment
 variables that were passed to \fIXstartup\fP are also
 passed to \fIXreset\fP.

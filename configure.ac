@@ -236,6 +236,46 @@ AC_ARG_WITH(config-type,
 	[SERVERSTYPE="$withval"], [SERVERSTYPE="ws"])
 AC_SUBST(SERVERSTYPE)
 
+# Ideally we'd just pull out UTMP_FILE & WTMP_FILE from <utmp.h>
+# but that's not easy to do in autoconf
+AC_ARG_WITH(utmp_file,
+	AC_HELP_STRING([--with-utmp-file=<pathname>],
+	 [specify file to pass to sessreg -u for current logins]),
+	[UTMP_FILE="$withval"])
+if test "x$UTMP_FILE" = "xyes" ; then
+	AC_MSG_ERROR([path was not specified to --with-utmp-file])
+fi
+if test "x$UTMP_FILE" = "x" ; then
+	for UTMP_FILE in /var/adm/utmpx /var/run/utmp /var/log/utmp /var/adm/utmp /usr/adm/utmp /etc/utmp ; do
+		AC_CHECK_FILE([$UTMP_FILE], [break], [UTMP_FILE=""])
+	done
+	if test "x$UTMP_FILE" = "x" ; then
+		UTMP_FILE="/var/run/utmp"
+	fi
+fi
+AC_MSG_CHECKING([for path to file listing current logins for sessreg])
+AC_MSG_RESULT([$UTMP_FILE])
+AC_SUBST(UTMP_FILE)
+
+AC_ARG_WITH(wtmp_file,
+	AC_HELP_STRING([--with-wtmp-file=<pathname>],
+	 [specify file to pass to sessreg -w for login history]),
+	[WTMP_FILE="$withval"])
+if test "x$WTMP_FILE" = "xyes" ; then
+	AC_MSG_ERROR([path was not specified to --with-wtmp-file])
+fi
+if test "x$WTMP_FILE" = "x" ; then
+	for WTMP_FILE in /var/adm/wtmpx /var/log/wtmp /var/adm/wtmp /usr/adm/wtmp /etc/wtmp ; do 
+		AC_CHECK_FILE([$WTMP_FILE], [break], [WTMP_FILE=""])
+	done
+	if test "x$WTMP_FILE" = "x" ; then
+		WTMP_FILE="/var/log/wtmp"
+	fi
+fi
+AC_MSG_CHECKING([for path to file listing login history for sessreg])
+AC_MSG_RESULT([$WTMP_FILE])
+AC_SUBST(WTMP_FILE)
+
 case $host_os in
     *sco*|*solaris*)
 		SHELL_CMD="/bin/ksh"	;;
