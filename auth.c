@@ -731,9 +731,7 @@ DefineSelf(int fd, FILE *file, Xauth *auth)
 	 * the local entry anyway, so this one can
 	 * be tossed.
 	 */
-	if (family == FamilyInternet && len == 4 &&
-	    addr[0] == 127 && addr[1] == 0 &&
-	    addr[2] == 0 && addr[3] == 1)
+	if (family == FamilyInternet && len == 4 && addr[0] == 127)
 	{
 	    Debug ("Skipping localhost address\n");
 	    continue;
