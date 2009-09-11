@@ -26,6 +26,8 @@ bin_PROGRAMS = xdm xdmshell
 xdmlibdir = $(XDMLIBDIR)
 xdmlib_PROGRAMS = chooser
 
+AM_CFLAGS = $(CWARNFLAGS)
+
 #
 # xdm
 #
@@ -174,7 +176,7 @@ EXTRA_DIST += $(APPDEFAULTFILES:%=%.ad)
 
 if LINT
 ALL_LINT_FLAGS=$(LINT_FLAGS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
-		$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS)
+		$(AM_CPPFLAGS) $(CPPFLAGS)
 
 lint:
 	$(LINT) $(ALL_LINT_FLAGS) $(xdm_CFLAGS) $(xdm_SOURCES) $(xdm_LDADD)
