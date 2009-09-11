@@ -21,7 +21,7 @@ dnl
 dnl Process this file with autoconf to create configure.
 
 
-AC_PREREQ([2.57])
+AC_PREREQ([2.60])
 AC_INIT(xdm,[1.1.8],[https://bugs.freedesktop.org/enter_bug.cgi?product=xorg],xdm)
 AM_INIT_AUTOMAKE([dist-bzip2])
 AM_MAINTAINER_MODE
@@ -32,6 +32,7 @@ XORG_MACROS_VERSION(1.3)
 
 AM_CONFIG_HEADER(config.h)
 
+AC_USE_SYSTEM_EXTENSIONS
 AC_PROG_CC
 AM_PROG_CC_C_O
 AC_C_INLINE
@@ -135,7 +136,7 @@ fi
 
 case $host_os in
     linux*|gnu*|*-gnu)
-        OS_CFLAGS="-D_XOPEN_SOURCE -D_BSD_SOURCE"
+        OS_CFLAGS=""
 	SU="su"
         ;;
     darwin*)
@@ -454,7 +455,7 @@ AC_SUBST(XDMSHELL_LIBS)
 # Chooser
 #
 
-CHOOSER_CFLAGS="-D_BSD_SOURCE $CHOOSER_CFLAGS $XDM_PRINT_CFLAGS $XLIB_CFLAGS $DMCP_CFLAGS $AUTH_CFLAGS"
+CHOOSER_CFLAGS="$CHOOSER_CFLAGS $XDM_PRINT_CFLAGS $XLIB_CFLAGS $DMCP_CFLAGS $AUTH_CFLAGS"
 CHOOSER_LIBS="$CHOOSER_LIBS $XDM_PRINT_LIBS $DMCP_LIBS"
 
 AC_SUBST(CHOOSER_CFLAGS)
