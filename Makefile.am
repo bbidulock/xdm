@@ -133,7 +133,7 @@ CPP_FILES_FLAGS = $(MANDEFS) $(RANDOMMANDEFS) $(EXTRAMANDEFS)
 SUFFIXES += .$(APP_MAN_SUFFIX) .man.cpp
 
 .man.cpp.$(APP_MAN_SUFFIX):
-	$(RAWCPP) $(RAWCPPFLAGS) $(CPP_FILES_FLAGS) < $< | $(CPP_SED_MAGIC) > $@
+	$(cpp_verbose)$(RAWCPP) $(RAWCPPFLAGS) $(CPP_FILES_FLAGS) < $< | $(CPP_SED_MAGIC) > $@
 
 #
 #  xdmshell
