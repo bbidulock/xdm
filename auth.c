@@ -312,8 +312,16 @@ MakeServerAuthFile (struct display *d, FILE ** file)
 		if ((statb.st_mode & 0077) != 0)
 		    (void) chmod(d->authFile, statb.st_mode & 0700);
 	    } else {
-		if (errno == ENOENT)
+		if (errno == ENOENT) {
 		    r = mkdir(d->authFile, 0700);
+		    if (r < 0) {
+			LogError ("cannot make authentication directory %s: "
+				  "%s\n", d->authFile, _SysErrorMsg (errno));
+		    }
+		} else {
+		    LogError ("cannot access authentication directory %s: "
+			      "%s\n", d->authFile, _SysErrorMsg (errno));
+		}
 		if (r < 0) {
 		    free (d->authFile);
 		    d->authFile = NULL;
@@ -324,6 +332,8 @@ MakeServerAuthFile (struct display *d, FILE ** file)
 		      authDir, authdir1, authdir2);
 	    r = mkdir(d->authFile, 0700);
 	    if (r < 0  &&  errno != EEXIST) {
+		LogError ("cannot make authentication directory %s: %s\n",
+			  d->authFile, _SysErrorMsg (errno));
 		free (d->authFile);
 		d->authFile = NULL;
 		return FALSE;
@@ -333,6 +343,8 @@ MakeServerAuthFile (struct display *d, FILE ** file)
 #ifdef HAS_MKSTEMP
 	    fd = mkstemp (d->authFile);
 	    if (fd < 0) {
+		LogError ("cannot make authentication file %s: %s\n",
+			  d->authFile, _SysErrorMsg (errno));
 		free (d->authFile);
 		d->authFile = NULL;
 		return FALSE;
