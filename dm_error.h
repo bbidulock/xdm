@@ -42,6 +42,7 @@ authorization.
 
 extern void Debug        (char * fmt, ...) GCC_PRINTFLIKE(1,2);
 extern void InitErrorLog (void);
+extern void LogAppend    (char * fmt, ...) GCC_PRINTFLIKE(1,2);
 extern void LogError     (char * fmt, ...) GCC_PRINTFLIKE(1,2);
 extern void LogInfo      (char * fmt, ...) GCC_PRINTFLIKE(1,2);
 extern void LogOutOfMem  (char * fmt, ...) GCC_PRINTFLIKE(1,2);

@@ -432,8 +432,8 @@ ReinitResources (void)
     {
 	LogError ("extra arguments on command line:");
 	for (a = argv + 1; *a; a++)
-		LogError (" \"%s\"", *a);
-	LogError ("\n");
+		LogAppend (" \"%s\"", *a);
+	LogAppend ("\n");
     }
     free (argv);
 }

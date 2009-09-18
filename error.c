@@ -44,6 +44,21 @@ from The Open Group.
 
 #define WRITES(fd, buf) write(fd, buf, strlen(buf))
 
+/* Append more text to the log without a new header, right after
+   having called LogInfo or LogError */
+void LogAppend(char * fmt, ...)
+{
+    char buf[1024];
+
+    {
+	va_list args;
+	va_start(args, fmt);
+	vsnprintf (buf, sizeof buf, fmt, args);
+	va_end(args);
+    }
+    WRITES(STDERR_FILENO, buf);
+}
+
 void LogInfo(char * fmt, ...)
 {
     char buf[1024];
