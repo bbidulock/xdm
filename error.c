@@ -42,70 +42,63 @@ from The Open Group.
 #include "dm.h"
 #include "dm_error.h"
 
-#define WRITES(fd, buf) write(fd, buf, strlen(buf))
+/* This function does the actual log message writes. */
+static inline void
+LogVWrite(const char *fmt, va_list args)
+{
+    char buf[1024];
+    int len;
+
+    len = vsnprintf (buf, sizeof(buf), fmt, args);
+    if (len >= sizeof(buf)) {
+	len = sizeof(buf) - 1;
+    }
+    write(STDERR_FILENO, buf, len);
+}
+
+#define LogVarArgsWrite(fmt)	\
+    do {			\
+	va_list args;		\
+	va_start(args, fmt);	\
+	LogVWrite(fmt, args);	\
+	va_end(args);		\
+    } while(0)
+
+#define LogHeader(type)		\
+    LogAppend("xdm %s (pid %ld): ", type, (long)getpid())
 
 /* Append more text to the log without a new header, right after
    having called LogInfo or LogError */
-void LogAppend(char * fmt, ...)
+void
+LogAppend(const char * fmt, ...)
 {
-    char buf[1024];
-
-    {
-	va_list args;
-	va_start(args, fmt);
-	vsnprintf (buf, sizeof buf, fmt, args);
-	va_end(args);
-    }
-    WRITES(STDERR_FILENO, buf);
+    LogVarArgsWrite(fmt);
 }
 
-void LogInfo(char * fmt, ...)
+void
+LogInfo(const char * fmt, ...)
 {
-    char buf[1024];
-
-    snprintf(buf, sizeof buf, "xdm info (pid %ld): ", (long)getpid());
-    WRITES(STDERR_FILENO, buf);
-    {
-	va_list args;
-	va_start(args, fmt);
-	vsnprintf (buf, sizeof buf, fmt, args);
-	va_end(args);
-    }
-    WRITES(STDERR_FILENO, buf);
+    LogHeader("info");
+    LogVarArgsWrite(fmt);
 }
 
-void LogError (char * fmt, ...)
+void
+LogError (const char * fmt, ...)
 {
-    char buf[1024];
-
-    snprintf (buf, sizeof buf, "xdm error (pid %ld): ", (long)getpid());
-    WRITES(STDERR_FILENO, buf);
-    {
-	va_list args;
-	va_start(args, fmt);
-	vsnprintf (buf, sizeof buf, fmt, args);
-	va_end(args);
-    }
-    WRITES(STDERR_FILENO, buf);
+    LogHeader("error");
+    LogVarArgsWrite(fmt);
 }
 
-void LogPanic (char * fmt, ...)
+void
+LogPanic (const char * fmt, ...)
 {
-    char buf[1024];
-
-    snprintf (buf, sizeof buf, "xdm panic (pid %ld): ", (long)getpid());
-    WRITES(STDERR_FILENO, buf);
-    {
-	va_list args;
-	va_start(args, fmt);
-	vsnprintf (buf, sizeof buf, fmt, args);
-	va_end(args);
-    }
-    WRITES(STDERR_FILENO, buf);
+    LogHeader("panic");
+    LogVarArgsWrite(fmt);
     _exit (1);
 }
 
-void LogOutOfMem (char * fmt, ...)
+void
+LogOutOfMem (const char * fmt, ...)
 {
     fprintf (stderr, "xdm: out of memory in routine ");
     {
@@ -117,31 +110,29 @@ void LogOutOfMem (char * fmt, ...)
     fflush (stderr);
 }
 
-void Debug (char * fmt, ...)
+void
+Debug (const char * fmt, ...)
 {
     char buf[1024];
 
     if (debugLevel > 0)
     {
-	va_list args;
-	va_start(args, fmt);
-	vsnprintf (buf, sizeof buf, fmt, args);
-	va_end(args);
-	WRITES(STDOUT_FILENO, buf);
+	LogVarArgsWrite(fmt);
     }
 }
 
-void InitErrorLog (void)
+void
+InitErrorLog (void)
 {
-	int	i;
-	if (errorLogFile[0]) {
-		i = creat (errorLogFile, 0666);
-		if (i != -1) {
-			if (i != 2) {
-				dup2 (i, 2);
-				close (i);
-			}
-		} else
-			LogError ("Cannot open errorLogFile %s\n", errorLogFile);
-	}
+    int	i;
+    if (errorLogFile[0]) {
+	i = creat (errorLogFile, 0666);
+	if (i != -1) {
+	    if (i != STDERR_FILENO) {
+		dup2 (i, STDERR_FILENO);
+		close (i);
+	    }
+	} else
+	    LogError ("Cannot open errorLogFile %s\n", errorLogFile);
+    }
 }
