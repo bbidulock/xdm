@@ -670,8 +670,7 @@ draw_it (LoginWidget w)
 
     EraseCursor (w);
 
-    if( (w->login.outframewidth) < 1 )
-      w->login.outframewidth = 1;
+    /* draw window borders */
     for(i=1;i<=(w->login.outframewidth);i++)
     {
       XDrawLine(XtDisplay (w), XtWindow (w), w->login.hiGC,
@@ -727,6 +726,7 @@ draw_it (LoginWidget w)
 	    topLeftGC = botRightGC = w->login.bgGC;
 	}
 
+	/* draw borders of editboxes */
 	for (i=1; i<=(w->login.inframeswidth); i++)
 	{
 	    /* Make top/left sides */
