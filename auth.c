@@ -270,6 +270,38 @@ CleanUpFileName (char *src, char *dst, int len)
     *dst = '\0';
 }
 
+/* Checks to see if specified directory exists, makes it if not
+ * Returns: 0 if already exists, 1 if created, < 0 if error occured
+ */
+static int
+CheckServerAuthDir (const char *path, struct stat *statb, int mode)
+{
+    int r = stat(path, statb);
+
+    if (r != 0) {
+	if (errno == ENOENT) {
+	    r = mkdir(path, mode);
+	    if (r < 0) {
+		LogError ("cannot make authentication directory %s: %s\n",
+			  path, _SysErrorMsg (errno));
+	    } else {
+		r = 1;
+	    }
+	} else {
+	    LogError ("cannot access authentication directory %s: %s\n",
+		      path, _SysErrorMsg (errno));
+	}
+    } else { /* Directory already exists */
+	if (!S_ISDIR(statb->st_mode)) {
+	    LogError ("cannot make authentication directory %s: %s\n",
+		      path, "file with that name already exists");
+	    return -1;
+	}
+    }
+
+    return r;
+}
+
 static char authdir1[] = "authdir";
 static char authdir2[] = "authfiles";
 
@@ -298,6 +330,13 @@ MakeServerAuthFile (struct display *d, FILE ** file)
 		return FALSE;
 	} else {
 	    CleanUpFileName (d->name, cleanname, NAMELEN - 8);
+
+	    /* Make authDir if it doesn't already exist */
+	    r = CheckServerAuthDir(authDir, &statb, 0755);
+	    if (r < 0) {
+		return FALSE;
+	    }
+
 	    len = strlen (authDir) + strlen (authdir1) + strlen (authdir2)
 		+ strlen (cleanname) + 14;
 	    d->authFile = malloc (len);
@@ -305,35 +344,22 @@ MakeServerAuthFile (struct display *d, FILE ** file)
 		return FALSE;
 
 	    snprintf (d->authFile, len, "%s/%s", authDir, authdir1);
-	    r = stat(d->authFile, &statb);
+	    r = CheckServerAuthDir(d->authFile, &statb, 0700);
 	    if (r == 0) {
 		if (statb.st_uid != 0)
 		    (void) chown(d->authFile, 0, statb.st_gid);
 		if ((statb.st_mode & 0077) != 0)
 		    (void) chmod(d->authFile, statb.st_mode & 0700);
-	    } else {
-		if (errno == ENOENT) {
-		    r = mkdir(d->authFile, 0700);
-		    if (r < 0) {
-			LogError ("cannot make authentication directory %s: "
-				  "%s\n", d->authFile, _SysErrorMsg (errno));
-		    }
-		} else {
-		    LogError ("cannot access authentication directory %s: "
-			      "%s\n", d->authFile, _SysErrorMsg (errno));
-		}
-		if (r < 0) {
-		    free (d->authFile);
-		    d->authFile = NULL;
-		    return FALSE;
-		}
+	    } else if (r < 0) {
+		free (d->authFile);
+		d->authFile = NULL;
+		return FALSE;
 	    }
+
 	    snprintf (d->authFile, len, "%s/%s/%s",
 		      authDir, authdir1, authdir2);
-	    r = mkdir(d->authFile, 0700);
-	    if (r < 0  &&  errno != EEXIST) {
-		LogError ("cannot make authentication directory %s: %s\n",
-			  d->authFile, _SysErrorMsg (errno));
+	    r = CheckServerAuthDir(d->authFile, &statb, 0700);
+	    if (r < 0) {
 		free (d->authFile);
 		d->authFile = NULL;
 		return FALSE;
