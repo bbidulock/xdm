@@ -863,7 +863,29 @@ StorePid (void)
     if (pidFile[0] != '\0') {
 	pidFd = open (pidFile, O_RDWR);
 	if (pidFd == -1 && errno == ENOENT)
+	{
+	    /* Make sure directory exists if needed
+	       Allows setting pidDir to /var/run/xdm
+	     */
+	    char *pidDir = strdup(pidFile);
+
+	    if (pidDir != NULL)
+	    {
+		char *p = strrchr(pidDir, '/');
+		int r;
+
+		if ((p != NULL) && (p != pidDir)) {
+		    *p = '\0';
+		}
+		r = mkdir(pidDir, 0755);
+		if ( (r < 0) && (errno != EEXIST) ) {
+		     LogError ("process-id directory %s cannot be created\n",
+			       pidDir);
+		}
+	    }
+
 	    pidFd = open (pidFile, O_RDWR|O_CREAT, 0666);
+	}
 	if (pidFd == -1 || !(pidFilePtr = fdopen (pidFd, "r+")))
 	{
 	    LogError ("process-id file %s cannot be opened\n",
