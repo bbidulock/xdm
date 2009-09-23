@@ -595,7 +595,7 @@ RedrawFail (LoginWidget w)
 		    x = ERROR_X(w, start);
 #ifdef USE_XFT
 		    if (w->login.failUp == 0) {
-			XClearArea(XtDisplay(w), XtWindow(w), x, y,
+			XClearArea(XtDisplay(w), XtWindow(w), x, y - F_ASCENT(fail),
 				   ERROR_W(w, start), FAIL_Y_INC(w), False);
 		    } else
 #endif
@@ -616,7 +616,7 @@ RedrawFail (LoginWidget w)
 
 #ifdef USE_XFT
 	if (w->login.failUp == 0) {
-	    XClearArea(XtDisplay(w), XtWindow(w), x, y,
+	    XClearArea(XtDisplay(w), XtWindow(w), x, y - F_ASCENT(fail),
 		       ERROR_W(w, w->login.fail), FAIL_Y_INC(w), False);
 	} else
 #endif
