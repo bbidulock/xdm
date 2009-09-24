@@ -371,7 +371,7 @@ algorithm is used instead.
 .IP \fBDisplayManager.greeterLib\fP
 On systems that support a dynamically-loadable greeter library, the
 name of the library.  The default is
-\fI XDMDIR/libXdmGreet.so\fP.
+\fI DEF_GREETER_LIB\fP.
 .IP \fBDisplayManager.choiceTimeout\fP
 Number of seconds to wait for display to respond after user has
 selected a host from the chooser.  If the display sends an XDMCP
