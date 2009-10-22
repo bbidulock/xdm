@@ -1,7 +1,8 @@
-Makefile
-Makefile.in
+#		Add & Override for this directory and it's subdirectories
+Xreset
+Xservers
+Xstartup
 Xresources
 Xservers.ws
 Xsession
 xdm-config
-*~
