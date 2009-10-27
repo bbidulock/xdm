@@ -106,8 +106,7 @@ appman_PRE = xdm.man.cpp
 appman_DATA = $(appman_PRE:man.cpp=@APP_MAN_SUFFIX@)
 
 CLEANFILES = $(appman_DATA)
-EXTRA_DIST = $(appman_PRE) ChangeLog
-MAINTAINERCLEANFILES = ChangeLog
+EXTRA_DIST = $(appman_PRE) 
 
 include $(top_srcdir)/cpprules.in
 
