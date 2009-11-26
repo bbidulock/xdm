@@ -105,6 +105,7 @@ appmandir = $(APP_MAN_DIR)
 appman_PRE = xdm.man.cpp
 appman_DATA = $(appman_PRE:man.cpp=@APP_MAN_SUFFIX@)
 
+MAINTAINERCLEANFILES = ChangeLog INSTALL
 CLEANFILES = $(appman_DATA)
 EXTRA_DIST = $(appman_PRE) 
 
