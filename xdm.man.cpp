@@ -1050,6 +1050,10 @@ If set to ``true'', allow an otherwise failing password match to succeed
 if the account does not require a password at all.
 The default is ``false'', so only users that have passwords assigned can
 log in.
+.IP "\fBxlogin.Login.echoPasswd\fP"
+If set to ``true'', stars will be rendered instead of the password itself,
+i.e. '***...'.
+The default is ``false''.
 .IP "\fBxlogin.Login.translations\fP"
 This specifies the translations used for the login widget.  Refer to the X
 Toolkit documentation for a complete discussion on translations.  The default
