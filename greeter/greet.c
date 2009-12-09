@@ -73,7 +73,7 @@ from The Open Group.
 #include "dm.h"
 #include "dm_error.h"
 #include "greet.h"
-#include "Login.h"
+#include "LoginP.h"
 
 #if defined(HAVE_OPENLOG) && defined(HAVE_SYSLOG_H)
 # define USE_SYSLOG
@@ -499,9 +499,9 @@ greet_user_rtn GreetUser(
 	const char *	  login_prompt;
 
 
-	SetPrompt(login, 0, NULL, LOGIN_PROMPT_NOT_SHOWN, False);
+	SetPrompt(login, LOGIN_PROMPT_USERNAME, NULL, LOGIN_PROMPT_NOT_SHOWN, False);
 	login_prompt  = GetPrompt(login, LOGIN_PROMPT_USERNAME);
-	SetPrompt(login, 1, NULL, LOGIN_PROMPT_NOT_SHOWN, False);
+	SetPrompt(login, LOGIN_PROMPT_PASSWORD, NULL, LOGIN_PROMPT_NOT_SHOWN, False);
 
 # define RUN_AND_CHECK_PAM_ERROR(function, args)			\
 	    do { 						\

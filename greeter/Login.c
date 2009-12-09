@@ -219,7 +219,9 @@ static XtResource resources[] = {
     {XtNallowNullPasswd, XtCAllowNullPasswd, XtRBoolean, sizeof (Boolean),
 	offset(allow_null_passwd), XtRImmediate, (XtPointer) False},
     {XtNallowRootLogin, XtCAllowRootLogin, XtRBoolean, sizeof(Boolean),
-     offset(allow_root_login), XtRImmediate, (XtPointer) True}
+	offset(allow_root_login), XtRImmediate, (XtPointer) True},
+    {XtNechoPasswd, XtCEchoPasswd, XtRBoolean, sizeof(Boolean),
+	offset(echo_passwd), XtRImmediate, (XtPointer) False}
 };
 
 #undef offset
@@ -350,11 +352,33 @@ static inline int max (int a, int b) { return a > b ? a : b; }
 static void
 realizeValue (LoginWidget w, int cursor, int promptNum, GC gc)
 {
-    loginPromptState state = w->login.prompts[promptNum].state;
+    loginPromptState state = PROMPT_STATE(w, promptNum);
     char *text = VALUE_TEXT(w, promptNum);
     int	x, y, height, width, curoff;
 
     XDM_ASSERT(promptNum >= 0 && promptNum <= LAST_PROMPT);
+
+    /* replace all password characters with asterisks */
+    if ((promptNum == LOGIN_PROMPT_PASSWORD) && (w->login.echo_passwd == True))
+    {
+	Cardinal length = strlen(text);
+	Cardinal i = 0;
+
+	text = XtMalloc(length + 1);
+
+	if (text == NULL)
+	{
+	    LogOutOfMem("realizeValue");
+	    return;
+	}
+
+	while (i < length)
+	{
+	    text[i++] = '*';
+	}
+
+	text[i] = 0;
+    }
 
     x = VALUE_X (w,promptNum);
     y = PROMPT_Y (w,promptNum);
@@ -365,7 +389,7 @@ realizeValue (LoginWidget w, int cursor, int promptNum, GC gc)
     height -= (w->login.inframeswidth * 2);
     width -= (w->login.inframeswidth * 2);
 #ifdef XPM
-    width -= (w->login.logoWidth + 2*(w->login.logoPadding));
+    width -= (w->login.logoWidth + (w->login.logoPadding * 2));
 #endif
     if (cursor > VALUE_SHOW_START(w, promptNum))
 	curoff = TEXT_WIDTH (text, text, cursor);
@@ -379,7 +403,9 @@ realizeValue (LoginWidget w, int cursor, int promptNum, GC gc)
 			    x + curoff, y - TEXT_Y_INC(w),
 			    width - curoff, height);
 	}
-    } else if ((state == LOGIN_PROMPT_ECHO_ON) || (state == LOGIN_TEXT_INFO)) {
+    } else if ((state == LOGIN_PROMPT_ECHO_ON) || (state == LOGIN_TEXT_INFO) ||
+	       ((promptNum == LOGIN_PROMPT_PASSWORD) && (w->login.echo_passwd == True)))
+    {
 	int textwidth;
 	int offset = max(cursor, VALUE_SHOW_START(w, promptNum));
 	int textlen = strlen (text + offset);
@@ -411,6 +437,11 @@ realizeValue (LoginWidget w, int cursor, int promptNum, GC gc)
 	} else {
 	    DRAW_STRING(text, x + curoff, y, text + offset, textlen);
 	}
+    }
+    /* free memory */
+    if ((promptNum == LOGIN_PROMPT_PASSWORD) && (w->login.echo_passwd == True))
+    {
+	XtFree(text);
     }
 }
 
@@ -460,9 +491,18 @@ realizeCursor (LoginWidget w, GC gc)
 	}
 	break;
     case LOGIN_PROMPT_ECHO_OFF:
-	/* Move cursor one pixel per character to give some feedback without
-	   giving away the password length */
-	x += PROMPT_CURSOR(w, w->login.activePrompt);
+	if ((w->login.activePrompt == LOGIN_PROMPT_PASSWORD) && (w->login.echo_passwd == True)) {
+	    int len = PROMPT_CURSOR(w, w->login.activePrompt) -
+		VALUE_SHOW_START(w, w->login.activePrompt);
+
+	    x += len*TEXT_WIDTH(text, "*", 1);
+	}
+	else
+	{
+	    /* Move cursor one pixel per character to give some feedback
+	       without giving away the password length */
+	    x += PROMPT_CURSOR(w, w->login.activePrompt);
+	}
 	break;
     }
 
