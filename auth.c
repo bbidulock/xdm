@@ -403,6 +403,7 @@ SaveServerAuthorizations (
     int		i;
     const char	dummy_auth[] = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
 		               "XXXXXXXXXXXXXXXXX"; /* 64 "X"s */
+    int		err = 0;
 
     mask = umask (0077);
     ret = MakeServerAuthFile(d, &auth_file);
@@ -410,10 +411,8 @@ SaveServerAuthorizations (
     if (!ret)
 	return FALSE;
     if (!auth_file) {
-	Debug ("Can't creat auth file %s\n", d->authFile);
-	LogError ("Cannot open server authorization file %s\n", d->authFile);
-	free (d->authFile);
-	d->authFile = NULL;
+	LogError ("cannot open server authorization file %s: %s\n",
+		  d->authFile, _SysErrorMsg (errno));
 	ret = FALSE;
     }
     else
@@ -436,8 +435,7 @@ SaveServerAuthorizations (
 		(void) fflush (auth_file);
 		if (ferror (auth_file))
 		{
-		    LogError ("Cannot write server authorization file %s\n",
-			      d->authFile);
+		    err = errno;
 		    ret = FALSE;
 		}
 		/*
@@ -453,14 +451,15 @@ SaveServerAuthorizations (
 	     * to the auth file so xrdb and setup programs don't fail.
 	     */
 	    if (auths[i]->data_length > 0)
-		if (!XauWriteAuth (auth_file, auths[i]) ||
-		    fflush (auth_file) == EOF)
+		if (!XauWriteAuth (auth_file, auths[i]))
 		{
-		    LogError ("Cannot write server authorization file %s\n",
-			      d->authFile);
+		    Debug ("XauWriteAuth() failed\n");
+		}
+		(void) fflush (auth_file);
+		if (ferror (auth_file))
+		{
+		    err = errno;
 		    ret = FALSE;
-		    free (d->authFile);
-		    d->authFile = NULL;
 		}
     	}
 	/*
@@ -471,6 +470,16 @@ SaveServerAuthorizations (
 		Debug ("ftruncate() failed\n");
 	}
 	fclose (auth_file);
+
+    }
+    if (ret == FALSE)
+    {
+	LogError ("Cannot write to server authorization file %s%s%s\n",
+		  d->authFile,
+		  err ? ": " : "",
+		  err ? _SysErrorMsg (errno) : "");
+	free (d->authFile);
+	d->authFile = NULL;
     }
     return ret;
 }
