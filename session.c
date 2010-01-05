@@ -791,7 +791,7 @@ StartClient (
 		verify->userEnviron = setEnv(verify->userEnviron, "HOME", "/");
 	    }
 	if (verify->argv) {
-		Debug ("executing session %s\n", verify->argv[0]);
+		LogInfo ("executing session %s\n", verify->argv[0]);
 		execute (verify->argv, verify->userEnviron);
 		LogError ("Session \"%s\" execution failed (err %d)\n", verify->argv[0], errno);
 	} else {
@@ -821,21 +821,28 @@ int
 source (char **environ, char *file)
 {
     char	**args, *args_safe[2];
-    int		ret;
+    int		ret = 0;
+    FILE	*f;
 
     if (file && file[0]) {
-	Debug ("source %s\n", file);
-	args = parseArgs ((char **) 0, file);
-	if (!args) {
-	    args = args_safe;
-	    args[0] = file;
-	    args[1] = NULL;
+	f = fopen (file, "r");
+	if (!f)
+	    LogInfo ("not sourcing %s (%s)\n", file, _SysErrorMsg (errno));
+	else {
+	    fclose (f);
+	    LogInfo ("sourcing %s\n", file);
+	    args = parseArgs ((char **) 0, file);
+	    if (!args) {
+		args = args_safe;
+		args[0] = file;
+		args[1] = NULL;
+	    }
+	    ret = runAndWait (args, environ);
+	    freeArgs (args);
 	}
-	ret = runAndWait (args, environ);
-	freeArgs (args);
-	return ret;
-    }
-    return 0;
+    } else
+	Debug ("source() given null pointer in file argument\n");
+    return ret;
 }
 
 static int
