@@ -130,6 +130,23 @@ if test "x$USE_PAM" != "xno" ; then
 		 fi])
 fi
 
+use_selinux_default=no
+# Check for selinux support
+AC_ARG_WITH(selinux, AC_HELP_STRING([--with-selinux],[Add support for selinux]),
+	[USE_SELINUX=$withval], [USE_SELINUX=$use_selinux_default])
+if test "x$USE_SELINUX" != "xno" ; then
+   	old_LIBS="$LIBS"
+	LIBS=""
+	AC_SEARCH_LIBS(is_selinux_enabled,[selinux])
+	AC_CHECK_FUNC(is_selinux_enabled,
+		[AC_DEFINE(HAVE_SELINUX,1,[Add support for selinux])],
+		[if test "x$USE_SELINUX" != "xtry" ; then
+			AC_MSG_ERROR(["selinux support requested, but is_selinux_enabled not found."])
+		 fi])
+	XDM_LIBS="$XDM_LIBS $LIBS"
+	LIBS="$old_LIBS"
+fi
+
 # FIXME: Find better test for which OS'es use su -m  - for now, just try to
 # mirror the Imakefile setting of:
 # if  defined(OpenBSDArchitecture) || defined(NetBSDArchitecture) || defined(FreeBSDArchitecture) || defined(DarwinArchitecture)
