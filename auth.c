@@ -522,12 +522,32 @@ static int
 openFiles (char *name, char *new_name, FILE **oldp, FILE **newp)
 {
 	mode_t	mask;
+	int newfd;
 
 	strcpy (new_name, name);
 	strcat (new_name, "-n");
+	/*
+	 * Set safe umask for file creation operations.
+	 */
 	mask = umask (0077);
+	/*
+	 * Unlink the authorization file we intend to create, and then open
+	 * it with O_CREAT | O_EXCL to avoid race-based symlink attacks.
+	 */
 	(void) unlink (new_name);
-	*newp = fopen (new_name, "w");
+	newfd = open (new_name, O_WRONLY | O_CREAT | O_EXCL, 0600);
+	if (newfd >= 0)
+	    *newp = fdopen (newfd, "w");
+	else
+	{
+	    LogError ("Cannot create file %s: %s\n", new_name,
+		      _SysErrorMsg (errno));
+	    *newp = NULL;
+	}
+	/*
+	 * There are no more attempts to create files after this point;
+	 * restore the original umask.
+	 */
 	(void) umask (mask);
 	if (!*newp) {
 		Debug ("can't open new file %s\n", new_name);
