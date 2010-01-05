@@ -401,6 +401,8 @@ SaveServerAuthorizations (
     mode_t	mask;
     int		ret;
     int		i;
+    const char	dummy_auth[] = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+		               "XXXXXXXXXXXXXXXXX"; /* 64 "X"s */
 
     mask = umask (0077);
     ret = MakeServerAuthFile(d, &auth_file);
@@ -418,6 +420,31 @@ SaveServerAuthorizations (
     {
     	Debug ("File: %s auth: %p\n", d->authFile, auths);
 	ret = TRUE;
+	if (count == 0)
+	{
+		/*
+		 * This is a crude hack to determine whether we really can
+		 * write to the auth file even if we don't have real data
+		 * to write right now.
+		 */
+
+		/*
+		 * Write garbage data to file to provoke ENOSPC and other
+		 * errors.
+		 */
+		(void) fprintf (auth_file, "%s", dummy_auth);
+		(void) fflush (auth_file);
+		if (ferror (auth_file))
+		{
+		    LogError ("Cannot write server authorization file %s\n",
+			      d->authFile);
+		    ret = FALSE;
+		}
+		/*
+		 * Rewind so that the garbage data is overwritten later.
+		 */
+		rewind(auth_file);
+	}
 	for (i = 0; i < count; i++)
 	{
 	    /*
@@ -436,6 +463,13 @@ SaveServerAuthorizations (
 		    d->authFile = NULL;
 		}
     	}
+	/*
+	 * XXX: This is not elegant, but stdio has no truncation function.
+	 */
+	if (ftruncate(fileno(auth_file), ftell(auth_file)))
+	{
+		Debug ("ftruncate() failed\n");
+	}
 	fclose (auth_file);
     }
     return ret;
