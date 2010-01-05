@@ -553,8 +553,17 @@ WaitForChild (void)
 			d->startTries, d->startAttempts);
 		if (d->displayType.origin == FromXDMCP ||
 		    d->status == zombie ||
-		    ++d->startTries >= d->startAttempts) {
-		    LogError ("Display %s is being disabled\n", d->name);
+		    ++d->startTries >= d->startAttempts)
+		{
+		    /*
+		     * During normal xdm shutdown, killed local X servers
+		     * can be zombies; this is not an error.
+		     */
+		    if (d->status == zombie &&
+			(d->startTries < d->startAttempts))
+			LogInfo ("display %s is being disabled\n", d->name);
+		    else
+			LogError ("display %s is being disabled\n", d->name);
 		    StopDisplay(d);
 		} else
 		    RestartDisplay (d, TRUE);
