@@ -489,9 +489,6 @@ greet_user_rtn GreetUser(
 	LogError ("Cannot reopen display %s for greet window\n", d->name);
 	exit (RESERVER_DISPLAY);
     }
-#ifdef USE_SYSLOG
-    openlog("xdm", LOG_ODELAY|LOG_PID, LOG_AUTHPRIV);
-#endif
 
     for (;;) {
 #ifdef USE_PAM

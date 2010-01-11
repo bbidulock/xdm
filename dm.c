@@ -75,6 +75,16 @@ from The Open Group.
 # endif
 #endif
 
+#if defined(HAVE_OPENLOG) && defined(HAVE_SYSLOG_H)
+# define USE_SYSLOG
+# include <syslog.h>
+# ifndef LOG_AUTHPRIV
+#  define LOG_AUTHPRIV LOG_AUTH
+# endif
+# ifndef LOG_PID
+#  define LOG_PID 0
+# endif
+#endif
 
 #if defined(SVR4) && !defined(sun)
 extern FILE    *fdopen();
@@ -749,6 +759,9 @@ StartDisplay (struct display *d)
 	    CleanUpChild ();
 	    (void) Signal (SIGPIPE, SIG_IGN);
 	}
+#ifdef USE_SYSLOG
+	openlog("xdm", LOG_PID, LOG_AUTHPRIV);
+#endif
 	LoadSessionResources (d);
 	SetAuthorization (d);
 	if (!WaitForServer (d))
