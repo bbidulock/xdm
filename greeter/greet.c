@@ -500,7 +500,7 @@ greet_user_rtn GreetUser(
 	struct myconv_data pcd		= { d, greet, NULL };
 	struct pam_conv   pc 		= { pamconv, &pcd };
 	const char *	  pam_fname;
-	char *		  username;
+	char *		  username	= NULL;
 	const char *	  login_prompt;
 
 
