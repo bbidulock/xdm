@@ -342,6 +342,8 @@ CloseGreet (struct display *d)
 	XSetAccessControl (dpy, DisableAccess);
     }
     XtDestroyWidget (toplevel);
+    toplevel = NULL;
+    login = NULL; /* child of toplevel, which we just destroyed */
     ClearCloseOnFork (XConnectionNumber (dpy));
     XCloseDisplay (dpy);
     Debug ("Greet connection closed\n");
@@ -706,6 +708,11 @@ static int pamconv(int num_msg,
 
     m = (struct pam_message *)*msg;
     r = *response;
+
+    if (login == NULL) {
+	status = PAM_CONV_ERR;
+	goto pam_error;
+    }
 
     for (i = 0; i < num_msg; i++ , m++ , r++) {
 	char *username;
