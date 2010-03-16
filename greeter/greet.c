@@ -410,9 +410,14 @@ static void
 FailedLogin (struct display *d, struct greet_info *greet)
 {
 #ifdef USE_SYSLOG
+    const char *username = greet->name;
+
+    if (username == NULL)
+	username = "username unavailable";
+
     syslog(LOG_AUTHPRIV|LOG_NOTICE,
 	   "LOGIN FAILURE ON %s, %s",
-	   d->name, greet->name);
+	   d->name, username);
 #endif
     DrawFail (login);
 #ifndef USE_PAM
