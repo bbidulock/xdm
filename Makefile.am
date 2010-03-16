@@ -196,3 +196,4 @@ ChangeLog:
 
 dist-hook: ChangeLog INSTALL
 
+ACLOCAL_AMFLAGS = -I m4

@@ -25,6 +25,7 @@ AC_PREREQ([2.60])
 AC_INIT(xdm,[1.1.9],[https://bugs.freedesktop.org/enter_bug.cgi?product=xorg],xdm)
 AM_INIT_AUTOMAKE([foreign dist-bzip2])
 AM_MAINTAINER_MODE
+AC_CONFIG_MACRO_DIR([m4])
 
 # Require xorg-macros: XORG_DEFAULT_OPTIONS
 m4_ifndef([XORG_MACROS_VERSION],
