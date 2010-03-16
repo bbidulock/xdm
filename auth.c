@@ -309,8 +309,8 @@ static int
 MakeServerAuthFile (struct display *d, FILE ** file)
 {
     int len;
-#if defined(SYSV) && !defined(SVR4)
-# define NAMELEN	14
+#ifdef MAXNAMELEN
+# define NAMELEN	MAXNAMELEN
 #else
 # define NAMELEN	255
 #endif
