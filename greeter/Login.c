@@ -359,7 +359,7 @@ realizeValue (LoginWidget w, int cursor, int promptNum, GC gc)
     XDM_ASSERT(promptNum >= 0 && promptNum <= LAST_PROMPT);
 
     /* replace all password characters with asterisks */
-    if ((promptNum == LOGIN_PROMPT_PASSWORD) && (w->login.echo_passwd == True))
+    if ((state == LOGIN_PROMPT_ECHO_OFF) && (w->login.echo_passwd == True))
     {
 	Cardinal length = strlen(text);
 	Cardinal i = 0;
@@ -404,7 +404,7 @@ realizeValue (LoginWidget w, int cursor, int promptNum, GC gc)
 			    width - curoff, height);
 	}
     } else if ((state == LOGIN_PROMPT_ECHO_ON) || (state == LOGIN_TEXT_INFO) ||
-	       ((promptNum == LOGIN_PROMPT_PASSWORD) && (w->login.echo_passwd == True)))
+	       ((state == LOGIN_PROMPT_ECHO_OFF) && (w->login.echo_passwd == True)))
     {
 	int textwidth;
 	int offset = max(cursor, VALUE_SHOW_START(w, promptNum));
@@ -439,7 +439,7 @@ realizeValue (LoginWidget w, int cursor, int promptNum, GC gc)
 	}
     }
     /* free memory */
-    if ((promptNum == LOGIN_PROMPT_PASSWORD) && (w->login.echo_passwd == True))
+    if ((state == LOGIN_PROMPT_ECHO_OFF) && (w->login.echo_passwd == True))
     {
 	XtFree(text);
     }
@@ -491,7 +491,7 @@ realizeCursor (LoginWidget w, GC gc)
 	}
 	break;
     case LOGIN_PROMPT_ECHO_OFF:
-	if ((w->login.activePrompt == LOGIN_PROMPT_PASSWORD) && (w->login.echo_passwd == True)) {
+	if (w->login.echo_passwd == True) {
 	    int len = PROMPT_CURSOR(w, w->login.activePrompt) -
 		VALUE_SHOW_START(w, w->login.activePrompt);
 
