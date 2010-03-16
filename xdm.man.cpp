@@ -1045,6 +1045,8 @@ drawn in hiColor and shdColor.
 If set to ``false'', don't allow root (and any other user with uid = 0) to
 log in directly.
 The default is ``true''.
+This setting is only checked by some of the authentication backends at this
+time.
 .IP "\fBxlogin.Login.allowNullPasswd\fP"
 If set to ``true'', allow an otherwise failing password match to succeed
 if the account does not require a password at all.

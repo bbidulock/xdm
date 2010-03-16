@@ -197,11 +197,7 @@ static XtResource resources[] = {
 	offset(passwdPrompt), XtRString, "Password:  "},
     {XtNfail, XtCFail, XtRString, sizeof (char *),
 	offset(failMsg), XtRString,
-#if defined(sun) && defined(SVR4)
-     "Login incorrect or not on system console if root"
-#else
-     "Login incorrect"
-#endif
+	"Login incorrect or forbidden by policy"
     },
     {XtNchangePasswdMessage, XtCChangePasswdMessage, XtRString,
 	sizeof (char *), offset(passwdChangeMsg), XtRString,

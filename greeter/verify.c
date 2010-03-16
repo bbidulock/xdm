@@ -350,6 +350,16 @@ Verify (struct display *d, struct greet_info *greet, struct verify_info *verify)
 		return 0;
 	}
 
+	/*
+	 * Only accept root logins if allowRootLogin resource is not false
+	 */
+	if ((p->pw_uid == 0) && !greet->allow_root_login) {
+		Debug("root logins not allowed\n");
+		if (greet->password != NULL)
+		    bzero(greet->password, strlen(greet->password));
+		return 0;
+	}
+
 # if defined(sun) && defined(SVR4)
 	/* Solaris: If CONSOLE is set to /dev/console in /etc/default/login,
 	   then root can only login on system console */
@@ -467,7 +477,6 @@ Verify (struct display *d, struct greet_info *greet, struct verify_info *verify)
 #  ifdef KERBEROS
 done:
 #  endif
-#  ifdef __OpenBSD__
 	/*
 	 * Only accept root logins if allowRootLogin resource is set
 	 */
@@ -476,6 +485,7 @@ done:
 		bzero(greet->password, strlen(greet->password));
 		return 0;
 	}
+#  ifdef __OpenBSD__
 	/*
 	 * Shell must be in /etc/shells
 	 */
