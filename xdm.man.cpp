@@ -1443,7 +1443,7 @@ Kerberos credentials cache
 .IR sessreg (__appmansuffix__),
 .IR Xserver (__appmansuffix__),
 .\" .IR chooser (__appmansuffix__), \" except that there isn't a manual for it yet
-.\" .IR xdmshell (__appmansuffix__), \" except that there isn't a manual for it yet
+.IR xdmshell (__appmansuffix__),
 .IR fonts.conf (__filemansuffix__).
 .br
 .I "X Display Manager Control Protocol"
