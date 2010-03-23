@@ -969,6 +969,9 @@ StorePid (void)
 static void
 RemovePid (void)
 {
+    if (parent_pid != getpid())
+	return;
+
     Debug ("unlinking process ID file %s\n", pidFile);
     if (unlink (pidFile))
 	if (errno != ENOENT)
