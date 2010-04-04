@@ -176,7 +176,7 @@ CreateListeningSocket (struct sockaddr *sock_addr, int salen)
     RegisterCloseOnFork (fd);
 
 #  if defined(IPv6) && defined(IPV6_V6ONLY)
-    if (sock_addr->sa_family == AF_INET6)
+    if (sock_addr->sa_family == AF_INET6) {
 	int zero = 0;
 	if (setsockopt(fd, IPPROTO_IPV6, IPV6_V6ONLY, &zero, sizeof(zero)) < 0) {
 	    LogError ("Could not disable V6ONLY on XDMCP socket: %s\n",
