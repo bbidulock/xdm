@@ -1,9 +1,3 @@
-!
-!
-!
-!
-!
-
 Xcursor.theme: whiteglass
 
 #define BS \ /* cpp can be trickier than m4 */
