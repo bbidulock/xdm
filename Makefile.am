@@ -21,7 +21,19 @@
 
 SUBDIRS = config greeter
 
-bin_PROGRAMS = xdm xdmshell
+bin_PROGRAMS = xdm
+noinst_PROGRAMS =
+
+appman_PRE = xdm.man.cpp
+noinst_man_PRE =
+
+if INSTALL_XDMSHELL
+bin_PROGRAMS += xdmshell
+appman_PRE += xdmshell.man.cpp
+else
+noinst_PROGRAMS += xdmshell
+noinst_man_PRE += xdmshell.man.cpp
+endif
 
 xdmlibdir = $(XDMLIBDIR)
 xdmlib_PROGRAMS = chooser
@@ -101,13 +113,12 @@ endif
 #
 
 appmandir = $(APP_MAN_DIR)
-
-appman_PRE = xdm.man.cpp xdmshell.man.cpp
 appman_DATA = $(appman_PRE:man.cpp=@APP_MAN_SUFFIX@)
+noinst_DATA = $(noinst_man_PRE:man.cpp=@APP_MAN_SUFFIX@)
 
 MAINTAINERCLEANFILES = ChangeLog INSTALL
-CLEANFILES = $(appman_DATA)
-EXTRA_DIST = $(appman_PRE) 
+CLEANFILES = $(appman_DATA) $(noinst_DATA)
+EXTRA_DIST = $(appman_PRE) $(noinst_man_PRE)
 
 include $(top_srcdir)/cpprules.in
 
