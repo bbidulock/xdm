@@ -136,7 +136,7 @@ use_selinux_default=no
 AC_ARG_WITH(selinux, AC_HELP_STRING([--with-selinux],[Add support for selinux]),
 	[USE_SELINUX=$withval], [USE_SELINUX=$use_selinux_default])
 if test "x$USE_SELINUX" != "xno" ; then
-   	old_LIBS="$LIBS"
+	old_LIBS="$LIBS"
 	LIBS=""
 	AC_SEARCH_LIBS(is_selinux_enabled,[selinux])
 	AC_CHECK_FUNC(is_selinux_enabled,
@@ -144,7 +144,7 @@ if test "x$USE_SELINUX" != "xno" ; then
 		[if test "x$USE_SELINUX" != "xtry" ; then
 			AC_MSG_ERROR(["selinux support requested, but is_selinux_enabled not found."])
 		 fi])
-	XDM_LIBS="$XDM_LIBS $LIBS"
+	XDM_OS_LIBS="$XDM_OS_LIBS $LIBS"
 	LIBS="$old_LIBS"
 fi
 
