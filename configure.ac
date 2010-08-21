@@ -419,7 +419,7 @@ if test "x$DYNAMIC_GREETER" = "xyes" ; then
 	PKG_CHECK_MODULES(XDMGREET, xt x11 xext)
 
 	GREETERLIB="${XDMLIBDIR}/libXdmGreet.so"
-	AC_DEFINE_DIR(DEF_GREETER_LIB, GREETERLIB, 
+	AX_DEFINE_DIR(DEF_GREETER_LIB, GREETERLIB,
 			[Location of Xdm Greeter library])
 
 	XDMGREET_CFLAGS="$XDMGREET_CFLAGS $XDM_PRINT_CFLAGS $DMCP_CFLAGS $XLIB_CFLAGS $OS_CFLAGS $GREETER_CFLAGS $AUTH_CFLAGS"
@@ -496,21 +496,21 @@ fi
 if test -z "$DEF_SERVER_LINE" ; then 
 	DEF_SERVER_LINE=":0 local ${DEF_SERVER} :0"
 fi
-AC_DEFINE_DIR(DEF_SERVER_LINE, DEF_SERVER_LINE,
+AX_DEFINE_DIR(DEF_SERVER_LINE, DEF_SERVER_LINE,
 	[Define to default Xserver file entry for local X server])
 
 # -DXRDB_PROGRAM="$(BINDIR)/xrdb"
 AC_ARG_WITH(xrdb, AC_HELP_STRING([--with-xrdb=path],
 			[Use path for xrdb (default: bindir/xrdb)]),
 	    [XRDB=$withval], [XRDB=${bindir}/xrdb])
-AC_DEFINE_DIR(XRDB_PROGRAM, XRDB, 
+AX_DEFINE_DIR(XRDB_PROGRAM, XRDB,
 	[Define to pathname for xrdb program])
 
 # -DDEF_SESSION="$(BINDIR)/xterm -ls"
 AC_ARG_WITH(default-session, AC_HELP_STRING([--with-default-session=command],
 		[Use command for default session (default: bindir/xterm -ls)]),
 	    [DEF_SESSION=$withval], [DEF_SESSION="${bindir}/xterm -ls"])
-AC_DEFINE_DIR(DEF_SESSION, DEF_SESSION,
+AX_DEFINE_DIR(DEF_SESSION, DEF_SESSION,
 	[Define to default command to start X session])
 
 # -DDEF_USER_PATH="$(DEF_USER_PATH)"
@@ -538,7 +538,7 @@ if test -z "$DEF_USER_PATH" ; then
 		;;
 	esac
 fi
-AC_DEFINE_DIR(DEF_USER_PATH, DEF_USER_PATH,
+AX_DEFINE_DIR(DEF_USER_PATH, DEF_USER_PATH,
 	[Define to default PATH environment variable for user sessions])
 
 # -DDEF_SYSTEM_PATH="$(DEF_SYSTEM_PATH)"
@@ -560,29 +560,29 @@ if test -z "$DEF_SYSTEM_PATH" ; then
 		;;
 	esac
 fi
-AC_DEFINE_DIR(DEF_SYSTEM_PATH, DEF_SYSTEM_PATH,
+AX_DEFINE_DIR(DEF_SYSTEM_PATH, DEF_SYSTEM_PATH,
 	[Define to default PATH environment variable for system commands])
 
 # -DDEF_SYSTEM_SHELL="$(BOURNE_SHELL)"
 if test -z "$BOURNE_SHELL" ; then
 	BOURNE_SHELL=/bin/sh
 fi
-AC_DEFINE_DIR(DEF_SYSTEM_SHELL, BOURNE_SHELL,
+AX_DEFINE_DIR(DEF_SYSTEM_SHELL, BOURNE_SHELL,
 	[Define to default shell])
 
 # -DDEF_FAILSAFE_CLIENT="$(BINDIR)/xterm"
 
-AC_DEFINE_DIR(DEF_FAILSAFE_CLIENT, bindir/xterm,
+AX_DEFINE_DIR(DEF_FAILSAFE_CLIENT, bindir/xterm,
 	[Define to default command to start failsafe X session])
 
 # -DDEF_XDM_CONFIG="$(XDMDIR)/xdm-config"
 
-AC_DEFINE_DIR(DEF_XDM_CONFIG, XDMCONFIGDIR/xdm-config, 
+AX_DEFINE_DIR(DEF_XDM_CONFIG, XDMCONFIGDIR/xdm-config,
 	[Define to pathname of default xdm-config file])
 
 # -DDEF_CHOOSER="$(CHOOSERPATH)"
 
-AC_DEFINE_DIR(DEF_CHOOSER, XDMLIBDIR/chooser, 
+AX_DEFINE_DIR(DEF_CHOOSER, XDMLIBDIR/chooser,
 	[Define to pathname of where chooser binary is installed])
 
 # -DDEF_AUTH_DIR="$(XDMDIR)"
@@ -593,12 +593,12 @@ AC_ARG_WITH(authdir,
 	[XDMXAUTHDIR="$withval"], [XDMXAUTHDIR="/var/lib/xdm"])
 AC_SUBST(XDMXAUTHDIR)
 
-AC_DEFINE_DIR(DEF_AUTH_DIR, XDMXAUTHDIR,
+AX_DEFINE_DIR(DEF_AUTH_DIR, XDMXAUTHDIR,
 	[Define to pathname where authentication cookie files should be stored])
 
 # -DDEF_GREETER_LIB="$(XDMDIR)/libXdmGreet.so"
 
-AC_DEFINE_DIR(DEF_GREETER_LIB, XDMLIBDIR/libXdmGreet.so, 
+AX_DEFINE_DIR(DEF_GREETER_LIB, XDMLIBDIR/libXdmGreet.so,
 	[Define to pathname where greeter shared object is installed (if used)])
 
 PKG_CHECK_MODULES(APPDEFS, xt)
