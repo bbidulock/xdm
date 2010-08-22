@@ -343,10 +343,12 @@ in the section
 A list of additional environment variables, separated by white space,
 to pass on to the \fIXsetup\fP,
 \fIXstartup\fP, \fIXsession\fP, and \fIXreset\fP programs.
+#if !defined(ARC4_RANDOM)
 .IP \fBDisplayManager.randomFile\fP
 A file to checksum to generate the seed of authorization keys.
 This should be a file that changes frequently.
 The default is \fI/dev/mem\fP.
+#endif
 #ifdef DEV_RANDOM
 .IP \fBDisplayManager.randomDevice\fP
 A file to read 8 bytes from to generate the seed of authorization keys.
