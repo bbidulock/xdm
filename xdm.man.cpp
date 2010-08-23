@@ -343,20 +343,23 @@ in the section
 A list of additional environment variables, separated by white space,
 to pass on to the \fIXsetup\fP,
 \fIXstartup\fP, \fIXsession\fP, and \fIXreset\fP programs.
-#if !defined(ARC4_RANDOM)
+.\" The command "if 'x.A'x' .ig" causes everything up to .. to be ignored
+.\" if A is replaced by an empty string in the sed processing, otherwise
+.\" it will be output as normal.
+.if !'x.ARC4_RANDOM'x.' .ig
 .IP \fBDisplayManager.randomFile\fP
 A file to checksum to generate the seed of authorization keys.
 This should be a file that changes frequently.
 The default is \fI/dev/mem\fP.
-#endif
-#ifdef DEV_RANDOM
+..
+.if 'x.DEV_RANDOM'x.' .ig
 .IP \fBDisplayManager.randomDevice\fP
 A file to read 8 bytes from to generate the seed of authorization keys.
 The default is \fI DEV_RANDOM \fP. If this file cannot be read, or if a
 read blocks for more than 5 seconds, xdm falls back to using a checksum
 of \fBDisplayManager.randomFile\fP to generate the seed.
-#endif
-#if !defined(ARC4_RANDOM)
+..
+.if !'x.ARC4_RANDOM'x.' .ig
 .IP \fBDisplayManager.prngdSocket\fP
 .IP \fBDisplayManager.prngPort\fP
 A UNIX domain socket name or a TCP socket port number on local host on
@@ -369,7 +372,7 @@ be specified. The default is to use the Unix-domain socket
 On systems that don't have such a daemon, a fall-back entropy
 gathering system, based on various log file contents hashed by the MD5
 algorithm is used instead.
-#endif
+..
 .IP \fBDisplayManager.greeterLib\fP
 On systems that support a dynamically-loadable greeter library, the
 name of the library.  The default is
@@ -676,13 +679,13 @@ Here is an example Xaccess file:
 .LP
 .ta 2i 4i
 .nf
-XCOMM
-XCOMM Xaccess \- XDMCP access control file
-XCOMM
+#
+# Xaccess \- XDMCP access control file
+#
 
-XCOMM
-XCOMM Direct/Broadcast query entries
-XCOMM
+#
+# Direct/Broadcast query entries
+#
 
 !xtra.lcs.mit.edu	# disallow direct/broadcast service for xtra
 bambi.ogi.edu	# allow access from this particular display
@@ -691,9 +694,9 @@ bambi.ogi.edu	# allow access from this particular display
 *.deshaw.com	NOBROADCAST	# allow only direct access
 *.gw.com			# allow direct and broadcast
 
-XCOMM
-XCOMM Indirect query entries
-XCOMM
+#
+# Indirect query entries
+#
 
 %HOSTS	expo.lcs.mit.edu xenon.lcs.mit.edu \\
 	excess.lcs.mit.edu kanga.lcs.mit.edu

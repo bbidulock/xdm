@@ -119,33 +119,22 @@ noinst_DATA = $(noinst_man_PRE:man.cpp=@APP_MAN_SUFFIX@)
 MAINTAINERCLEANFILES = ChangeLog INSTALL
 CLEANFILES = $(appman_DATA) $(noinst_DATA)
 EXTRA_DIST = $(appman_PRE) $(noinst_man_PRE)
+SUFFIXES   = .$(APP_MAN_SUFFIX) .man.cpp
 
-include $(top_srcdir)/cpprules.in
-
-XORGRELSTRING = @PACKAGE_STRING@
-  XORGMANNAME = X Version 11
-
-MANDEFS = \
-	-D__xorgversion__="\"$(XORGRELSTRING)\" \"$(XORGMANNAME)\"" \
-	-DCHOOSERPATH="$(xdmlibdir)/chooser" -DXDMLOGDIR="$(XDMLOGDIR)" \
-	-DXDMDIR="$(XDMCONFIGDIR)" -DBINDIR="$(bindir)" \
-	-DXDMPIDDIR="$(XDMPIDDIR)" -DXDMXAUTHDIR="$(XDMXAUTHDIR)" \
-	-DDEF_USER_PATH="$(DEF_USER_PATH)" \
-	-DDEF_SYSTEM_PATH="$(DEF_SYSTEM_PATH)" \
-	-DDEF_GREETER_LIB="$(DEF_GREETER_LIB)" \
-	-D__appmansuffix__=$(APP_MAN_SUFFIX) \
-	-D__filemansuffix__=$(FILE_MAN_SUFFIX) \
-	-D__libmansuffix__=$(LIB_MAN_SUFFIX) \
-	-D__miscmansuffix__=$(MISC_MAN_SUFFIX) \
-	-D__drivermansuffix__=$(DRIVER_MAN_SUFFIX) \
-	-D__adminmansuffix__=$(ADMIN_MAN_SUFFIX) 
-
-CPP_FILES_FLAGS = $(MANDEFS) $(RANDOMMANDEFS) $(EXTRAMANDEFS)
-
-SUFFIXES += .$(APP_MAN_SUFFIX) .man.cpp
+MAN_SUBSTS +=	-e 's|CHOOSERPATH|$(xdmlibdir)/chooser|g' \
+		-e 's|XDMLOGDIR|$(XDMLOGDIR)|g' \
+		-e 's|XDMDIR|$(XDMCONFIGDIR)|g' \
+		-e 's|BINDIR|$(bindir)|g' \
+		-e 's|XDMPIDDIR|$(XDMPIDDIR)|g' \
+		-e 's|XDMXAUTHDIR|$(XDMXAUTHDIR)|g' \
+		-e 's|DEF_USER_PATH|$(DEF_USER_PATH)|g' \
+		-e 's|DEF_SYSTEM_PATH|$(DEF_SYSTEM_PATH)|g' \
+		-e 's|DEF_GREETER_LIB|$(DEF_GREETER_LIB)|g' \
+		-e 's|DEV_RANDOM|$(DEV_RANDOM)|g' \
+		-e 's|ARC4_RANDOM|$(ARC4_RANDOM)|g'
 
 .man.cpp.$(APP_MAN_SUFFIX):
-	$(cpp_verbose)$(RAWCPP) $(RAWCPPFLAGS) $(CPP_FILES_FLAGS) < $< | $(CPP_SED_MAGIC) > $@
+	$(AM_V_GEN)$(SED) $(MAN_SUBSTS) < $< > $@
 
 #
 #  xdmshell
