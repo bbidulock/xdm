@@ -1,6 +1,6 @@
-# 
+#
 #  Copyright 2005  Red Hat, Inc.
-# 
+#
 #  Permission to use, copy, modify, distribute, and sell this software and its
 #  documentation for any purpose is hereby granted without fee, provided that
 #  the above copyright notice appear in all copies and that both that
@@ -10,7 +10,7 @@
 #  specific, written prior permission.  Red Hat makes no
 #  representations about the suitability of this software for any purpose.  It
 #  is provided "as is" without express or implied warranty.
-# 
+#
 #  RED HAT DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
 #  INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN NO
 #  EVENT SHALL RED HAT BE LIABLE FOR ANY SPECIAL, INDIRECT OR
@@ -19,7 +19,7 @@
 #  TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 #  PERFORMANCE OF THIS SOFTWARE.
 
-SUBDIRS = config greeter man
+SUBDIRS = chooser config greeter man
 
 bin_PROGRAMS = xdm
 noinst_PROGRAMS =
@@ -29,9 +29,6 @@ bin_PROGRAMS += xdmshell
 else
 noinst_PROGRAMS += xdmshell
 endif
-
-xdmlibdir = $(XDMLIBDIR)
-xdmlib_PROGRAMS = chooser
 
 AM_CFLAGS = $(CWARNFLAGS)
 
@@ -100,16 +97,6 @@ xdmshell_CFLAGS = $(XDMSHELL_CFLAGS) -DBINDIR="\"$(bindir)\""
 xdmshell_SOURCES =	\
         xdmshell.c
 
-#
-#  chooser
-#
-
-chooser_CFLAGS = $(CHOOSER_CFLAGS)
-chooser_LDADD = $(CHOOSER_LIBS)
-
-chooser_SOURCES =	\
-	chooser.c
-
 # App default files
 
 # This ensures distcheck is performed in a location where user has write access
@@ -124,8 +111,8 @@ ALL_LINT_FLAGS=$(LINT_FLAGS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 lint:
 	$(LINT) $(ALL_LINT_FLAGS) $(xdm_CFLAGS) $(xdm_SOURCES) $(xdm_LIBS)
 	$(LINT) $(ALL_LINT_FLAGS) $(xdmshell_CFLAGS) $(xdmshell_SOURCES)
-	$(LINT) $(ALL_LINT_FLAGS) $(chooser_CFLAGS) $(chooser_SOURCES) $(chooser_LDADD)
 	(cd greeter && $(MAKE) $(AM_MAKEFLAGS) lint)
+	(cd chooser && $(MAKE) $(AM_MAKEFLAGS) lint)
 endif LINT
 
 MAINTAINERCLEANFILES = ChangeLog INSTALL
