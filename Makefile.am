@@ -19,17 +19,9 @@
 #  TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 #  PERFORMANCE OF THIS SOFTWARE.
 
-SUBDIRS = chooser config greeter man
+SUBDIRS = chooser config greeter man xdmshell
 
 bin_PROGRAMS = xdm
-noinst_PROGRAMS =
-
-if INSTALL_XDMSHELL
-bin_PROGRAMS += xdmshell
-else
-noinst_PROGRAMS += xdmshell
-endif
-
 AM_CFLAGS = $(CWARNFLAGS)
 
 #
@@ -88,15 +80,6 @@ if HAS_KERBEROS_FIVE
 xdm_SOURCES += krb5auth.c
 endif
 
-#
-#  xdmshell
-#
-xdmshell_CFLAGS = $(XDMSHELL_CFLAGS) -DBINDIR="\"$(bindir)\""
-
-
-xdmshell_SOURCES =	\
-        xdmshell.c
-
 # App default files
 
 # This ensures distcheck is performed in a location where user has write access
@@ -110,7 +93,7 @@ ALL_LINT_FLAGS=$(LINT_FLAGS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 
 lint:
 	$(LINT) $(ALL_LINT_FLAGS) $(xdm_CFLAGS) $(xdm_SOURCES) $(xdm_LIBS)
-	$(LINT) $(ALL_LINT_FLAGS) $(xdmshell_CFLAGS) $(xdmshell_SOURCES)
+	(cd xdmshell && $(MAKE) $(AM_MAKEFLAGS) lint)
 	(cd greeter && $(MAKE) $(AM_MAKEFLAGS) lint)
 	(cd chooser && $(MAKE) $(AM_MAKEFLAGS) lint)
 endif LINT

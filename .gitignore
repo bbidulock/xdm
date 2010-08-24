@@ -77,4 +77,3 @@ core
 # For example, !report.pc overrides *.pc. See 'man gitignore'
 # 
 xdm
-xdmshell
