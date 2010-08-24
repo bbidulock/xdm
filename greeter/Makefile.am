@@ -11,7 +11,8 @@ libXdmGreet_la_SOURCES = \
 
 libXdmGreet_la_LIBADD = $(XDMGREET_LIBS)
 
-AM_CFLAGS = $(CWARNFLAGS) $(XDMGREET_CFLAGS) -DGREET_LIB -I$(top_srcdir)
+AM_CPPFLAGS = -I$(top_srcdir)/include
+AM_CFLAGS = $(CWARNFLAGS) $(XDMGREET_CFLAGS) -DGREET_LIB
 
 libXdmGreet_la_LDFLAGS = -module -avoid-version
 

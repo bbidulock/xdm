@@ -19,9 +19,10 @@
 #  TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 #  PERFORMANCE OF THIS SOFTWARE.
 
-SUBDIRS = chooser config greeter man xdmshell
+SUBDIRS = chooser config greeter include man xdmshell
 
 bin_PROGRAMS = xdm
+AM_CPPFLAGS = -I$(top_srcdir)/include
 AM_CFLAGS = $(CWARNFLAGS)
 
 #
@@ -55,12 +56,7 @@ xdm_SOURCES =	\
         mitauth.c \
         genauth.c \
         access.c \
-        choose.c \
-        dm_auth.h \
-        dm_error.h \
-        dm.h \
-        dm_socket.h \
-        greet.h
+        choose.c
 
 if HAS_XDM_AUTH
 xdm_CFLAGS +=  -DHASXDMAUTH

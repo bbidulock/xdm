@@ -1,7 +1,7 @@
 xdmlibdir = $(XDMLIBDIR)
 xdmlib_PROGRAMS = chooser
 
-AM_CPPFLAGS = -I$(top_srcdir)
+AM_CPPFLAGS = -I$(top_srcdir)/include
 AM_CFLAGS = $(CWARNFLAGS) $(CHOOSER_CFLAGS)
 AM_LDFLAGS = $(CHOOSER_LIBS)
 

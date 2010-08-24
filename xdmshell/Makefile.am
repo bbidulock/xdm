@@ -5,7 +5,7 @@ else
 noinst_PROGRAMS = xdmshell
 endif
 
-AM_CPPFLAGS = -I$(top_srcdir)
+AM_CPPFLAGS = -I$(top_srcdir)/include
 AM_CFLAGS = 			\
 	$(CWARNFLAGS)		\
 	$(XDMSHELL_CFLAGS)	\

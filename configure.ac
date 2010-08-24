@@ -549,6 +549,7 @@ AC_CONFIG_FILES([Makefile
 		chooser/Makefile
 		config/Makefile
 		greeter/Makefile
+		include/Makefile
 		man/Makefile
 		xdmshell/Makefile])
 AC_OUTPUT
