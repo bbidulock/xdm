@@ -118,9 +118,9 @@ struct AuthProtocol {
     void	    (*InitAuth)(unsigned short len, char *name);
     Xauth	    *(*GetAuth)(unsigned short len, char *name);
     void	    (*GetXdmcpAuth)(
-    			struct protoDisplay	*pdpy,
-    			unsigned short	authorizationNameLen,
-    			char		*authorizationName);
+			struct protoDisplay	*pdpy,
+			unsigned short	authorizationNameLen,
+			char		*authorizationName);
     int		    inited;
 };
 
@@ -191,7 +191,7 @@ GenerateAuthorization (unsigned short name_length, char *name)
 	{
 	    Debug ("Got %p (%d %*.*s) ", auth,
 		auth->name_length, auth->name_length,
- 		auth->name_length, auth->name);
+		auth->name_length, auth->name);
 	    for (i = 0; i < (int)auth->data_length; i++)
 		Debug (" %02x", auth->data[i] & 0xff);
 	    Debug ("\n");
@@ -240,7 +240,7 @@ SetProtoDisplayAuthorization (
 	if (auth)
 	    Debug ("Got %p (%d %*.*s)\n", auth,
 		auth->name_length, auth->name_length,
- 		auth->name_length, auth->name);
+		auth->name_length, auth->name);
 	else
 	    Debug ("Got (null)\n");
     }
@@ -417,7 +417,7 @@ SaveServerAuthorizations (
     }
     else
     {
-    	Debug ("File: %s auth: %p\n", d->authFile, auths);
+	Debug ("File: %s auth: %p\n", d->authFile, auths);
 	ret = TRUE;
 	if (count == 0)
 	{
@@ -461,7 +461,7 @@ SaveServerAuthorizations (
 		    err = errno;
 		    ret = FALSE;
 		}
-    	}
+	}
 	/*
 	 * XXX: This is not elegant, but stdio has no truncation function.
 	 */
@@ -727,9 +727,9 @@ checkEntry (Xauth *auth)
 	for (a = addrs; a; a = a->next) {
 		if (a->family == auth->family &&
 		    a->address_length == auth->address_length &&
- 		    binaryEqual (a->address, auth->address, auth->address_length) &&
+		    binaryEqual (a->address, auth->address, auth->address_length) &&
 		    a->number_length == auth->number_length &&
- 		    binaryEqual (a->number, auth->number, auth->number_length) &&
+		    binaryEqual (a->number, auth->number, auth->number_length) &&
 		    a->name_length == auth->name_length &&
 		    binaryEqual (a->name, auth->name, auth->name_length))
 		{
@@ -795,7 +795,7 @@ DefineLocal (FILE *file, Xauth *auth)
 	uname(&name);
 	snprintf(tmp_displayname, sizeof(tmp_displayname), "%s", name.nodename);
 	writeAddr (FamilyLocal, strlen (tmp_displayname), tmp_displayname,
-       		   file, auth);
+		   file, auth);
 
 	/*
 	 * If _XGetHostname() returned the same value as uname(), don't
@@ -1122,7 +1122,7 @@ DefineSelf (int fd, FILE *file, Xauth *auth)
 		continue;
 
 	    if (len == 0)
- 	    {
+	    {
 		Debug ("Skipping zero length address\n");
 		continue;
 	    }
@@ -1405,11 +1405,11 @@ SetUserAuthorization (struct display *d, struct verify_info *verify)
 		!strncmp (auths[i]->name, "MIT-MAGIC-COOKIE-1", 18))
 	    {
 		magicCookie = i;
-	    	if (d->displayType.location == Local)
-	    	    writeLocalAuth (new, auths[i], d->name);
+		if (d->displayType.location == Local)
+		    writeLocalAuth (new, auths[i], d->name);
 #ifdef XDMCP
-	    	else
-	    	    writeRemoteAuth (new, auths[i], d->peer, d->peerlen, d->name);
+		else
+		    writeRemoteAuth (new, auths[i], d->peer, d->peerlen, d->name);
 #endif
 		break;
 	    }
@@ -1426,11 +1426,11 @@ SetUserAuthorization (struct display *d, struct verify_info *verify)
 		if (auths[i]->name_length == 14 &&
 		    !strncmp (auths[i]->name, "MIT-KERBEROS-5", 14))
 		    auths[i]->data_length = 0;
-	    	if (d->displayType.location == Local)
-	    	    writeLocalAuth (new, auths[i], d->name);
+		if (d->displayType.location == Local)
+		    writeLocalAuth (new, auths[i], d->name);
 #ifdef XDMCP
-	    	else
-	    	    writeRemoteAuth (new, auths[i], d->peer, d->peerlen, d->name);
+		else
+		    writeRemoteAuth (new, auths[i], d->peer, d->peerlen, d->name);
 #endif
 		auths[i]->data_length = data_len;
 	    }
@@ -1513,10 +1513,10 @@ RemoveUserAuthorization (struct display *d, struct verify_info *verify)
 	for (i = 0; i < d->authNum; i++)
 	{
 	    if (d->displayType.location == Local)
-	    	writeLocalAuth (new, auths[i], d->name);
+		writeLocalAuth (new, auths[i], d->name);
 #ifdef XDMCP
 	    else
-	    	writeRemoteAuth (new, auths[i], d->peer, d->peerlen, d->name);
+		writeRemoteAuth (new, auths[i], d->peer, d->peerlen, d->name);
 #endif
 	}
 	doWrite = 1;

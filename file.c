@@ -76,9 +76,9 @@ splitIntoWords (char *s)
 	    ++s;
 	if (!args)
 	{
-    	    args = (char **) malloc (2 * sizeof (char *));
-    	    if (!args)
-	    	return NULL;
+	    args = (char **) malloc (2 * sizeof (char *));
+	    if (!args)
+		return NULL;
 	}
 	else
 	{
@@ -86,8 +86,8 @@ splitIntoWords (char *s)
 					 (nargs+2)*sizeof (char *));
 	    if (!newargs)
 	    {
-	    	freeFileArgs (args);
-	    	return NULL;
+		freeFileArgs (args);
+		return NULL;
 	    }
 	    args = newargs;
 	}

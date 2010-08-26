@@ -360,7 +360,7 @@ AddHostname (ARRAY8Ptr hostname, ARRAY8Ptr status, struct sockaddr *addr, int wi
     if (!*names)
     {
 	new = (HostName *) malloc (sizeof (HostName));
-    	if (!new)
+	if (!new)
 	    return 0;
 	if (hostname->length)
 	{
@@ -370,33 +370,33 @@ AddHostname (ARRAY8Ptr hostname, ARRAY8Ptr status, struct sockaddr *addr, int wi
 #if defined(IPv6) && defined(AF_INET6)
 	    case AF_INET6:
 #endif
-	    	{
-	    	    struct hostent  *hostent;
+		{
+		    struct hostent  *hostent;
 		    char	    *host;
 
-	    	    hostent = gethostbyaddr ((char *)hostAddr.data, hostAddr.length, addr->sa_family);
-	    	    if (hostent)
-	    	    {
+		    hostent = gethostbyaddr ((char *)hostAddr.data, hostAddr.length, addr->sa_family);
+		    if (hostent)
+		    {
 			XdmcpDisposeARRAY8 (hostname);
-		    	host = (char *)hostent->h_name;
+			host = (char *)hostent->h_name;
 			XdmcpAllocARRAY8 (hostname, strlen (host));
 			memmove( hostname->data, host, hostname->length);
-	    	    }
-	    	}
+		    }
+		}
 	    }
 	}
-    	if (!XdmcpAllocARRAY8 (&new->hostaddr, hostAddr.length))
-    	{
+	if (!XdmcpAllocARRAY8 (&new->hostaddr, hostAddr.length))
+	{
 	    free ((char *) new->fullname);
 	    free ((char *) new);
 	    return 0;
-    	}
-    	memmove( new->hostaddr.data, hostAddr.data, hostAddr.length);
+	}
+	memmove( new->hostaddr.data, hostAddr.data, hostAddr.length);
 	new->connectionType = connectionType;
 	new->hostname = *hostname;
 
-    	*names = new;
-    	new->next = NULL;
+	*names = new;
+	new->next = NULL;
 	NameTableSize++;
     }
     else
@@ -502,40 +502,40 @@ ReceivePacket (XtPointer closure, int *source, XtInputId *id)
 	return;
     switch (header.opcode) {
     case WILLING:
-    	if (XdmcpReadARRAY8 (&buffer, &authenticationName) &&
+	if (XdmcpReadARRAY8 (&buffer, &authenticationName) &&
 	    XdmcpReadARRAY8 (&buffer, &hostname) &&
 	    XdmcpReadARRAY8 (&buffer, &status))
-    	{
+	{
 	    if (header.length == 6 + authenticationName.length +
-	    	hostname.length + status.length)
+		hostname.length + status.length)
 	    {
 		if (AddHostname (&hostname, &status, (struct sockaddr *) &addr,
-		  		 header.opcode == (int) WILLING))
+				 header.opcode == (int) WILLING))
 		    saveHostname = 1;
 	    }
-    	}
+	}
 	XdmcpDisposeARRAY8 (&authenticationName);
 	break;
     case UNWILLING:
-    	if (XdmcpReadARRAY8 (&buffer, &hostname) &&
+	if (XdmcpReadARRAY8 (&buffer, &hostname) &&
 	    XdmcpReadARRAY8 (&buffer, &status))
-    	{
+	{
 	    if (header.length == 4 + hostname.length + status.length)
 	    {
 		if (AddHostname (&hostname, &status, (struct sockaddr *) &addr,
-		  		 header.opcode == (int) WILLING))
+				 header.opcode == (int) WILLING))
 		    saveHostname = 1;
 
 	    }
-    	}
+	}
 	break;
     default:
 	break;
     }
     if (!saveHostname)
     {
-    	XdmcpDisposeARRAY8 (&hostname);
-    	XdmcpDisposeARRAY8 (&status);
+	XdmcpDisposeARRAY8 (&hostname);
+	XdmcpDisposeARRAY8 (&status);
     }
 }
 
@@ -750,7 +750,7 @@ RegisterHostname (char *name)
 	    if (!hostent)
 		return;
 	    if (hostent->h_addrtype != AF_INET || hostent->h_length != 4)
-	    	return;
+		return;
 	    in_addr.sin_family = hostent->h_addrtype;
 	    memmove( &in_addr.sin_addr, hostent->h_addr, 4);
 	}
@@ -987,8 +987,8 @@ Choose (HostName *h)
     {
 	int i;
 
-    	printf ("%u\n", h->connectionType);
-    	for (i = 0; i < (int)h->hostaddr.length; i++)
+	printf ("%u\n", h->connectionType);
+	for (i = 0; i < (int)h->hostaddr.length; i++)
 	    printf ("%u%s", h->hostaddr.data[i],
 		    i == h->hostaddr.length - 1 ? "\n" : " ");
     }
@@ -1056,9 +1056,9 @@ Hostselect (int line)
 	liney = lineheight * line;
 
 	if ((y + liney) < 0) {
-    	    XawViewportSetCoordinates(viewport, 0, liney);
+	    XawViewportSetCoordinates(viewport, 0, liney);
 	} else if ((y + liney + lineheight) > portheight) {
-    	    XawViewportSetCoordinates(viewport, 0,
+	    XawViewportSetCoordinates(viewport, 0,
 				      (liney + lineheight) - portheight);
 	}
 
@@ -1378,4 +1378,3 @@ CvtStringToARRAY8 (XrmValuePtr args, Cardinal *num_args, XrmValuePtr fromVal, Xr
     toVal->addr = (caddr_t) &dest;
     toVal->size = sizeof (ARRAY8Ptr);
 }
-

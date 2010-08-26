@@ -293,9 +293,9 @@ WaitForServer (struct display *d)
     static int i;
 
     for (i = 0; i < (d->openRepeat > 0 ? d->openRepeat : 1); i++) {
-    	(void) Signal (SIGALRM, abortOpen);
-    	(void) alarm ((unsigned) d->openTimeout);
-    	if (!Setjmp (openAbort)) {
+	(void) Signal (SIGALRM, abortOpen);
+	(void) alarm ((unsigned) d->openTimeout);
+	if (!Setjmp (openAbort)) {
 	    Debug ("Before XOpenDisplay(%s)\n", d->name);
 	    errno = 0;
 	    (void) XSetIOErrorHandler (openErrorHandler);
@@ -317,24 +317,24 @@ WaitForServer (struct display *d)
 	    Debug ("After XOpenDisplay(%s)\n", d->name);
 	    if (d->dpy) {
 #ifdef XDMCP
-	    	if (d->displayType.location == Foreign)
+		if (d->displayType.location == Foreign)
 		    GetRemoteAddress (d, ConnectionNumber (d->dpy));
 #endif
-	    	RegisterCloseOnFork (ConnectionNumber (d->dpy));
+		RegisterCloseOnFork (ConnectionNumber (d->dpy));
 		(void) fcntl (ConnectionNumber (d->dpy), F_SETFD, 0);
-	    	return 1;
+		return 1;
 	    } else {
-	    	Debug ("OpenDisplay failed %d (%s) on \"%s\"\n",
+		Debug ("OpenDisplay failed %d (%s) on \"%s\"\n",
 		       errno, strerror (errno), d->name);
 	    }
 	    Debug ("waiting for server to start %d\n", i);
 	    sleep ((unsigned) d->openDelay);
-    	} else {
+	} else {
 	    Debug ("hung in open, aborting\n");
 	    LogError ("Hung in XOpenDisplay(%s), aborting\n", d->name);
 	    (void) Signal (SIGALRM, SIG_DFL);
 	    break;
-    	}
+	}
     }
     Debug ("giving up on server\n");
     LogError ("server open failed for %s, giving up\n", d->name);

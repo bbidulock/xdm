@@ -316,18 +316,18 @@ indirect_respond (
 	/*
 	 * set up the forward query packet
 	 */
-    	header.version = XDM_PROTOCOL_VERSION;
-    	header.opcode = (CARD16) FORWARD_QUERY;
-    	header.length = 0;
-    	header.length += 2 + clientAddress.length;
-    	header.length += 2 + clientPort.length;
-    	header.length += 1;
-    	for (i = 0; i < (int)queryAuthenticationNames.length; i++)
+	header.version = XDM_PROTOCOL_VERSION;
+	header.opcode = (CARD16) FORWARD_QUERY;
+	header.length = 0;
+	header.length += 2 + clientAddress.length;
+	header.length += 2 + clientPort.length;
+	header.length += 1;
+	for (i = 0; i < (int)queryAuthenticationNames.length; i++)
 	    header.length += 2 + queryAuthenticationNames.data[i].length;
-    	XdmcpWriteHeader (&buffer, &header);
-    	XdmcpWriteARRAY8 (&buffer, &clientAddress);
-    	XdmcpWriteARRAY8 (&buffer, &clientPort);
-    	XdmcpWriteARRAYofARRAY8 (&buffer, &queryAuthenticationNames);
+	XdmcpWriteHeader (&buffer, &header);
+	XdmcpWriteARRAY8 (&buffer, &clientAddress);
+	XdmcpWriteARRAY8 (&buffer, &clientPort);
+	XdmcpWriteARRAYofARRAY8 (&buffer, &queryAuthenticationNames);
 
 	localHostAsWell = ForEachMatchingIndirectHost (&clientAddress, connectionType, sendForward, (char *) &fd);
 
@@ -581,15 +581,15 @@ NetworkAddressToName(
 		{
 		    if (removeDomainname)
 		    {
-		    	char    *localDot, *remoteDot;
+			char    *localDot, *remoteDot;
 
 			/* check for a common domain name.  This
 			 * could reduce names by recognising common
 			 * super-domain names as well, but I don't think
 			 * this is as useful, and will confuse more
 			 * people
- 			 */
-		    	if ((localDot = strchr(localhost, '.')) &&
+			 */
+			if ((localDot = strchr(localhost, '.')) &&
 		            (remoteDot = strchr(hostname, '.')))
 			{
 			    /* smash the name in place; it won't
@@ -673,15 +673,15 @@ NetworkAddressToName(
 		{
 		    if (removeDomainname)
 		    {
-		    	char    *localDot, *remoteDot;
+			char    *localDot, *remoteDot;
 
 			/* check for a common domain name.  This
 			 * could reduce names by recognising common
 			 * super-domain names as well, but I don't think
 			 * this is as useful, and will confuse more
 			 * people
- 			 */
-		    	if ((localDot = strchr(localhost, '.')) &&
+			 */
+			if ((localDot = strchr(localhost, '.')) &&
 		            (remoteDot = strchr(hostent->h_name, '.')))
 			{
 			    /* smash the name in place; it won't
@@ -760,8 +760,8 @@ forward_respond (
 	    for (i = 0; i < (int)clientAddress.length; i++)
 		Debug (" %d", clientAddress.data[i]);
 	    Debug ("\n");
-    	    switch (from->sa_family)
-    	    {
+	    switch (from->sa_family)
+	    {
 # ifdef AF_INET
 	    case AF_INET:
 		{
@@ -858,7 +858,7 @@ forward_respond (
 	    case AF_DECnet:
 		goto badAddress;
 # endif
-    	    }
+	    }
 	}
 	else
 	{
@@ -1379,7 +1379,7 @@ send_alive (
 	    sendRunning = 0;
 	    sendSessionID = 0;
 	    if (d && d->status == running)
- 	    {
+	    {
 		if (d->sessionID == sessionID)
 		    sendRunning = 1;
 		sendSessionID = d->sessionID;
@@ -1481,7 +1481,7 @@ NetworkAddressToHostname (
 		/* can't get name, so use emergency fallback */
 # if defined(IPv6) && defined(AF_INET6)
 		inet_ntop(af_type, connectionAddress->data,
-		  	  dotted, sizeof(dotted));
+			  dotted, sizeof(dotted));
 # else
 		snprintf(dotted, sizeof(dotted), "%d.%d.%d.%d",
 			 connectionAddress->data[0],

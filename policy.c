@@ -104,10 +104,10 @@ SelectAuthorizationTypeIndex (
 	    break;
     if (j < NumAuth)
     {
-    	for (i = 0; i < (int)authorizationNames->length; i++)
+	for (i = 0; i < (int)authorizationNames->length; i++)
 	    if (XdmcpARRAY8Equal (&authorizationNames->data[i],
 				  &auth[j].authorization))
-	    	return i;
+		return i;
     }
     for (i = 0; i < (int)authorizationNames->length; i++)
 	if (ValidAuthorization (authorizationNames->data[i].length,

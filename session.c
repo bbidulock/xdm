@@ -287,7 +287,7 @@ void
 SessionPingFailed (struct display *d)
 {
     if (clientPid > 1) {
-    	AbortClient (clientPid);
+	AbortClient (clientPid);
 	source (verify.systemEnviron, d->reset);
     }
     SessionExit (d, RESERVER_DISPLAY, TRUE);
@@ -443,9 +443,9 @@ SetupDisplay (struct display *d)
     char	**env = NULL;
 
     if (d->setup && d->setup[0]) {
-    	env = systemEnv (d, (char *) 0, (char *) 0);
-    	(void) source (env, d->setup);
-    	freeEnv (env);
+	env = systemEnv (d, (char *) 0, (char *) 0);
+	(void) source (env, d->setup);
+	freeEnv (env);
     }
 }
 

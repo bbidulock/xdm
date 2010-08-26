@@ -421,7 +421,7 @@ ReadDisplayEntry (FILE *file)
 tryagain:
     displayOrAlias = ReadWord (file, FALSE);
     if (!displayOrAlias)
-    	return NULL;
+	return NULL;
     d = (DisplayEntry *) malloc (sizeof (DisplayEntry));
     d->notAllowed = 0;
     d->notBroadcast = 0;
@@ -447,18 +447,18 @@ tryagain:
 	    d->notAllowed = 1;
 	    ++displayOrAlias;
 	}
-    	if (HasGlobCharacters (displayOrAlias))
-    	{
+	if (HasGlobCharacters (displayOrAlias))
+	{
 	    d->type = DISPLAY_PATTERN;
 	    d->entry.displayPattern = strdup (displayOrAlias);
 	    if (!d->entry.displayPattern)
 	    {
-	    	free ((char *) d);
-	    	return NULL;
+		free ((char *) d);
+		return NULL;
 	    }
-    	}
-    	else
-    	{
+	}
+	else
+	{
 	    void *addr = NULL;
 	    size_t addr_length = 0;
 	    int addrtype = 0;
@@ -501,12 +501,12 @@ tryagain:
 	    display = &d->entry.displayAddress;
 	    if (!XdmcpAllocARRAY8 (&display->clientAddress, addr_length))
 	    {
-	    	free ((char *) d);
+		free ((char *) d);
 # if defined(IPv6) && defined(AF_INET6)
 		if (ai)
 		    freeaddrinfo(ai);
 # endif
-	    	return NULL;
+		return NULL;
 	    }
 	    memmove( display->clientAddress.data, addr, addr_length);
 # if defined(IPv6) && defined(AF_INET6)
@@ -517,29 +517,29 @@ tryagain:
 	    {
 # ifdef AF_UNIX
 	    case AF_UNIX:
-	    	display->connectionType = FamilyLocal;
-	    	break;
+		display->connectionType = FamilyLocal;
+		break;
 # endif
 # ifdef AF_INET
 	    case AF_INET:
-	    	display->connectionType = FamilyInternet;
-	    	break;
+		display->connectionType = FamilyInternet;
+		break;
 # endif
 # if defined(IPv6) && defined(AF_INET6)
 	    case AF_INET6:
-	    	display->connectionType = FamilyInternet6;
-	    	break;
+		display->connectionType = FamilyInternet6;
+		break;
 # endif
 # ifdef AF_DECnet
 	    case AF_DECnet:
-	    	display->connectionType = FamilyDECnet;
-	    	break;
+		display->connectionType = FamilyDECnet;
+		break;
 # endif
 	    default:
-	    	display->connectionType = FamilyLocal;
-	    	break;
+		display->connectionType = FamilyLocal;
+		break;
 	    }
-    	}
+	}
     }
     prev = &d->hosts;
     while ((h = ReadHostEntry (file)))
@@ -590,8 +590,8 @@ ScanAccessDatabase (void)
     FreeAccessDatabase ();
     if (*accessFile)
     {
-    	datafile = fopen (accessFile, "r");
-    	if (!datafile)
+	datafile = fopen (accessFile, "r");
+	if (!datafile)
 	{
 	    LogError ("Cannot open access control file %s, no XDMCP reqeusts will be granted\n", accessFile);
 	    return 0;
@@ -743,26 +743,26 @@ int ForEachMatchingIndirectHost (
 
     for (d = database; d; d = d->next)
     {
-    	switch (d->type) {
-    	case DISPLAY_ALIAS:
+	switch (d->type) {
+	case DISPLAY_ALIAS:
 	case DISPLAY_LISTEN:
 	    continue;
-    	case DISPLAY_PATTERN:
+	case DISPLAY_PATTERN:
 	    if (!clientName)
 		clientName = NetworkAddressToHostname (connectionType,
 						       clientAddress);
 	    if (!patternMatch (clientName, d->entry.displayPattern))
 		continue;
 	    break;
-    	case DISPLAY_ADDRESS:
+	case DISPLAY_ADDRESS:
 	    if (d->entry.displayAddress.connectionType != connectionType ||
-	    	!XdmcpARRAY8Equal (&d->entry.displayAddress.clientAddress,
+		!XdmcpARRAY8Equal (&d->entry.displayAddress.clientAddress,
 				  clientAddress))
 	    {
 		continue;
 	    }
 	    break;
-    	}
+	}
 	if (!d->hosts)
 	    continue;
 	if (d->notAllowed)
@@ -798,26 +798,26 @@ int UseChooser (
 
     for (d = database; d; d = d->next)
     {
-    	switch (d->type) {
-    	case DISPLAY_ALIAS:
+	switch (d->type) {
+	case DISPLAY_ALIAS:
 	case DISPLAY_LISTEN:
 	    continue;
-    	case DISPLAY_PATTERN:
+	case DISPLAY_PATTERN:
 	    if (!clientName)
 		clientName = NetworkAddressToHostname (connectionType,
 						       clientAddress);
 	    if (!patternMatch (clientName, d->entry.displayPattern))
 		continue;
 	    break;
-    	case DISPLAY_ADDRESS:
+	case DISPLAY_ADDRESS:
 	    if (d->entry.displayAddress.connectionType != connectionType ||
-	    	!XdmcpARRAY8Equal (&d->entry.displayAddress.clientAddress,
+		!XdmcpARRAY8Equal (&d->entry.displayAddress.clientAddress,
 				  clientAddress))
 	    {
 		continue;
 	    }
 	    break;
-    	}
+	}
 	if (!d->hosts)
 	    continue;
 	if (d->notAllowed)
@@ -846,26 +846,26 @@ void ForEachChooserHost (
 
     for (d = database; d; d = d->next)
     {
-    	switch (d->type) {
-    	case DISPLAY_ALIAS:
+	switch (d->type) {
+	case DISPLAY_ALIAS:
 	case DISPLAY_LISTEN:
 	    continue;
-    	case DISPLAY_PATTERN:
+	case DISPLAY_PATTERN:
 	    if (!clientName)
 		clientName = NetworkAddressToHostname (connectionType,
 						       clientAddress);
 	    if (!patternMatch (clientName, d->entry.displayPattern))
 		continue;
 	    break;
-    	case DISPLAY_ADDRESS:
+	case DISPLAY_ADDRESS:
 	    if (d->entry.displayAddress.connectionType != connectionType ||
-	    	!XdmcpARRAY8Equal (&d->entry.displayAddress.clientAddress,
+		!XdmcpARRAY8Equal (&d->entry.displayAddress.clientAddress,
 				  clientAddress))
 	    {
 		continue;
 	    }
 	    break;
-    	}
+	}
 	if (!d->hosts)
 	    continue;
 	if (d->notAllowed)
@@ -906,26 +906,26 @@ int AcceptableDisplayAddress (
     {
 	if (d->hosts)
 	    continue;
-    	switch (d->type) {
-    	case DISPLAY_ALIAS:
-    	case DISPLAY_LISTEN:
+	switch (d->type) {
+	case DISPLAY_ALIAS:
+	case DISPLAY_LISTEN:
 	    continue;
-    	case DISPLAY_PATTERN:
+	case DISPLAY_PATTERN:
 	    if (!clientName)
 		clientName = NetworkAddressToHostname (connectionType,
 						       clientAddress);
 	    if (!patternMatch (clientName, d->entry.displayPattern))
 		continue;
 	    break;
-    	case DISPLAY_ADDRESS:
+	case DISPLAY_ADDRESS:
 	    if (d->entry.displayAddress.connectionType != connectionType ||
-	    	!XdmcpARRAY8Equal (&d->entry.displayAddress.clientAddress,
+		!XdmcpARRAY8Equal (&d->entry.displayAddress.clientAddress,
 				  clientAddress))
 	    {
 		continue;
 	    }
 	    break;
-    	}
+	}
 	break;
     }
     if (clientName)
@@ -945,7 +945,7 @@ void ForEachListenAddr (
 
     for (d = database; d != NULL ; d = d->next)
     {
-    	if (d->type == DISPLAY_LISTEN) {
+	if (d->type == DISPLAY_LISTEN) {
 	    listenFound = 1;
 	    h = d->hosts;
 	    if (h != NULL) {

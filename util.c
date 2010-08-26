@@ -198,9 +198,9 @@ freeEnv (char **env)
 
     if (env)
     {
-    	for (e = env; *e; e++)
+	for (e = env; *e; e++)
 	    free (*e);
-    	free (env);
+	free (env);
     }
 }
 

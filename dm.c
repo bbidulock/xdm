@@ -268,7 +268,7 @@ ScanServers (void)
     {
 	serversFile = fopen (servers, "r");
 	if (serversFile == NULL)
- 	{
+	{
 	    LogError ("cannot access servers file %s\n", servers);
 	    return;
 	}
@@ -504,9 +504,9 @@ WaitForChild (void)
 		       d->startTries, d->startAttempts);
 		LogError ("Display %s cannot be opened\n", d->name);
 		/*
- 		 * no display connection was ever made, tell the
+		 * no display connection was ever made, tell the
 		 * terminal that the open attempt failed
- 		 */
+		 */
 #ifdef XDMCP
 		if (d->displayType.origin == FromXDMCP)
 		    SendFailed (d, "Cannot open display");
@@ -572,7 +572,7 @@ WaitForChild (void)
 		d->startTries = 0;
 		Debug ("Display exited with REMANAGE_DISPLAY\n");
 		/*
- 		 * XDMCP will restart the session if the display
+		 * XDMCP will restart the session if the display
 		 * requests it
 		 */
 		if (d->displayType.origin == FromXDMCP || d->status == zombie)
@@ -730,8 +730,8 @@ StartDisplay (struct display *d)
 	 * certainly notice when they exit
 	 */
 	d->pingInterval = 0;
-    	if (d->authorize)
-    	{
+	if (d->authorize)
+	{
 	    Debug ("SetLocalAuthorization %s, auth %s\n",
 		    d->name, d->authNames[0]);
 	    SetLocalAuthorization (d);
@@ -743,7 +743,7 @@ StartDisplay (struct display *d)
 	     */
 	    if (d->serverPid != -1 && d->resetForAuth && d->resetSignal)
 		kill (d->serverPid, d->resetSignal);
-    	}
+	}
 	if (d->serverPid == -1 && !StartServer (d))
 	{
 	    LogError ("Server for display %s can't be started, session disabled\n", d->name);

@@ -273,8 +273,8 @@ IndirectChoice (
 	else
 	{
 	    if (XdmcpARRAY8Equal (clientAddress, &c->client) &&
-	    	connectionType == c->connectionType)
-	    	return &c->choice;
+		connectionType == c->connectionType)
+		return &c->choice;
 	    prev = c;
 	}
     }
@@ -316,11 +316,11 @@ RegisterIndirectChoice (
 	if (!c)
 	    return 0;
 	c->connectionType = connectionType;
-    	if (!XdmcpCopyARRAY8 (clientAddress, &c->client))
-    	{
+	if (!XdmcpCopyARRAY8 (clientAddress, &c->client))
+	{
 	    free ((char *) c);
 	    return 0;
-    	}
+	}
     }
     else
     {
@@ -473,10 +473,10 @@ ProcessChooserSocket (int fd)
     Debug ("Read returns %d\n", len);
     if (len > 0)
     {
-    	buffer.data = (BYTE *) buf;
-    	buffer.size = sizeof (buf);
-    	buffer.count = len;
-    	buffer.pointer = 0;
+	buffer.data = (BYTE *) buf;
+	buffer.size = sizeof (buf);
+	buffer.count = len;
+	buffer.pointer = 0;
 	if (XdmcpReadARRAY8 (&buffer, &clientAddress)) {
 	    if (XdmcpReadCARD16 (&buffer, &connectionType)) {
 		if (XdmcpReadARRAY8 (&buffer, &choice)) {
@@ -542,4 +542,3 @@ RunChooser (struct display *d)
 }
 
 #endif /* XDMCP */
-
