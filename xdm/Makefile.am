@@ -19,35 +19,61 @@
 #  TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 #  PERFORMANCE OF THIS SOFTWARE.
 
-SUBDIRS = chooser config greeter include man xdm xdmshell
+bin_PROGRAMS = xdm
 
-# This ensures distcheck is performed in a location where user has write access
-DISTCHECK_CONFIGURE_FLAGS = --with-appdefaultdir=\$${datadir}/X11/app-defaults
+AM_CPPFLAGS = -I$(top_srcdir)/include
+AM_CFLAGS = $(CWARNFLAGS) $(XDM_CFLAGS)
 
-dist_appdefault_DATA = app-defaults/Chooser
+# The xdm binary needs to export symbols so that they can be used from
+# libXdmGreet.so loaded through a dlopen call from session.c
+AM_LDFLAGS = $(XDM_LIBS) -export-dynamic
+
+xdm_SOURCES =		\
+        access.c	\
+        auth.c		\
+        choose.c	\
+        daemon.c	\
+        dm.c		\
+        dpylist.c	\
+        error.c		\
+        file.c		\
+        genauth.c	\
+        mitauth.c	\
+        netaddr.c	\
+        policy.c	\
+        protodpy.c	\
+        reset.c		\
+        resource.c	\
+        server.c	\
+        session.c	\
+        socket.c	\
+        streams.c	\
+        util.c		\
+        xdmcp.c
+
+if HAS_XDM_AUTH
+AM_CFLAGS +=  -DHASXDMAUTH
+xdm_SOURCES += xdmauth.c
+endif
+
+if !HAVE_ARC4RANDOM
+xdm_SOURCES += prngc.c
+endif
+
+if HAS_SECURE_RPC
+AM_CFLAGS += -DSECURE_RPC
+xdm_SOURCES += rpcauth.c
+endif
+
+if HAS_KERBEROS_FIVE
+xdm_SOURCES += krb5auth.c
+endif
 
 if LINT
-ALL_LINT_FLAGS=$(LINT_FLAGS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
-		$(AM_CPPFLAGS) $(CPPFLAGS)
+ALL_LINT_FLAGS=$(LINT_FLAGS) $(DEFS) $(DEFAULT_INCLUDES) \
+		$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS)
 
 lint:
-	$(LINT) $(ALL_LINT_FLAGS) $(xdm_CFLAGS) $(xdm_SOURCES) $(xdm_LIBS)
-	(cd xdm && $(MAKE) $(AM_MAKEFLAGS) lint)
-	(cd xdmshell && $(MAKE) $(AM_MAKEFLAGS) lint)
-	(cd greeter && $(MAKE) $(AM_MAKEFLAGS) lint)
-	(cd chooser && $(MAKE) $(AM_MAKEFLAGS) lint)
+	$(LINT) $(ALL_LINT_FLAGS) $(xdm_SOURCES) $(XDM_LIBS)
+
 endif LINT
-
-MAINTAINERCLEANFILES = ChangeLog INSTALL
-
-.PHONY: ChangeLog INSTALL
-
-INSTALL:
-	$(INSTALL_CMD)
-
-ChangeLog:
-	$(CHANGELOG_CMD)
-
-dist-hook: ChangeLog INSTALL
-
-ACLOCAL_AMFLAGS = -I m4

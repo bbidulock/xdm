@@ -71,9 +71,8 @@ core
 *.tar.bz2
 *.tar.gz
 #
-#		Add & Override patterns for xdm 
+#		Add & Override patterns for xdm
 #
 #		Edit the following section as needed
 # For example, !report.pc overrides *.pc. See 'man gitignore'
-# 
-xdm
+#
