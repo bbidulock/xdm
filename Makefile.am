@@ -19,12 +19,12 @@
 #  TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 #  PERFORMANCE OF THIS SOFTWARE.
 
-SUBDIRS = chooser config greeter include man xdm xdmshell
+SUBDIRS = app-defaults chooser config greeter include man xdm xdmshell
+
+ACLOCAL_AMFLAGS = -I m4
 
 # This ensures distcheck is performed in a location where user has write access
 DISTCHECK_CONFIGURE_FLAGS = --with-appdefaultdir=\$${datadir}/X11/app-defaults
-
-dist_appdefault_DATA = app-defaults/Chooser
 
 if LINT
 ALL_LINT_FLAGS=$(LINT_FLAGS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
@@ -49,5 +49,3 @@ ChangeLog:
 	$(CHANGELOG_CMD)
 
 dist-hook: ChangeLog INSTALL
-
-ACLOCAL_AMFLAGS = -I m4
