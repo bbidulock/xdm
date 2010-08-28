@@ -155,25 +155,12 @@ chooser_LDADD = $(CHOOSER_LIBS)
 chooser_SOURCES =	\
 	chooser.c
 
-# App default files  (*.ad)
+# App default files
 
+# This ensures distcheck is performed in a location where user has write access
 DISTCHECK_CONFIGURE_FLAGS = --with-appdefaultdir=\$${datadir}/X11/app-defaults
 
-appdefaultdir = @appdefaultdir@
-
-APPDEFAULTFILES = app-defaults/Chooser
-
-SUFFIXES += .ad
-
-.ad:
-	[ -d app-defaults ] || mkdir app-defaults
-	cp $< $@
-
-appdefault_DATA = $(APPDEFAULTFILES)
-
-CLEANFILES += $(APPDEFAULTFILES)
-
-EXTRA_DIST += $(APPDEFAULTFILES:%=%.ad)
+dist_appdefault_DATA = app-defaults/Chooser
 
 if LINT
 ALL_LINT_FLAGS=$(LINT_FLAGS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
