@@ -385,8 +385,6 @@ PKG_CHECK_MODULES(AUTH, xau)
 # Greeter
 #
 
-GREETER_CFLAGS="$GREETER_CFLAGS -DGREET_LIB"
-
 # The xdm binary needs to export symbols so that they can be used from
 # libXdmGreet.so.  Some platforms require extra flags to do this.
 # gcc should set these flags when -rdynamic is passed to it, other
