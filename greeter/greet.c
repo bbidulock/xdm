@@ -93,7 +93,6 @@ from The Open Group.
 extern int getdomainname(char *name, size_t len);
 #endif
 
-#ifdef GREET_LIB
 /*
  * Function pointers filled in by the initial call ito the library
  */
@@ -134,8 +133,6 @@ char     *(*__xdm_crypt)(CRYPT_ARGS) = NULL;
 # ifdef USE_PAM
 pam_handle_t **(*__xdm_thepamhp)(void) = NULL;
 # endif
-
-#endif
 
 #ifdef SECURE_RPC
 # include <rpc/rpc.h>
@@ -438,7 +435,6 @@ greet_user_rtn GreetUser(
 {
     int i;
 
-#ifdef GREET_LIB
 /*
  * These must be set before they are used.
  */
@@ -478,7 +474,6 @@ greet_user_rtn GreetUser(
 # ifdef USE_PAM
     __xdm_thepamhp = dlfuncs->_thepamhp;
 # endif
-#endif
 
     *dpy = InitGreet (d);
     /*

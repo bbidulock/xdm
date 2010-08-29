@@ -76,12 +76,10 @@ extern int key_setnet(struct key_netstarg *arg);
 #include <selinux/get_context_list.h>
 #endif /* HAVE_SELINUX */
 
-#ifndef GREET_USER_STATIC
 # include <dlfcn.h>
 # ifndef RTLD_NOW
 #  define RTLD_NOW 1
 # endif
-#endif
 
 #ifdef HAVE_SELINUX
 /* This should be run just before we exec the user session. */
@@ -327,9 +325,7 @@ ManageSession (struct display *d)
     Display		*dpy;
     greet_user_rtn	greet_stat;
     static GreetUserProc greet_user_proc = NULL;
-#ifndef GREET_USER_STATIC
     void		*greet_lib_handle;
-#endif
 
     Debug ("ManageSession %s\n", d->name);
     (void)XSetIOErrorHandler(IOErrorHandler);
@@ -344,9 +340,6 @@ ManageSession (struct display *d)
      */
     LoadXloginResources (d);
 
-#ifdef GREET_USER_STATIC
-    greet_user_proc = GreetUser;
-#else
     Debug ("ManageSession: loading greeter library %s\n", greeterLib);
     greet_lib_handle = dlopen(greeterLib, RTLD_NOW);
     if (greet_lib_handle != NULL)
@@ -355,7 +348,6 @@ ManageSession (struct display *d)
 	LogError ("%s while loading %s\n", dlerror(), greeterLib);
 	exit(UNMANAGE_DISPLAY);
 	}
-#endif
 
     /* tell the possibly dynamically loaded greeter function
      * what data structure formats to expect.
@@ -375,10 +367,8 @@ ManageSession (struct display *d)
 	    if (StartClient (&verify, d, &clientPid, greet.name, greet.password)) {
 		Debug ("Client Started\n");
 
-#ifndef GREET_USER_STATIC
                 /* Save memory; close library */
                 dlclose(greet_lib_handle);
-#endif
 
 		/*
 		 * Wait for session to end,

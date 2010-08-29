@@ -94,21 +94,6 @@ xdm_SOURCES += krb5auth.c
 endif
 
 #
-# greeter
-#
-
-if !DYNAMIC_GREETER
-xdm_SOURCES += \
-	greeter/greet.c		\
-	greeter/Login.c		\
-	greeter/Login.h		\
-	greeter/LoginP.h	\
-	greeter/verify.c
-xdm_CFLAGS += $(XDMGREET_CFLAGS)
-endif
-
-
-#
 #  xdm man page 
 #
 
