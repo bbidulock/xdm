@@ -160,7 +160,7 @@ case $host_os in
 	SU="su -m"
         ;;
     *bsd*|dragonfly*)
-        OS_CFLAGS="-DCSRG_BASED"
+        OS_CFLAGS=""
 	SU="su -m"
         ;;
     solaris*|sysv4*)
