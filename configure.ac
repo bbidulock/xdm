@@ -156,7 +156,7 @@ case $host_os in
 	SU="su"
         ;;
     darwin*)
-        OS_CFLAGS="-DNO_LASTLOG"
+        OS_CFLAGS=""
 	SU="su -m"
         ;;
     *bsd*|dragonfly*)
