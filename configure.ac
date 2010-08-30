@@ -382,14 +382,6 @@ PKG_CHECK_MODULES(AUTH, xau)
 # Greeter
 #
 
-# The xdm binary needs to export symbols so that they can be used from
-# libXdmGreet.so.  Some platforms require extra flags to do this.
-# gcc should set these flags when -rdynamic is passed to it, other
-# compilers/linkers may need to be added
-if test "x$GCC" = "xyes"; then
-	XDM_LDFLAGS="$XDM_LDFLAGS -rdynamic"
-fi
-
 PKG_CHECK_MODULES(XDMGREET, xt x11 xext)
 
 GREETERLIB="${XDMLIBDIR}/libXdmGreet.so"
@@ -421,7 +413,6 @@ AC_SEARCH_LIBS(crypt, crypt)
 
 AC_SUBST(XDM_CFLAGS)
 AC_SUBST(XDM_LIBS)
-AC_SUBST(XDM_LDFLAGS)
 
 #
 # xdmshell

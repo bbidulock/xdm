@@ -45,7 +45,10 @@ AM_CFLAGS = $(CWARNFLAGS)
 #
 
 xdm_CFLAGS = $(XDM_CFLAGS)
-xdm_LDADD = $(XDM_LIBS) $(XDM_LDFLAGS)
+# The xdm binary needs to export symbols so that they can be used from
+# libXdmGreet.so loaded through a dlopen call from session.c
+xdm_LDFLAGS =  -export-dynamic
+xdm_LDADD = $(XDM_LIBS)
 
 xdm_SOURCES =	\
         auth.c \
