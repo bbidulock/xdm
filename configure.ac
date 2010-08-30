@@ -89,7 +89,7 @@ if test "x$HAS_SETUSERCONTEXT" = "xyes" ; then
 fi
 
 AC_CHECK_FUNCS([daemon sigaction openlog asprintf])
-AC_CHECK_HEADERS([grp.h syslog.h])
+AC_CHECK_HEADERS([grp.h syslog.h sys/param.h])
 AC_TYPE_SIGNAL
 
 XTRANS_CONNECTION_FLAGS

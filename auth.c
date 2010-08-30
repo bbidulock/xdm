@@ -99,10 +99,12 @@ from The Open Group.
 # define SYSV_SIOCGIFCONF
 #endif
 
-#ifdef CSRG_BASED
-# include <sys/param.h>
-# if (BSD >= 199103)
-#  define VARIABLE_IFREQ
+#ifdef HAVE_SYS_PARAM_H
+#include <sys/param.h>
+# ifdef BSD
+#  if (BSD >= 199103)
+#   define VARIABLE_IFREQ
+#  endif
 # endif
 #endif
 
