@@ -152,23 +152,18 @@ fi
 
 case $host_os in
     linux*|gnu*|*-gnu)
-        OS_CFLAGS=""
 	SU="su"
         ;;
     darwin*)
-        OS_CFLAGS=""
 	SU="su -m"
         ;;
     *bsd*|dragonfly*)
-        OS_CFLAGS=""
 	SU="su -m"
         ;;
     solaris*|sysv4*)
-	OS_CFLAGS=""
 	SU="su"
 	;;
     *)
-        OS_CFLAGS=
 	SU="su"
         ;;
 esac
@@ -387,14 +382,14 @@ PKG_CHECK_MODULES(XDMGREET, xt x11 xext)
 GREETERLIB="${XDMLIBDIR}/libXdmGreet.so"
 AX_DEFINE_DIR(DEF_GREETER_LIB, GREETERLIB, [Location of Xdm Greeter library])
 
-XDMGREET_CFLAGS="$XDMGREET_CFLAGS $XDM_PRINT_CFLAGS $DMCP_CFLAGS $XLIB_CFLAGS $OS_CFLAGS $GREETER_CFLAGS $AUTH_CFLAGS"
+XDMGREET_CFLAGS="$XDMGREET_CFLAGS $XDM_PRINT_CFLAGS $DMCP_CFLAGS $XLIB_CFLAGS $GREETER_CFLAGS $AUTH_CFLAGS"
 XDMGREET_LIBS="$XDMGREET_LIBS $XDM_PRINT_LIBS $DMCP_LIBS $GREETER_LIBS"
 
 #
 #  XDM
 #
 
-XDM_CFLAGS="$XDM_CFLAGS $DMCP_CFLAGS $XLIB_CFLAGS $OS_CFLAGS $AUTH_CFLAGS"
+XDM_CFLAGS="$XDM_CFLAGS $DMCP_CFLAGS $XLIB_CFLAGS $AUTH_CFLAGS"
 XDM_LIBS="$XDM_LIBS $DMCP_LIBS"
 
 AC_CHECK_LIB(Xdmcp, XdmcpWrap, [xdmauth="yes"], [xdmauth="no"], [$DMCP_LIBS])
