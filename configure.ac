@@ -106,17 +106,8 @@ AC_CHECK_DECL(key_setnet,
 #include <rpc/key_prot.h>
 ])
 
-# darwin could have PAM support, but not yet
-case $host_os in
-    darwin*)
-        use_pam_default=no
-        ;;
-    *)
-        use_pam_default=try
-        ;;
-esac
-
 # Check for PAM support
+use_pam_default=try
 AC_ARG_WITH(pam, AC_HELP_STRING([--with-pam],[Use PAM for authentication]),
 	[USE_PAM=$withval], [USE_PAM=$use_pam_default])
 if test "x$USE_PAM" != "xno" ; then
