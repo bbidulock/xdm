@@ -516,7 +516,7 @@ RunChooser (struct display *d)
     char    **env;
 
     Debug ("RunChooser %s\n", d->name);
-# ifndef HAS_SETPROCTITLE
+# ifndef HAVE_SETPROCTITLE
     SetTitle (d->name, "chooser", (char *) 0);
 # else
     setproctitle("chooser %s", d->name);

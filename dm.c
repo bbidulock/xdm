@@ -1004,7 +1004,7 @@ UnlockPidFile (void)
 }
 #endif
 
-#ifndef HAS_SETPROCTITLE
+#ifndef HAVE_SETPROCTITLE
 void SetTitle (char *name, ...)
 {
 # ifndef NOXDMTITLE

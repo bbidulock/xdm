@@ -91,7 +91,7 @@ AC_TYPE_SIGNAL
 #
 # Required system libraries have been searched for and are listed in $LIBS
 #------------------------------------------------------------------------------
-AC_CHECK_FUNCS([daemon sigaction openlog asprintf])
+AC_CHECK_FUNCS([daemon sigaction openlog asprintf setproctitle])
 
 #------------------------------------------------------------------------------
 
@@ -115,16 +115,6 @@ AC_CHECK_FUNC(getifaddrs, AC_DEFINE(HAS_GETIFADDRS,1,
 	[Define to 1 if you have the 'getifaddrs' function.]))
 AC_CHECK_FUNC(getspnam, AC_DEFINE(USESHADOW,1,
 	[Define to 1 if you have the shadow password functions.]))
-
-
-# According to the old Imakefile, FreeBSD has this in libutil
-AC_CHECK_FUNC(setproctitle, [HAS_SETPROCTITLE="yes"],
-	AC_CHECK_LIB(util, setproctitle, 
-		     [HAS_SETPROCTITLE="yes" ; XDM_OS_LIBS="$XDM_OS_LIBS -lutil"]))
-if test "x$HAS_SETPROCTITLE" = "xyes" ; then
-	AC_DEFINE(HAS_SETPROCTITLE,1,
-		[Define to 1 if you have the 'setproctitle' function.])
-fi
 
 # According to the old Imakefile, BSD/OS has this in libutil
 AC_CHECK_FUNC(setusercontext, [HAS_SETUSERCONTEXT="yes"],
