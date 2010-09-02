@@ -110,7 +110,7 @@ typedef union wait	waitType;
 
 # ifdef CSRG_BASED
 #  include <sys/param.h>
-#  ifdef HAS_SETUSERCONTEXT
+#  ifdef HAVE_SETUSERCONTEXT
 #   include <login_cap.h>
 #   include <pwd.h>
 #   ifdef USE_BSDAUTH

@@ -573,7 +573,7 @@ StartClient (
     char	**f, *home;
     char	*failsafeArgv[2];
     pid_t	pid;
-#ifdef HAS_SETUSERCONTEXT
+#ifdef HAVE_SETUSERCONTEXT
     struct passwd* pwd;
 #endif
 #ifdef USE_PAM
@@ -641,7 +641,7 @@ StartClient (
 #endif
 
 #ifndef AIXV3
-# ifndef HAS_SETUSERCONTEXT
+# ifndef HAVE_SETUSERCONTEXT
 	if (setgid (verify->gid) < 0) {
 	    LogError ("setgid %d (user \"%s\") failed: %s\n",
 		      verify->gid, name, _SysErrorMsg (errno));
@@ -661,7 +661,7 @@ StartClient (
 	    return (0);
 	}
 #  endif   /* QNX4 doesn't support multi-groups, no initgroups() */
-# endif /* !HAS_SETUSERCONTEXT */
+# endif /* !HAVE_SETUSERCONTEXT */
 
 # ifdef USE_PAM
 	if (pamh) {
@@ -684,13 +684,13 @@ StartClient (
 	}
 # endif
 
-# ifndef HAS_SETUSERCONTEXT
+# ifndef HAVE_SETUSERCONTEXT
 	if (setuid(verify->uid) < 0) {
 	    LogError ("setuid %d (user \"%s\") failed: %s\n",
 		      verify->uid, name, _SysErrorMsg (errno));
 	    return (0);
 	}
-# else /* HAS_SETUSERCONTEXT */
+# else /* HAVE_SETUSERCONTEXT */
 	/*
 	 * Set the user's credentials: uid, gid, groups,
 	 * environment variables, resource limits, and umask.
@@ -708,7 +708,7 @@ StartClient (
 		      name, _SysErrorMsg (errno));
 	    return (0);
 	}
-# endif /* HAS_SETUSERCONTEXT */
+# endif /* HAVE_SETUSERCONTEXT */
 #else /* AIXV3 */
 	/*
 	 * Set the user's credentials: uid, gid, groups,

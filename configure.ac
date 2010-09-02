@@ -91,7 +91,7 @@ AC_TYPE_SIGNAL
 #
 # Required system libraries have been searched for and are listed in $LIBS
 #------------------------------------------------------------------------------
-AC_CHECK_FUNCS([daemon sigaction openlog asprintf setproctitle])
+AC_CHECK_FUNCS([daemon sigaction openlog asprintf setproctitle setusercontext])
 
 #------------------------------------------------------------------------------
 
@@ -115,15 +115,6 @@ AC_CHECK_FUNC(getifaddrs, AC_DEFINE(HAS_GETIFADDRS,1,
 	[Define to 1 if you have the 'getifaddrs' function.]))
 AC_CHECK_FUNC(getspnam, AC_DEFINE(USESHADOW,1,
 	[Define to 1 if you have the shadow password functions.]))
-
-# According to the old Imakefile, BSD/OS has this in libutil
-AC_CHECK_FUNC(setusercontext, [HAS_SETUSERCONTEXT="yes"],
-	AC_CHECK_LIB(util, setusercontext, 
-		    [HAS_SETUSERCONTEXT="yes" ; XDM_OS_LIBS="$XDM_OS_LIBS -lutil"]))
-if test "x$HAS_SETUSERCONTEXT" = "xyes" ; then
-	AC_DEFINE(HAS_SETUSERCONTEXT,1,
-		[Define to 1 if you have the 'setusercontext' function.])
-fi
 
 XTRANS_CONNECTION_FLAGS
 dnl Sets $SECURE_RPC to "yes" or "no"
