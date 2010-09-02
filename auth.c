@@ -318,7 +318,7 @@ MakeServerAuthFile (struct display *d, FILE ** file)
 #endif
     char    cleanname[NAMELEN];
     int r;
-#ifdef HAS_MKSTEMP
+#ifdef HAVE_MKSTEMP
     int fd;
 #endif
     struct stat	statb;
@@ -368,7 +368,7 @@ MakeServerAuthFile (struct display *d, FILE ** file)
 	    }
 	    snprintf (d->authFile, len, "%s/%s/%s/A%s-XXXXXX",
 		      authDir, authdir1, authdir2, cleanname);
-#ifdef HAS_MKSTEMP
+#ifdef HAVE_MKSTEMP
 	    fd = mkstemp (d->authFile);
 	    if (fd < 0) {
 		LogError ("cannot make authentication file %s: %s\n",
@@ -809,7 +809,7 @@ DefineLocal (FILE *file, Xauth *auth)
 	writeAddr (FamilyLocal, len, displayname, file, auth);
 }
 
-#ifdef HAS_GETIFADDRS
+#ifdef HAVE_GETIFADDRS
 # include <ifaddrs.h>
 
 static void
@@ -1209,7 +1209,7 @@ DefineSelf (int fd, int file, int auth)
 #   endif /* SIOCGIFCONF else */
 #  endif /* WINTCP else */
 # endif /* STREAMSCONN && !SYSV_SIOCGIFCONF else */
-#endif /* HAS_GETIFADDRS */
+#endif /* HAVE_GETIFADDRS */
 
 static void
 setAuthNumber (Xauth *auth, char *name)
@@ -1313,7 +1313,7 @@ SetUserAuthorization (struct display *d, struct verify_info *verify)
     int		i;
     int		magicCookie;
     int		data_len;
-#ifdef HAS_MKSTEMP
+#ifdef HAVE_MKSTEMP
     int		fd;
 #endif
 
@@ -1348,7 +1348,7 @@ SetUserAuthorization (struct display *d, struct verify_info *verify)
 	if (lockStatus != LOCK_SUCCESS) {
 	    snprintf (backup_name, sizeof(backup_name),
 		      "%s/.XauthXXXXXX", d->userAuthDir);
-#ifdef HAS_MKSTEMP
+#ifdef HAVE_MKSTEMP
 	    fd = mkstemp (backup_name);
 	    if (fd >= 0) {
 		old = fdopen (fd, "r");
@@ -1378,7 +1378,7 @@ SetUserAuthorization (struct display *d, struct verify_info *verify)
 			if (new != NULL)
 			    (void) fclose (new);
 		    }
-#ifdef HAS_MKSTEMP
+#ifdef HAVE_MKSTEMP
 		} else {
 		    (void) fclose (old);
 #endif

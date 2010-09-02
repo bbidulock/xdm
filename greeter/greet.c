@@ -119,7 +119,7 @@ void    (*__xdm_LogOutOfMem)(const char * fmt, ...) = NULL;
 void    (*__xdm_setgrent)(void) = NULL;
 struct group    *(*__xdm_getgrent)(void) = NULL;
 void    (*__xdm_endgrent)(void) = NULL;
-# ifdef USESHADOW
+# ifdef HAVE_GETSPNAM
 struct spwd   *(*__xdm_getspnam)(GETSPNAM_ARGS) = NULL;
 #  ifndef QNX4
 void   (*__xdm_endspent)(void) = NULL;
@@ -460,7 +460,7 @@ greet_user_rtn GreetUser(
     __xdm_setgrent = dlfuncs->_setgrent;
     __xdm_getgrent = dlfuncs->_getgrent;
     __xdm_endgrent = dlfuncs->_endgrent;
-# ifdef USESHADOW
+# ifdef HAVE_GETSPNAM
     __xdm_getspnam = dlfuncs->_getspnam;
 #  ifndef QNX4
     __xdm_endspent = dlfuncs->_endspent;

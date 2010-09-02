@@ -74,7 +74,7 @@ struct dlfuncs {
     SETGRENT_TYPE (*_setgrent)(void);		/* no longer used */
     struct group *(*_getgrent)(void);	/* no longer used */
     void (*_endgrent)(void);		/* no longer used */
-#ifdef USESHADOW
+#ifdef HAVE_GETSPNAM
     struct spwd *(*_getspnam)(GETSPNAM_ARGS);
 # ifndef QNX4
     void (*_endspent)(void);
@@ -158,7 +158,7 @@ extern	void    (*__xdm_LogOutOfMem)(const char * fmt, ...);
 extern	void    (*__xdm_setgrent)(void);
 extern	struct group    *(*__xdm_getgrent)(void);
 extern	void    (*__xdm_endgrent)(void);
-# ifdef USESHADOW
+# ifdef HAVE_GETSPNAM
 extern	struct spwd   *(*__xdm_getspnam)(GETSPNAM_ARGS);
 #  ifndef QNX4
 extern	void    (*__xdm_endspent)(void);
@@ -200,7 +200,7 @@ extern  pam_handle_t    **(*__xdm_thepamhp)(void);
 # define	setgrent		(*__xdm_setgrent)
 # define	getgrent		(*__xdm_getgrent)
 # define	endgrent		(*__xdm_endgrent)
-# ifdef USESHADOW
+# ifdef HAVE_GETSPNAM
 #  define	getspnam		(*__xdm_getspnam)
 #  ifndef QNX4
 #   define	endspent		(*__xdm_endspent)

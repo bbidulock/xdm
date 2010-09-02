@@ -129,7 +129,7 @@ extern	struct group	*getgrent(void);
 extern	void	endgrent(void);
 #endif
 
-#ifdef USESHADOW
+#ifdef HAVE_GETSPNAM
 # if defined(SVR4)
 #  include <shadow.h>
 # else
@@ -192,7 +192,7 @@ static	struct dlfuncs	dlfuncs = {
 	setgrent,
 	getgrent,
 	endgrent,
-#ifdef USESHADOW
+#ifdef HAVE_GETSPNAM
 	getspnam,
 # ifndef QNX4
 	endspent,
