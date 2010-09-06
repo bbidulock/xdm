@@ -179,7 +179,7 @@ main (int argc, char **argv)
 	snprintf(cmdbuf, sizeof(cmdbuf), "/bin/rm -f %s/authdir/authfiles/A*", authDir);
 	system(cmdbuf);
     }
-#if!defined(ARC4_RANDOM) && !defined(DEV_RANDOM)
+#if!defined(HAVE_ARC4RANDOM) && !defined(DEV_RANDOM)
     AddOtherEntropy ();
 #endif
 #ifdef XDMCP
@@ -205,7 +205,7 @@ main (int argc, char **argv)
 #endif
     ScanServers ();
     StartDisplays ();
-#if !defined(ARC4_RANDOM) && !defined(DEV_RANDOM)
+#if !defined(HAVE_ARC4RANDOM) && !defined(DEV_RANDOM)
     AddOtherEntropy();
 #endif
     (void) Signal (SIGHUP, RescanNotify);
@@ -540,7 +540,7 @@ WaitForChild (void)
 			  " removing display %s\n",d->name);
 		    LogError("Server crash rate too high:"
 			     " removing display %s\n",d->name);
-#if !defined(ARC4_RANDOM) && !defined(DEV_RANDOM)
+#if !defined(HAVE_ARC4RANDOM) && !defined(DEV_RANDOM)
 		    AddTimerEntropy();
 #endif
 		    RemoveDisplay (d);

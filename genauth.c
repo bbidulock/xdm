@@ -89,7 +89,7 @@ pollRandomDevice (int fd)
 # define pollRandomDevice(fd) 1
 #endif
 
-#if !defined(ARC4_RANDOM)
+#if !defined(HAVE_ARC4RANDOM)
 
 /* ####################################################################### */
 
@@ -337,7 +337,7 @@ AddPreGetEntropy (void)
     }
     LogError("Cannot read randomFile \"%s\"; X cookies may be easily guessable\n", randomFile);
 }
-#endif /* !ARC4_RANDOM && !DEV_RANDOM */
+#endif /* !HAVE_ARC4RANDOM && !DEV_RANDOM */
 
 
 #ifdef HASXDMAUTH
@@ -346,7 +346,7 @@ InitXdmcpWrapper (void)
 {
     CARD32 sum[4];
 
-# ifdef	ARC4_RANDOM
+# ifdef	HAVE_ARC4RANDOM
     sum[0] = arc4random();
     sum[1] = arc4random();
     *(u_char *)sum = 0;
@@ -437,14 +437,14 @@ GenerateAuthData (char *auth, int len)
     }
     return 1;
 #else /* !XDMAUTH */
-# ifdef ARC4_RANDOM
+# ifdef HAVE_ARC4RANDOM
     CARD32 *rnd = (CARD32 *)auth;
     int i;
 
     for (i = 0; i < len; i += 4)
 	rnd[i / 4] = arc4random();
     return 1;
-# else /* !ARC4_RANDOM */
+# else /* !HAVE_ARC4RANDOM */
     CARD32 tmp[4] = { 0x67452301, 0xefcdab89, 0x98badcfe, 0x10325476 };
 #  ifdef DEV_RANDOM
     int fd;
@@ -476,6 +476,6 @@ GenerateAuthData (char *auth, int len)
     add_entropy (tmp + 2, 1);
     memcpy (auth, tmp, len);
     return 1;
-# endif /* !ARC4_RANDOM */
+# endif /* !HAVE_ARC4RANDOM */
 #endif /* !HASXDMAUTH */
 }

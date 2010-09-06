@@ -87,7 +87,7 @@ extern void SetUserAuthorization (struct display *d, struct verify_info *verify)
 
 /* genauth.c */
 extern int GenerateAuthData (char *auth, int len);
-# if !defined(ARC4_RANDOM)
+# if !defined(HAVE_ARC4RANDOM)
 extern void AddPreGetEntropy (void);
 extern void AddOtherEntropy (void);
 extern void AddTimerEntropy (void);

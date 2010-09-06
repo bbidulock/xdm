@@ -55,13 +55,13 @@ int	removeDomainname;
 char	*keyFile;
 char	*accessFile;
 char	**exportList;
-#if !defined(ARC4_RANDOM)
+#if !defined(HAVE_ARC4RANDOM)
 char	*randomFile;
 #endif
 #ifdef DEV_RANDOM
 char	*randomDevice;
 #endif
-#if !defined(ARC4_RANDOM)
+#if !defined(HAVE_ARC4RANDOM)
 char	*prngdSocket;
 int	prngdPort;
 #endif
@@ -176,7 +176,7 @@ struct dmResources {
 				DEF_ACCESS_FILE} ,
 { "exportList",	"ExportList",	DM_ARGV,	(char **) &exportList,
 				""} ,
-#if !defined(ARC4_RANDOM)
+#if !defined(HAVE_ARC4RANDOM)
 { "randomFile",	"RandomFile",	DM_STRING,	&randomFile,
 				DEF_RANDOM_FILE} ,
 { "prngdSocket", "PrngdSocket", DM_STRING,	&prngdSocket,

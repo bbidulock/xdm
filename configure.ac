@@ -74,7 +74,9 @@ AC_SEARCH_LIBS([setproctitle], [util bsd])
 AC_SEARCH_LIBS([setusercontext], [util])
 
 # Function arc4random() is in BSD standard C or GNU systems -lbsd
-AC_SEARCH_LIBS([arc4random], [bsd])
+AC_SEARCH_LIBS([arc4random], [bsd], [HAVE_ARC4RANDOM="yes"])
+AC_SUBST(HAVE_ARC4RANDOM)
+AM_CONDITIONAL(HAVE_ARC4RANDOM, test x$HAVE_ARC4RANDOM = xyes)
 
 # Function crypt() comes from the C library or the -lcrypt data encryption library
 AC_SEARCH_LIBS(crypt, crypt)
@@ -92,7 +94,7 @@ AC_TYPE_SIGNAL
 # Required system libraries have been searched for and are listed in $LIBS
 #------------------------------------------------------------------------------
 AC_CHECK_FUNCS([daemon sigaction openlog asprintf setproctitle setusercontext \
-                mkstemp getifaddrs getspnam])
+                mkstemp getifaddrs getspnam arc4random])
 
 #------------------------------------------------------------------------------
 
@@ -197,14 +199,6 @@ if test x$RANDOM_DEVICE != xno ; then
 		DEV_RANDOM=$RANDOM_DEVICE
 fi
 AC_SUBST(DEV_RANDOM)
-
-AC_CHECK_FUNC(arc4random, [HAS_ARC4_RANDOM="yes"], [HAS_ARC4_RANDOM="no"])
-AM_CONDITIONAL(HAS_ARC4_RANDOM, test x$HAS_ARC4_RANDOM = xyes)
-if test x$HAS_ARC4_RANDOM = xyes ; then
-	AC_DEFINE(ARC4_RANDOM, 1, [Define to use arc4random() function])
-	ARC4_RANDOM=1
-fi
-AC_SUBST(ARC4_RANDOM)
 
 # FIXME: find out how to check for these things. Note that Kerberos was
 # turned off everywhere but on OpenBSD.

@@ -83,7 +83,7 @@ xdm_CFLAGS +=  -DHASXDMAUTH
 xdm_SOURCES += xdmauth.c
 endif
 
-if !HAS_ARC4_RANDOM
+if !HAVE_ARC4RANDOM
 xdm_SOURCES += prngc.c
 endif
 
@@ -119,7 +119,7 @@ MAN_SUBSTS +=	-e 's|CHOOSERPATH|$(xdmlibdir)/chooser|g' \
 		-e 's|DEF_SYSTEM_PATH|$(DEF_SYSTEM_PATH)|g' \
 		-e 's|DEF_GREETER_LIB|$(DEF_GREETER_LIB)|g' \
 		-e 's|DEV_RANDOM|$(DEV_RANDOM)|g' \
-		-e 's|ARC4_RANDOM|$(ARC4_RANDOM)|g'
+		-e 's|ARC4_RANDOM|$(HAVE_ARC4RANDOM)|g'
 
 .man.cpp.$(APP_MAN_SUFFIX):
 	$(AM_V_GEN)$(SED) $(MAN_SUBSTS) < $< > $@

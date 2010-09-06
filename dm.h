@@ -318,7 +318,7 @@ extern int	removeDomainname;
 extern char	*keyFile;
 extern char	*accessFile;
 extern char	**exportList;
-# if !defined(ARC4_RANDOM)
+# if !defined(HAVE_ARC4RANDOM)
 extern char	*randomFile;
 extern char	*prngdSocket;
 extern int	prngdPort;
