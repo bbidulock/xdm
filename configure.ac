@@ -86,6 +86,15 @@ AC_CHECK_HEADERS([grp.h syslog.h sys/param.h])
 # Checks for typedefs, structures, and compiler characteristics.
 AC_TYPE_SIGNAL
 
+#------------------------------------------------------------------------------
+#			Check for system library functions
+#
+# Required system libraries have been searched for and are listed in $LIBS
+#------------------------------------------------------------------------------
+AC_CHECK_FUNCS([daemon sigaction openlog asprintf])
+
+#------------------------------------------------------------------------------
+
 m4_ifdef([AM_SILENT_RULES],[HAVE_AM_SILENT_RULES=yes])
 AM_CONDITIONAL(HAVE_AM_SILENT_RULES, test x$HAVE_AM_SILENT_RULES != x)
 
@@ -125,8 +134,6 @@ if test "x$HAS_SETUSERCONTEXT" = "xyes" ; then
 	AC_DEFINE(HAS_SETUSERCONTEXT,1,
 		[Define to 1 if you have the 'setusercontext' function.])
 fi
-
-AC_CHECK_FUNCS([daemon sigaction openlog asprintf])
 
 XTRANS_CONNECTION_FLAGS
 dnl Sets $SECURE_RPC to "yes" or "no"
