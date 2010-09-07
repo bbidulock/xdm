@@ -47,17 +47,18 @@ XORG_DEFAULT_OPTIONS
 XORG_PROG_RAWCPP
 XORG_WITH_LINT
 
+# Checks for programs.
+# Check for mktemp to prevent security issue noted in Xorg bug #5898
+# See https://bugs.freedesktop.org/show_bug.cgi?id=5898 for details.
+AC_PATH_PROG(MKTEMP_COMMAND, mktemp)
+AM_CONDITIONAL(HAVE_MKTEMP_COMMAND, test x$MKTEMP_COMMAND != x)
+
 m4_ifdef([AM_SILENT_RULES],[HAVE_AM_SILENT_RULES=yes])
 AM_CONDITIONAL(HAVE_AM_SILENT_RULES, test x$HAVE_AM_SILENT_RULES != x)
 
 XDM_CFLAGS="$XDM_CFLAGS"
 GREETER_CFLAGS="$GREETER_CFLAGS"
 CHOOSER_CFLAGS="$CHOOSER_CFLAGS"
-
-# Check for mktemp to prevent security issue noted in Xorg bug #5898
-# See https://bugs.freedesktop.org/show_bug.cgi?id=5898 for details.
-AC_PATH_PROG(MKTEMP_COMMAND, mktemp)
-AM_CONDITIONAL(HAVE_MKTEMP_COMMAND, test x$MKTEMP_COMMAND != x)
 
 AC_FUNC_FORK
 
