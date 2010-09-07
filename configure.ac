@@ -20,23 +20,26 @@ dnl  PERFORMANCE OF THIS SOFTWARE.
 dnl
 dnl Process this file with autoconf to create configure.
 
-
+# Initialize Autoconf
 AC_PREREQ([2.60])
-AC_INIT(xdm,[1.1.10],[https://bugs.freedesktop.org/enter_bug.cgi?product=xorg],xdm)
+AC_INIT([xdm], [1.1.10],
+        [https://bugs.freedesktop.org/enter_bug.cgi?product=xorg], [xdm])
+AC_USE_SYSTEM_EXTENSIONS
+AC_CONFIG_SRCDIR([Makefile.am])
+AC_CONFIG_MACRO_DIR([m4])
+AC_CONFIG_HEADERS(config.h)
+
+# Initialize Automake
 AM_INIT_AUTOMAKE([foreign dist-bzip2])
 AM_MAINTAINER_MODE
-AC_CONFIG_MACRO_DIR([m4])
+AM_PROG_CC_C_O
 
 # Require X.Org macros 1.8 or later for MAN_SUBSTS set by XORG_MANPAGE_SECTIONS
 m4_ifndef([XORG_MACROS_VERSION],
           [m4_fatal([must install xorg-macros 1.8 or later before running autoconf/autogen])])
 XORG_MACROS_VERSION(1.8)
-AC_USE_SYSTEM_EXTENSIONS
 XORG_DEFAULT_OPTIONS
 
-AM_CONFIG_HEADER(config.h)
-
-AM_PROG_CC_C_O
 AC_LIBTOOL_DLOPEN
 AC_PROG_LIBTOOL
 
