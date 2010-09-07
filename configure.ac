@@ -53,6 +53,33 @@ XORG_WITH_LINT
 AC_PATH_PROG(MKTEMP_COMMAND, mktemp)
 AM_CONDITIONAL(HAVE_MKTEMP_COMMAND, test x$MKTEMP_COMMAND != x)
 
+#------------------------------------------------------------------------------
+#			Check for system libraries
+#
+# AC_SEARCH_LIBS: tests using $LIBS and tests again with each listed library.
+#                 pre-pends the found library to $LIBS.
+#
+#------------------------------------------------------------------------------
+# Function getifaddrs() comes from the C library or the -lnsl name service library
+AC_SEARCH_LIBS([getifaddrs], [nsl])
+
+# Function getspnam() comes from the C library, System V -lsec, UnixWare 7 -lgen
+# or Old Linux versions -lshadow
+AC_SEARCH_LIBS([getspnam], [sec gen shadow])
+
+# Function setproctitle() is in BSD -lutil or GNU systems -lbsd but N/A on Solaris
+AC_SEARCH_LIBS([setproctitle], [util bsd])
+
+# Function setusercontext() is in BSD -lutil but N/A on Solaris or GNU systems
+AC_SEARCH_LIBS([setusercontext], [util])
+
+# Function arc4random() is in BSD standard C or GNU systems -lbsd
+AC_SEARCH_LIBS([arc4random], [bsd])
+
+# Function crypt() comes from the C library or the -lcrypt data encryption library
+AC_SEARCH_LIBS(crypt, crypt)
+#------------------------------------------------------------------------------
+
 m4_ifdef([AM_SILENT_RULES],[HAVE_AM_SILENT_RULES=yes])
 AM_CONDITIONAL(HAVE_AM_SILENT_RULES, test x$HAVE_AM_SILENT_RULES != x)
 
@@ -399,8 +426,6 @@ if test "x$xdmauth_enable" = "xyes" -a "x$xdmauth" = "xno" ; then
 fi
 
 AM_CONDITIONAL(HAS_XDM_AUTH, test x$xdmauth = xyes -a x$xdmauth_enable != xno)
-
-AC_SEARCH_LIBS(crypt, crypt)
 
 AC_SUBST(XDM_CFLAGS)
 AC_SUBST(XDM_LIBS)
