@@ -80,6 +80,12 @@ AC_SEARCH_LIBS([arc4random], [bsd])
 AC_SEARCH_LIBS(crypt, crypt)
 #------------------------------------------------------------------------------
 
+# Checks for header files.
+AC_CHECK_HEADERS([grp.h syslog.h sys/param.h])
+
+# Checks for typedefs, structures, and compiler characteristics.
+AC_TYPE_SIGNAL
+
 m4_ifdef([AM_SILENT_RULES],[HAVE_AM_SILENT_RULES=yes])
 AM_CONDITIONAL(HAVE_AM_SILENT_RULES, test x$HAVE_AM_SILENT_RULES != x)
 
@@ -121,8 +127,6 @@ if test "x$HAS_SETUSERCONTEXT" = "xyes" ; then
 fi
 
 AC_CHECK_FUNCS([daemon sigaction openlog asprintf])
-AC_CHECK_HEADERS([grp.h syslog.h sys/param.h])
-AC_TYPE_SIGNAL
 
 XTRANS_CONNECTION_FLAGS
 dnl Sets $SECURE_RPC to "yes" or "no"
