@@ -137,16 +137,12 @@ use_selinux_default=no
 AC_ARG_WITH(selinux, AC_HELP_STRING([--with-selinux],[Add support for selinux]),
 	[USE_SELINUX=$withval], [USE_SELINUX=$use_selinux_default])
 if test "x$USE_SELINUX" != "xno" ; then
-	old_LIBS="$LIBS"
-	LIBS=""
 	AC_SEARCH_LIBS(is_selinux_enabled,[selinux])
 	AC_CHECK_FUNC(is_selinux_enabled,
 		[AC_DEFINE(HAVE_SELINUX,1,[Add support for selinux])],
 		[if test "x$USE_SELINUX" != "xtry" ; then
 			AC_MSG_ERROR(["selinux support requested, but is_selinux_enabled not found."])
 		 fi])
-	XDM_OS_LIBS="$XDM_OS_LIBS $LIBS"
-	LIBS="$old_LIBS"
 fi
 
 # FIXME: Find better test for which OS'es use su -m  - for now, just try to
@@ -305,8 +301,6 @@ AC_SUBST(SHELL_CMD)
 # Checks for pkg-config packages
 
 PKG_CHECK_MODULES(XDM, xmu x11 xau)
-
-XDM_LIBS="$XDM_LIBS $XDM_OS_LIBS"
 
 PKG_CHECK_EXISTS(xinerama, [
 	AC_DEFINE([USE_XINERAMA], 1, 
