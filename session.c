@@ -71,17 +71,17 @@ extern int key_setnet(struct key_netstarg *arg);
 # include <prot.h>
 #endif
 
-#ifdef HAVE_SELINUX
+#ifdef USE_SELINUX
 #include <selinux/selinux.h>
 #include <selinux/get_context_list.h>
-#endif /* HAVE_SELINUX */
+#endif /* USE_SELINUX */
 
 # include <dlfcn.h>
 # ifndef RTLD_NOW
 #  define RTLD_NOW 1
 # endif
 
-#ifdef HAVE_SELINUX
+#ifdef USE_SELINUX
 /* This should be run just before we exec the user session. */
 static int
 xdm_selinux_setup (const char *login)
@@ -115,7 +115,7 @@ xdm_selinux_setup (const char *login)
 	freecon (scontext);
 	return TRUE;
 }
-#endif /* HAVE_SELINUX */
+#endif /* USE_SELINUX */
 
 static	int	runAndWait (char **args, char **environ);
 
@@ -817,7 +817,7 @@ StartClient (
 	    bzero(passwd, strlen(passwd));
 
 	SetUserAuthorization (d, verify);
-#ifdef HAVE_SELINUX
+#ifdef USE_SELINUX
    /*
     * For Security Enhanced Linux:
     * set the default security context for this user.
@@ -827,7 +827,7 @@ StartClient (
        exit (UNMANAGE_DISPLAY);
        return (0);
    }
-#endif /* HAVE_SELINUX */
+#endif /* USE_SELINUX */
 	home = getEnv (verify->userEnviron, "HOME");
 	if (home)
 	    if (chdir (home) == -1) {

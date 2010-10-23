@@ -134,17 +134,19 @@ if test "x$USE_PAM" != "xno" ; then
     )
 fi
 
-use_selinux_default=no
-# Check for selinux support
-AC_ARG_WITH(selinux, AC_HELP_STRING([--with-selinux],[Add support for selinux]),
-	[USE_SELINUX=$withval], [USE_SELINUX=$use_selinux_default])
+# Check for Security-Enhanced Linux (SELinux) support
+AC_ARG_WITH(selinux, AS_HELP_STRING([--with-selinux],
+	[Add support for SELinux (default is no support)]),
+	[USE_SELINUX=$withval], [USE_SELINUX=no])
 if test "x$USE_SELINUX" != "xno" ; then
-	AC_SEARCH_LIBS(is_selinux_enabled,[selinux])
-	AC_CHECK_FUNC(is_selinux_enabled,
-		[AC_DEFINE(HAVE_SELINUX,1,[Add support for selinux])],
-		[if test "x$USE_SELINUX" != "xtry" ; then
-			AC_MSG_ERROR(["selinux support requested, but is_selinux_enabled not found."])
-		 fi])
+    AC_SEARCH_LIBS(is_selinux_enabled, [selinux],
+	[AC_CHECK_FUNC([is_selinux_enabled],
+	    [AC_DEFINE(USE_SELINUX,1,[Use Security-Enhanced Linux (SELinux) support])]
+	)],
+	[AS_IF([test "x$USE_SELINUX" = "xyes"],
+	    [AC_MSG_ERROR([SELinux support requested, but is_selinux_enabled not found.])]
+	)]
+    )
 fi
 
 # FIXME: Find better test for which OS'es use su -m  - for now, just try to
