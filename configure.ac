@@ -175,28 +175,27 @@ case $host_os in
 esac
 AC_SUBST(SU)
 
-# Check for /dev/random or /dev/urandom
-AC_ARG_WITH(random-device, 
-	AC_HELP_STRING([--with-random-device\[=<pathname>\]],
-		[Use <pathname> as a source of randomness]),
-	RANDOM_DEVICE="$withval", RANDOM_DEVICE="try")
-
-if test x$RANDOM_DEVICE = xyes -o x$RANDOM_DEVICE = xtry ; then
-	AC_CHECK_FILE([/dev/urandom], [RANDOM_DEVICE=/dev/urandom],
-		AC_CHECK_FILE([/dev/random], [RANDOM_DEVICE=/dev/random]))
-	if test x$RANDOM_DEVICE = xyes ; then
-		AC_MSG_ERROR([random device support requested, but no random device was found.])		
-	else 
-		if test x$RANDOM_DEVICE = xtry ; then
-			RANDOM_DEVICE="no"
-		fi
-	fi
-fi
-
-if test x$RANDOM_DEVICE != xno ; then
-	AC_DEFINE_UNQUOTED(DEV_RANDOM,"$RANDOM_DEVICE",
-		[Define to device that provides random data source])
-		DEV_RANDOM=$RANDOM_DEVICE
+# Define a configure option to locate a special file (/dev/random or /dev/urandom)
+# that serves as a random or a pseudorandom number generator
+AC_ARG_WITH(random-device, AS_HELP_STRING([--with-random-device\[=<pathname>\]],
+	[Use <pathname> as a source of randomness (default is auto-detected)]),
+	[USE_DEVICE="$withval"], [USE_DEVICE="auto"])
+if test x$USE_DEVICE != xno ; then
+    if test x$USE_DEVICE = xyes -o x$USE_DEVICE = xauto ; then
+	AC_CHECK_FILE([/dev/urandom], [DEV_RANDOM=/dev/urandom],
+	    [AC_CHECK_FILE([/dev/random], [DEV_RANDOM=/dev/random],
+		[AS_IF([test "x$USE_DEVICE" = "xyes"],
+		    [AC_MSG_ERROR([random device support requested, but no random device was found.])]
+		)]
+	    )]
+	)
+    else
+	# assume the user input is a valid path to a random number generator
+	DEV_RANDOM=$USE_DEVICE
+    fi
+    if test x$DEV_RANDOM != x ; then
+	AC_DEFINE_UNQUOTED(DEV_RANDOM,"$DEV_RANDOM", [Define to device that provides random data source])
+    fi
 fi
 AC_SUBST(DEV_RANDOM)
 
