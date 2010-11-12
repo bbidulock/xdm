@@ -107,8 +107,10 @@ CHOOSER_CFLAGS="$CHOOSER_CFLAGS"
 
 AC_FUNC_FORK
 
+# Find needed libraries for TCP sockets (pre-pended in $LIBS)
 XTRANS_CONNECTION_FLAGS
-dnl Sets $SECURE_RPC to "yes" or "no"
+
+# Sets $SECURE_RPC to "yes" or "no" using libraries found above from $LIBS
 XTRANS_SECURE_RPC_FLAGS
 AM_CONDITIONAL(HAS_SECURE_RPC, test x$SECURE_RPC = xyes)
 
