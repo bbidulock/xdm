@@ -101,9 +101,6 @@ AC_FUNC_FORK
 AC_CHECK_FUNCS([daemon sigaction openlog asprintf setproctitle setusercontext \
                 mkstemp getifaddrs getspnam arc4random])
 
-m4_ifdef([AM_SILENT_RULES],[HAVE_AM_SILENT_RULES=yes])
-AM_CONDITIONAL(HAVE_AM_SILENT_RULES, test x$HAVE_AM_SILENT_RULES != x)
-
 XDM_CFLAGS="$XDM_CFLAGS"
 GREETER_CFLAGS="$GREETER_CFLAGS"
 CHOOSER_CFLAGS="$CHOOSER_CFLAGS"
