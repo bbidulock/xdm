@@ -19,20 +19,15 @@
 #  TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 #  PERFORMANCE OF THIS SOFTWARE.
 
-SUBDIRS = config greeter
+SUBDIRS = config greeter man
 
 bin_PROGRAMS = xdm
 noinst_PROGRAMS =
 
-appman_PRE = xdm.man.cpp
-noinst_man_PRE =
-
 if INSTALL_XDMSHELL
 bin_PROGRAMS += xdmshell
-appman_PRE += xdmshell.man.cpp
 else
 noinst_PROGRAMS += xdmshell
-noinst_man_PRE += xdmshell.man.cpp
 endif
 
 xdmlibdir = $(XDMLIBDIR)
@@ -97,34 +92,6 @@ xdm_SOURCES += krb5auth.c
 endif
 
 #
-#  xdm man page 
-#
-
-appmandir = $(APP_MAN_DIR)
-appman_DATA = $(appman_PRE:man.cpp=@APP_MAN_SUFFIX@)
-noinst_DATA = $(noinst_man_PRE:man.cpp=@APP_MAN_SUFFIX@)
-
-MAINTAINERCLEANFILES = ChangeLog INSTALL
-CLEANFILES = $(appman_DATA) $(noinst_DATA)
-EXTRA_DIST = $(appman_PRE) $(noinst_man_PRE)
-SUFFIXES   = .$(APP_MAN_SUFFIX) .man.cpp
-
-MAN_SUBSTS +=	-e 's|CHOOSERPATH|$(xdmlibdir)/chooser|g' \
-		-e 's|XDMLOGDIR|$(XDMLOGDIR)|g' \
-		-e 's|XDMDIR|$(XDMCONFIGDIR)|g' \
-		-e 's|BINDIR|$(bindir)|g' \
-		-e 's|XDMPIDDIR|$(XDMPIDDIR)|g' \
-		-e 's|XDMXAUTHDIR|$(XDMXAUTHDIR)|g' \
-		-e 's|DEF_USER_PATH|$(DEF_USER_PATH)|g' \
-		-e 's|DEF_SYSTEM_PATH|$(DEF_SYSTEM_PATH)|g' \
-		-e 's|DEF_GREETER_LIB|$(DEF_GREETER_LIB)|g' \
-		-e 's|DEV_RANDOM|$(DEV_RANDOM)|g' \
-		-e 's|ARC4_RANDOM|$(HAVE_ARC4RANDOM)|g'
-
-.man.cpp.$(APP_MAN_SUFFIX):
-	$(AM_V_GEN)$(SED) $(MAN_SUBSTS) < $< > $@
-
-#
 #  xdmshell
 #
 xdmshell_CFLAGS = $(XDMSHELL_CFLAGS) -DBINDIR="\"$(bindir)\""
@@ -160,6 +127,8 @@ lint:
 	$(LINT) $(ALL_LINT_FLAGS) $(chooser_CFLAGS) $(chooser_SOURCES) $(chooser_LDADD)
 	(cd greeter && $(MAKE) $(AM_MAKEFLAGS) lint)
 endif LINT
+
+MAINTAINERCLEANFILES = ChangeLog INSTALL
 
 .PHONY: ChangeLog INSTALL
 

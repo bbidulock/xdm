@@ -545,4 +545,8 @@ AC_SUBST(appdefaultdir)
 
 AC_SUBST(MKTEMP_COMMAND)
 
-AC_OUTPUT([Makefile config/Makefile greeter/Makefile])
+AC_CONFIG_FILES([Makefile
+		config/Makefile
+		greeter/Makefile
+		man/Makefile])
+AC_OUTPUT
