@@ -32,7 +32,6 @@ AC_CONFIG_HEADERS(config.h)
 # Initialize Automake
 AM_INIT_AUTOMAKE([foreign dist-bzip2])
 AM_MAINTAINER_MODE
-AM_PROG_CC_C_O
 
 # Initialize libtool
 AC_DISABLE_STATIC
