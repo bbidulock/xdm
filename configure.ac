@@ -119,17 +119,19 @@ AC_CHECK_DECL(key_setnet,
 #include <rpc/key_prot.h>
 ])
 
-# Check for PAM support
-use_pam_default=try
-AC_ARG_WITH(pam, AC_HELP_STRING([--with-pam],[Use PAM for authentication]),
-	[USE_PAM=$withval], [USE_PAM=$use_pam_default])
+# Check for pluggable authentication modules (PAM) support
+AC_ARG_WITH(pam, AS_HELP_STRING([--with-pam],
+	[Use PAM for authentication (default is autodetected)]),
+	[USE_PAM=$withval], [USE_PAM=auto])
 if test "x$USE_PAM" != "xno" ; then
-	AC_SEARCH_LIBS(pam_open_session,[pam])
-	AC_CHECK_FUNC(pam_open_session, 
-		[AC_DEFINE(USE_PAM,1,[Use PAM for authentication])],
-		[if test "x$USE_PAM" != "xtry" ; then
-			AC_MSG_ERROR([PAM support requested, but pam_open_session not found.])
-		 fi])
+    AC_SEARCH_LIBS([pam_open_session], [pam],
+	[AC_CHECK_FUNC([pam_open_session],
+	    [AC_DEFINE(USE_PAM,1,[Use PAM for authentication])]
+	)],
+	[AS_IF([test "x$USE_PAM" = "xyes"],
+	    [AC_MSG_ERROR([PAM support requested, but pam_open_session not found.])]
+	)]
+    )
 fi
 
 use_selinux_default=no
