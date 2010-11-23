@@ -84,6 +84,13 @@ AC_SEARCH_LIBS(crypt, crypt)
 
 # Checks for header files.
 AC_CHECK_HEADERS([grp.h syslog.h sys/param.h])
+AC_CHECK_DECL(key_setnet,
+	AC_DEFINE(HAVE_DECL_KEY_SETNET,1,
+	     [Define to 1 if your headers define the key_setnet() function.]),
+	[],[
+#include <rpc/rpc.h>
+#include <rpc/key_prot.h>
+])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_TYPE_SIGNAL
@@ -107,15 +114,6 @@ XTRANS_CONNECTION_FLAGS
 # Sets $SECURE_RPC to "yes" or "no" using libraries found above from $LIBS
 XTRANS_SECURE_RPC_FLAGS
 AM_CONDITIONAL(HAS_SECURE_RPC, test x$SECURE_RPC = xyes)
-
-dnl Is key_setnet defined in a header file?
-AC_CHECK_DECL(key_setnet, 
-	AC_DEFINE(HAVE_DECL_KEY_SETNET,1,
-	     [Define to 1 if your headers define the key_setnet() function.]),
-	[],[
-#include <rpc/rpc.h>
-#include <rpc/key_prot.h>
-])
 
 # Check for pluggable authentication modules (PAM) support
 AC_ARG_WITH(pam, AS_HELP_STRING([--with-pam],
