@@ -197,43 +197,43 @@ AM_CONDITIONAL(HAS_KERBEROS_FIVE, false)
 # Figure out where everything goes in the filesystem
 
 AC_ARG_WITH(xdmlibdir,
-	AC_HELP_STRING([--with-xdmlibdir=<pathname>],
+	AS_HELP_STRING([--with-xdmlibdir=<pathname>],
 	  [specify directory for xdm scripts and modules (default=${libdir}/X11/xdm)]),
 	[XDMLIBDIR="$withval"], [XDMLIBDIR="${libdir}/X11/xdm"])
 AC_SUBST(XDMLIBDIR)
 
 AC_ARG_WITH(xdmconfigdir,
-	AC_HELP_STRING([--with-xdmconfigdir=<pathname>],
+	AS_HELP_STRING([--with-xdmconfigdir=<pathname>],
 	  [specify directory for xdm config files (default is same as xdmlibdir)]),
 	[XDMCONFIGDIR="$withval"], [XDMCONFIGDIR="${XDMLIBDIR}"])
 AC_SUBST(XDMCONFIGDIR)
 
 AC_ARG_WITH(xdmscriptdir,
-	AC_HELP_STRING([--with-xdmscriptdir=<pathname>],
+	AS_HELP_STRING([--with-xdmscriptdir=<pathname>],
 	  [specify directory for xdm scripts (default is same as xdmlibdir)]),
 	[XDMSCRIPTDIR="$withval"], [XDMSCRIPTDIR="${XDMLIBDIR}"])
 AC_SUBST(XDMSCRIPTDIR)
 
 AC_ARG_WITH(logdir,
-	AC_HELP_STRING([--with-logdir=<pathname>],
+	AS_HELP_STRING([--with-logdir=<pathname>],
 	  [specify directory for xdm log files (default=/var/log)]),
 	[XDMLOGDIR="$withval"], [XDMLOGDIR="/var/log"])
 AC_SUBST(XDMLOGDIR)
 
 AC_ARG_WITH(piddir,
-	AC_HELP_STRING([--with-piddir=<pathname>],
+	AS_HELP_STRING([--with-piddir=<pathname>],
 	  [specify directory for xdm pid files (default=/var/run)]),
 	[XDMPIDDIR="$withval"], [XDMPIDDIR="/var/run"])
 AC_SUBST(XDMPIDDIR)
 
 AC_ARG_WITH(default-vt,
-	AC_HELP_STRING([--with-default-vt=<vtname>],
+	AS_HELP_STRING([--with-default-vt=<vtname>],
 	  [specify default vt to start xdm on (default=none)]),
 	[DEFAULTVT="$withval"], [[DEFAULTVT=""]])
 AC_SUBST(DEFAULTVT)
 
 AC_ARG_WITH(config-type,
-	AC_HELP_STRING([--with-config-type={ws|fs}],
+	AS_HELP_STRING([--with-config-type={ws|fs}],
 	 [default config file type to use - workstation (ws) or fileserver (fs) (default=ws)]),
 	[SERVERSTYPE="$withval"], [SERVERSTYPE="ws"])
 AC_SUBST(SERVERSTYPE)
@@ -241,7 +241,7 @@ AC_SUBST(SERVERSTYPE)
 # Ideally we'd just pull out UTMP_FILE & WTMP_FILE from <utmp.h>
 # but that's not easy to do in autoconf
 AC_ARG_WITH(utmp_file,
-	AC_HELP_STRING([--with-utmp-file=<pathname>],
+	AS_HELP_STRING([--with-utmp-file=<pathname>],
 	 [specify file to pass to sessreg -u for current logins]),
 	[UTMP_FILE="$withval"])
 if test "x$UTMP_FILE" = "xyes" ; then
@@ -260,7 +260,7 @@ AC_MSG_RESULT([$UTMP_FILE])
 AC_SUBST(UTMP_FILE)
 
 AC_ARG_WITH(wtmp_file,
-	AC_HELP_STRING([--with-wtmp-file=<pathname>],
+	AS_HELP_STRING([--with-wtmp-file=<pathname>],
 	 [specify file to pass to sessreg -w for login history]),
 	[WTMP_FILE="$withval"])
 if test "x$WTMP_FILE" = "xyes" ; then
@@ -303,7 +303,7 @@ PKG_CHECK_EXISTS(xinerama, [
 
 # Xft text drawing for the greeter screen
 AC_ARG_WITH(xft, 
-    	AC_HELP_STRING([--with-xft], 
+    	AS_HELP_STRING([--with-xft], 
 			[Use Xft to draw text (default is YES if installed)]),
 	[USE_XFT="$withval"], 
 	PKG_CHECK_EXISTS(xft, [USE_XFT="yes"], [USE_XFT="no"]))
@@ -318,7 +318,7 @@ fi
 
 # XPM logos for the greeter screen
 AC_ARG_ENABLE(xpm-logos, 
-    	AC_HELP_STRING([--enable-xpm-logos], 
+    	AS_HELP_STRING([--enable-xpm-logos], 
 			[Display xpm logos in greeter (default is YES)]),
 	[USE_XPM="$enableval"], 
 	PKG_CHECK_EXISTS(xpm, [USE_XPM="yes"], [USE_XPM="no"]))
@@ -334,15 +334,15 @@ fi
 AM_CONDITIONAL(USE_XPM, test "x$USE_XPM" = "xyes")
 
 AC_ARG_WITH(color-pixmap,
-	AC_HELP_STRING([--with-color-pixmap=<filename>],
+	AS_HELP_STRING([--with-color-pixmap=<filename>],
 		[specify xpm file to use as color logo (default=xorg.xpm)]),
 	[XDM_PIXMAP="$withval"], [XDM_PIXMAP="xorg.xpm"])
 AC_ARG_WITH(bw-pixmap,
-	AC_HELP_STRING([--with-bw-pixmap=<filename>],
+	AS_HELP_STRING([--with-bw-pixmap=<filename>],
       [specify xpm file to use as black-and-white logo (default=xorg-bw.xpm)]),
 	[XDM_BWPIXMAP="$withval"], [XDM_BWPIXMAP="xorg-bw.xpm"])
 AC_ARG_WITH(pixmapdir,
-	AC_HELP_STRING([--with-pixmapdir=<pathname>],
+	AS_HELP_STRING([--with-pixmapdir=<pathname>],
 	[specify directory for xpm files (default=xdmlibdir/pixmaps)]),
 	[XDM_PIXMAPDIR="$withval"], 
 	[XDM_PIXMAPDIR='${XDMLIBDIR}/pixmaps'])
@@ -380,7 +380,7 @@ XDM_LIBS="$XDM_LIBS $DMCP_LIBS"
 AC_CHECK_LIB(Xdmcp, XdmcpWrap, [xdmauth="yes"], [xdmauth="no"], [$DMCP_LIBS])
 
 AC_ARG_ENABLE(xdm-auth,
-	AC_HELP_STRING([--enable-xdm-auth],
+	AS_HELP_STRING([--enable-xdm-auth],
        [Support XDM-AUTHENTICATION-1 and XDM-AUTHORIZATION-1 (default: auto)]),
 	[xdmauth_enable="$enableval"], [xdmauth_enable="auto"])
 if test "x$xdmauth_enable" = "xyes" -a "x$xdmauth" = "xno" ; then
@@ -397,7 +397,7 @@ AC_SUBST(XDM_LIBS)
 #
 
 AC_ARG_ENABLE(xdmshell,
-	AC_HELP_STRING([--enable-xdmshell],
+	AS_HELP_STRING([--enable-xdmshell],
          [Install xdmshell (default: disabled)]),
 	[INSTALL_XDMSHELL="$enableval"], [INSTALL_XDMSHELL="no"])
 AM_CONDITIONAL(INSTALL_XDMSHELL, test x$INSTALL_XDMSHELL = xyes)
@@ -433,14 +433,14 @@ AX_DEFINE_DIR(DEF_SERVER_LINE, DEF_SERVER_LINE,
 	[Define to default Xserver file entry for local X server])
 
 # -DXRDB_PROGRAM="$(BINDIR)/xrdb"
-AC_ARG_WITH(xrdb, AC_HELP_STRING([--with-xrdb=path],
+AC_ARG_WITH(xrdb, AS_HELP_STRING([--with-xrdb=path],
 			[Use path for xrdb (default: bindir/xrdb)]),
 	    [XRDB=$withval], [XRDB=${bindir}/xrdb])
 AX_DEFINE_DIR(XRDB_PROGRAM, XRDB,
 	[Define to pathname for xrdb program])
 
 # -DDEF_SESSION="$(BINDIR)/xterm -ls"
-AC_ARG_WITH(default-session, AC_HELP_STRING([--with-default-session=command],
+AC_ARG_WITH(default-session, AS_HELP_STRING([--with-default-session=command],
 		[Use command for default session (default: bindir/xterm -ls)]),
 	    [DEF_SESSION=$withval], [DEF_SESSION="${bindir}/xterm -ls"])
 AX_DEFINE_DIR(DEF_SESSION, DEF_SESSION,
@@ -521,7 +521,7 @@ AX_DEFINE_DIR(DEF_CHOOSER, XDMLIBDIR/chooser,
 # -DDEF_AUTH_DIR="$(XDMDIR)"
 
 AC_ARG_WITH(authdir,
-	AC_HELP_STRING([--with-authdir=<pathname>],
+	AS_HELP_STRING([--with-authdir=<pathname>],
 	  [specify directory for X auth files (default=/var/lib/xdm)]),
 	[XDMXAUTHDIR="$withval"], [XDMXAUTHDIR="/var/lib/xdm"])
 AC_SUBST(XDMXAUTHDIR)
@@ -537,7 +537,7 @@ AX_DEFINE_DIR(DEF_GREETER_LIB, XDMLIBDIR/libXdmGreet.so,
 PKG_CHECK_MODULES(APPDEFS, xt)
 xt_appdefaultdir=`$PKG_CONFIG --variable=appdefaultdir xt`
 AC_ARG_WITH(appdefaultdir,
-	AC_HELP_STRING([--with-appdefaultdir=<pathname>],
+	AS_HELP_STRING([--with-appdefaultdir=<pathname>],
 	  [specify directory for app-defaults files (default is autodetected)]),
 	[appdefaultdir="$withval"], [appdefaultdir="${xt_appdefaultdir}"])
 AC_SUBST(appdefaultdir)
