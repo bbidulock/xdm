@@ -79,6 +79,9 @@ AM_CONDITIONAL(HAVE_ARC4RANDOM, test x$HAVE_ARC4RANDOM = xyes)
 
 # Function crypt() comes from the C library or the -lcrypt data encryption library
 AC_SEARCH_LIBS(crypt, crypt)
+
+# Function dl() comes from the C library or -ldl
+AC_SEARCH_LIBS([dlopen], [dl])
 #------------------------------------------------------------------------------
 
 # Checks for header files.
