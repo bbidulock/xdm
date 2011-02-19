@@ -528,24 +528,40 @@ WaitForChild (void)
 		Debug ("Display exited with RESERVER_DISPLAY\n");
 		if (d->displayType.origin == FromXDMCP || d->status == zombie)
 		    StopDisplay(d);
-		else
-		    RestartDisplay (d, TRUE);
-		{
-		  Time_t Time;
-		  time(&Time);
-		  Debug("time %i %i\n",Time,d->lastCrash);
-		  if (d->lastCrash &&
-		      ((Time - d->lastCrash) < XDM_BROKEN_INTERVAL)) {
-		    Debug("Server crash frequency too high:"
-			  " removing display %s\n",d->name);
-		    LogError("Server crash rate too high:"
-			     " removing display %s\n",d->name);
+		else {
+		  Time_t now;
+		  int crash;
+
+		  time(&now);
+		  Debug("time %i %i\n", now, d->lastCrash);
+		  crash = d->lastCrash &&
+		    ((now - d->lastCrash) < XDM_BROKEN_INTERVAL);
+
+		  if (crash) {
+		    const char *msg =
+			"Server crash frequency too high: stopping display";
+		    Debug("%s %s\n", msg, d->name);
+		    LogError("%s %s\n", msg, d->name);
 #if !defined(HAVE_ARC4RANDOM) && !defined(DEV_RANDOM)
 		    AddTimerEntropy();
 #endif
-		    RemoveDisplay (d);
-		  } else
-		    d->lastCrash = Time;
+		    /* For a local X server either:
+		     * 1. The server exit was returned by waitpid().  So
+		     *    serverPid==-1 => StopDisplay() calls RemoveDisplay()
+		     *
+		     * 2. The server is in zombie state or still running.  So
+		     *    serverPid>1 => StopDisplay()
+		     *                   a. sets status=zombie,
+		     *                   b. kills the server.
+		     *    The next waitpid() returns this zombie server pid
+		     *    and the 'case zombie:' below then calls
+		     *    RemoveDisplay().
+		     */
+		    StopDisplay(d);
+		  } else {
+		    RestartDisplay(d, TRUE);
+		  }
+		  d->lastCrash = now;
 		}
 		break;
 	    case waitCompose (SIGTERM,0,0):
