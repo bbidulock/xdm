@@ -1042,7 +1042,6 @@ DefineSelf (int fd, FILE *file, Xauth *auth)
     int 		family;
     register ifr_type  *ifr;
 #    ifdef USE_SIOCGLIFCONF
-    int			n;
     void *		bufptr = buf;
     size_t		buflen = sizeof(buf);
     struct lifconf	ifc;

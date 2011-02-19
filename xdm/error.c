@@ -113,8 +113,6 @@ LogOutOfMem (const char * fmt, ...)
 void
 Debug (const char * fmt, ...)
 {
-    char buf[1024];
-
     if (debugLevel > 0)
     {
 	LogVarArgsWrite(fmt);
