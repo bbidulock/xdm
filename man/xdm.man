@@ -450,27 +450,31 @@ See the section
 .IP "\fBDisplayManager.\fP\fIDISPLAY\fP\fB.openRepeat\fP"
 .IP "\fBDisplayManager.\fP\fIDISPLAY\fP\fB.openTimeout\fP"
 .IP "\fBDisplayManager.\fP\fIDISPLAY\fP\fB.startAttempts\fP"
+.IP "\fBDisplayManager.\fP\fIDISPLAY\fP\fB.reservAttempts\fP"
 These numeric resources control the behavior of
 .I xdm
 when attempting to open intransigent servers.  \fBopenDelay\fP is
 the length of the
-pause (in seconds) between successive attempts, \fBopenRepeat\fP is the
+pause in seconds between successive attempts, \fBopenRepeat\fP is the
 number of attempts to make, \fBopenTimeout\fP is the amount of time
 to wait while actually
 attempting the open (i.e., the maximum time spent in the
 .IR connect (2)
-system call) and \fBstartAttempts\fP is the number of times this entire process
-is done before giving up on the server.  After \fBopenRepeat\fP attempts have been made,
-or if \fBopenTimeout\fP seconds elapse in any particular attempt,
+system call) and \fBstartAttempts\fP is the number of times this
+entire process is done before giving up on the server.
+After \fBopenRepeat\fP attempts have been made, or
+if \fBopenTimeout\fP seconds elapse in any particular attempt,
 .I xdm
 terminates and restarts the server, attempting to connect again.
-This
-process is repeated \fBstartAttempts\fP times, at which point the display is
-declared dead and disabled.  Although
+This process is repeated \fBstartAttempts\fP times, at which point
+the display is declared dead and disabled.  Although
 this behavior may seem arbitrary, it has been empirically developed and
-works quite well on most systems.  The default values are
-5 for \fBopenDelay\fP, 5 for \fBopenRepeat\fP, 30 for \fBopenTimeout\fP and
-4 for \fBstartAttempts\fP.
+works quite well on most systems.  The bound \fBreservAttempts\fP
+is the number of times a successful connect is allowed to be followed
+by a fatal error.  When reached, the display is disabled.
+The default values are
+\fBopenDelay\fP: 15, \fBopenRepeat\fP: 5, \fBopenTimeout\fP: 120,
+\fBstartAttempts\fP: 4 and \fBreservAttempts\fP: 2.
 .IP "\fBDisplayManager.\fP\fIDISPLAY\fP\fB.pingInterval\fP"
 .IP "\fBDisplayManager.\fP\fIDISPLAY\fP\fB.pingTimeout\fP"
 To discover when remote displays disappear,

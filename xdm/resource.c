@@ -222,6 +222,8 @@ struct displayResource serverResources[] = {
 				"120" },
 { "startAttempts","StartAttempts",DM_INT,	boffset(startAttempts),
 				"4" },
+{ "reservAttempts","ReservAttempts",DM_INT,	boffset(reservAttempts),
+				"2" },
 { "pingInterval","PingInterval",DM_INT,		boffset(pingInterval),
 				"5" },
 { "pingTimeout","PingTimeout",	DM_INT,		boffset(pingTimeout),

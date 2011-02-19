@@ -492,6 +492,7 @@ WaitForChild (void)
 		break;
 	    case OBEYSESS_DISPLAY:
 		d->startTries = 0;
+		d->reservTries = 0;
 		Debug ("Display exited with OBEYSESS_DISPLAY\n");
 		if (d->displayType.lifetime != Permanent ||
 		    d->status == zombie)
@@ -533,11 +534,16 @@ WaitForChild (void)
 		  int crash;
 
 		  time(&now);
-		  Debug("time %i %i\n", now, d->lastCrash);
-		  crash = d->lastCrash &&
-		    ((now - d->lastCrash) < XDM_BROKEN_INTERVAL);
+		  crash = d->lastReserv &&
+		    ((now - d->lastReserv) < XDM_BROKEN_INTERVAL);
+		  Debug("time %i %i try %i of %i%s\n", now, d->lastReserv,
+			d->reservTries, d->reservAttempts,
+			crash ? " crash" : "");
 
-		  if (crash) {
+		  if (!crash)
+		    d->reservTries = 0;
+
+		  if (crash && ++d->reservTries >= d->reservAttempts) {
 		    const char *msg =
 			"Server crash frequency too high: stopping display";
 		    Debug("%s %s\n", msg, d->name);
@@ -561,7 +567,7 @@ WaitForChild (void)
 		  } else {
 		    RestartDisplay(d, TRUE);
 		  }
-		  d->lastCrash = now;
+		  d->lastReserv = now;
 		}
 		break;
 	    case waitCompose (SIGTERM,0,0):

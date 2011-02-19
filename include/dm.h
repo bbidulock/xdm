@@ -177,7 +177,8 @@ struct display {
 	pid_t		serverPid;	/* process id of server (-1 if none) */
 	FileState	state;		/* state during HUP processing */
 	int		startTries;	/* current start try */
-        Time_t          lastCrash;      /* time of last crash */
+	Time_t		lastReserv;     /* time of last reserver crash */
+	int		reservTries;	/* current reserver try */
 # ifdef XDMCP
 	/* XDMCP state */
 	CARD32		sessionID;	/* ID of active session */
@@ -197,6 +198,7 @@ struct display {
 	int		openRepeat;	/* open attempts to make */
 	int		openTimeout;	/* abort open attempt timeout */
 	int		startAttempts;	/* number of attempts at starting */
+	int		reservAttempts;	/* allowed start-IO error sequences */
 	int		pingInterval;	/* interval between XSync */
 	int		pingTimeout;	/* timeout for XSync */
 	int		terminateServer;/* restart for each session */
