@@ -1899,7 +1899,6 @@ static void Realize (
          * Create pixmap window
          */
         {
-            unsigned long valueMask = CWBackPixel | CWBackPixmap;
             XSetWindowAttributes windowAttributes = { 0 };
 
             windowAttributes.background_pixel = w->core.background_pixel;
@@ -1912,7 +1911,7 @@ static void Realize (
                 (w->core.height - w->login.logoHeight) /2,
                 w->login.logoWidth, w->login.logoHeight, 0,
                 CopyFromParent, InputOutput, CopyFromParent,
-                valueMask, &windowAttributes);
+                CWBackPixel | CWBackPixmap, &windowAttributes);
         }
 
         /*
