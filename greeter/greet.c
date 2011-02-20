@@ -143,8 +143,6 @@ pam_handle_t **(*__xdm_thepamhp)(void) = NULL;
 # include <krb5/krb5.h>
 #endif
 
-extern Display	*dpy;
-
 static int	done, code;
 #ifndef USE_PAM
 static char	name[NAME_LEN], password[PASSWORD_LEN];
