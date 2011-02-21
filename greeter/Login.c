@@ -217,7 +217,9 @@ static XtResource resources[] = {
     {XtNallowRootLogin, XtCAllowRootLogin, XtRBoolean, sizeof(Boolean),
 	offset(allow_root_login), XtRImmediate, (XtPointer) True},
     {XtNechoPasswd, XtCEchoPasswd, XtRBoolean, sizeof(Boolean),
-	offset(echo_passwd), XtRImmediate, (XtPointer) False}
+	offset(echo_passwd), XtRImmediate, (XtPointer) False},
+    {XtNechoPasswdChar, XtCEchoPasswdChar, XtRString,	sizeof (char *),
+	offset(echo_passwd_char), XtRString, (XtPointer) "*" }
 };
 
 #undef offset
@@ -370,7 +372,7 @@ realizeValue (LoginWidget w, int cursor, int promptNum, GC gc)
 
 	while (i < length)
 	{
-	    text[i++] = '*';
+	    text[i++] = w->login.echo_passwd_char[0];
 	}
 
 	text[i] = 0;
@@ -488,16 +490,16 @@ realizeCursor (LoginWidget w, GC gc)
 	break;
     case LOGIN_PROMPT_ECHO_OFF:
 	if (w->login.echo_passwd == True) {
-	    int len = PROMPT_CURSOR(w, w->login.activePrompt) -
-		VALUE_SHOW_START(w, w->login.activePrompt);
+	    if (w->login.echo_passwd_char[0] != 0) {
+		int len = PROMPT_CURSOR(w, w->login.activePrompt) -
+		    VALUE_SHOW_START(w, w->login.activePrompt);
 
-	    x += len*TEXT_WIDTH(text, "*", 1);
-	}
-	else
-	{
-	    /* Move cursor one pixel per character to give some feedback
-	       without giving away the password length */
-	    x += PROMPT_CURSOR(w, w->login.activePrompt);
+		x += len*TEXT_WIDTH(text, w->login.echo_passwd_char, 1);
+	    } else {
+		/* Move cursor one pixel per character to give some feedback
+		   without giving away the password length */
+		x += PROMPT_CURSOR(w, w->login.activePrompt);
+	    }
 	}
 	break;
     }

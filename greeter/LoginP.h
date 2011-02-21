@@ -130,8 +130,10 @@ typedef struct {
 	Boolean		allow_access;	/* disable access control on login */
 	Boolean		allow_null_passwd; /* allow null password on login */
 	Boolean		allow_root_login; /* allow root login */
-	/* show password as asterisks, i.e. '**...' */
+	/* option to display characters such as asterisks, i.e. '**...'
+	   for no-echo prompts like passwords */
 	Boolean		echo_passwd;
+	char *		echo_passwd_char;
 	XIC		xic;		/* input method of input context */
 	loginPromptData	prompts[NUM_PROMPTS];
     	time_t 		msgTimeout;

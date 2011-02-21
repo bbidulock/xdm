@@ -1062,9 +1062,13 @@ if the account does not require a password at all.
 The default is ``false'', so only users that have passwords assigned can
 log in.
 .IP "\fBxlogin.Login.echoPasswd\fP"
-If set to ``true'', stars will be rendered instead of the password itself,
-i.e. '***...'.
+If set to ``true'', a placeholder character (echoPasswdChar) will be shown
+for fields normally set to not echo, such as password input.
 The default is ``false''.
+.IP "\fBxlogin.Login.echoPasswdChar\fP"
+Character to display if echoPasswd is true.  The default is ``*''.
+If set to an empty value, the cursor will advance for each character input,
+but no text will be drawn.
 .IP "\fBxlogin.Login.translations\fP"
 This specifies the translations used for the login widget.  Refer to the X
 Toolkit documentation for a complete discussion on translations.  The default

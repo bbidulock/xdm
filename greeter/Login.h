@@ -101,6 +101,7 @@ from The Open Group.
 # define XtNallowNullPasswd	"allowNullPasswd"
 # define XtNallowRootLogin	"allowRootLogin"
 # define XtNechoPasswd		"echoPasswd"
+# define XtNechoPasswdChar	"echoPasswdChar"
 
 # define XtNface 		"face"
 # define XtCFace		"Face"
@@ -142,6 +143,7 @@ from The Open Group.
 # define XtCAllowNullPasswd	"AllowNullPasswd"
 # define XtCAllowRootLogin	"AllowRootLogin"
 # define XtCEchoPasswd		"EchoPasswd"
+# define XtCEchoPasswdChar	"EchoPasswdChar"
 
 # define XtNchangePasswdMessage	"changePasswdMessage"
 # define XtCChangePasswdMessage	"ChangePasswdMessage"
