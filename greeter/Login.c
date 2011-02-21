@@ -404,24 +404,21 @@ realizeValue (LoginWidget w, int cursor, int promptNum, GC gc)
     } else if ((state == LOGIN_PROMPT_ECHO_ON) || (state == LOGIN_TEXT_INFO) ||
 	       ((state == LOGIN_PROMPT_ECHO_OFF) && (w->login.echo_passwd == True)))
     {
-	int textwidth;
 	int offset = max(cursor, VALUE_SHOW_START(w, promptNum));
 	int textlen = strlen (text + offset);
 
-	textwidth = TEXT_WIDTH (text, text + offset, textlen);
-
-	if (textwidth > (width - curoff)) {
+	if (TEXT_WIDTH (text, text + offset, textlen) > (width - curoff)) {
 	    /* Recalculate amount of text that can fit in field */
 	    offset = VALUE_SHOW_START(w, promptNum);
 	    textlen = strlen (text + offset);
 
-	    while ((textlen > 0) && (textwidth > width))
+	    while ((textlen > 0) &&
+		   (TEXT_WIDTH (text, text + offset, textlen) > width))
 	    {
 		if (offset < PROMPT_CURSOR(w, promptNum)) {
 		    offset++;
 		}
 		textlen--;
-		textwidth = TEXT_WIDTH (text, text + offset, textlen);
 	    }
 
 	    VALUE_SHOW_START(w, promptNum) = offset;
