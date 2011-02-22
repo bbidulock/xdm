@@ -292,7 +292,12 @@ XmuXftTextWidth(Display *dpy, XftFont *font, FcChar8 *string, int len);
 
 #define STRING_WIDTH(f, s) 	TEXT_WIDTH (f, s, strlen(s))
 
-
+/* Padded width of logo image, if compiled with XPM support */
+#ifdef XPM
+# define LOGO_W(w)     ((w)->login.logoWidth + ((w)->login.logoPadding * 2))
+#else
+# define LOGO_W(w)     0
+#endif
 
 #define TEXT_PROMPT_W(w, m) (STRING_WIDTH(prompt, m) + w->login.inframeswidth)
 
@@ -307,14 +312,10 @@ XmuXftTextWidth(Display *dpy, XftFont *font, FcChar8 *string, int len);
 #define GREET_X(w)	((int)((w->core.width - \
 			     	STRING_WIDTH (greet, GREETING(w))) / 2))
 #define GREET_Y(w)	(GREETING(w)[0] ? 2 * GREET_Y_INC (w) : 0)
-#ifndef XPM
-# define GREET_W(w)	(max (STRING_WIDTH (greet, w->login.greeting), \
-			      STRING_WIDTH (greet, w->login.unsecure_greet)))
-#else
-# define GREET_W(w)	(max (STRING_WIDTH (greet, w->login.greeting), \
+#define GREET_W(w)	(max (STRING_WIDTH (greet, w->login.greeting), \
 			      STRING_WIDTH (greet, w->login.unsecure_greet)) \
-			 + w->login.logoWidth + (2*w->login.logoPadding))
-#endif /* XPM */
+			 + LOGO_W(w))
+
 #define PROMPT_X(w)	(2 * PROMPT_X_INC(w))
 #define PROMPT_Y(w,n)	((GREET_Y(w) + GREET_Y_INC(w) +\
 			  F_ASCENT(greet) + Y_INC(w)) + \
@@ -328,12 +329,7 @@ XmuXftTextWidth(Display *dpy, XftFont *font, FcChar8 *string, int len);
 #define FAIL_X(w)	ERROR_X(w, w->login.fail)
 #define FAIL_Y(w)	(PROMPT_Y(w,1) + 2 * FAIL_Y_INC (w) + F_ASCENT(fail))
 
-#ifndef XPM
-# define ERROR_W(w,m)	STRING_WIDTH (fail, m)
-#else
-# define ERROR_W(w,m)	(STRING_WIDTH (fail, m) \
-			 + w->login.logoWidth + (2*w->login.logoPadding))
-#endif /* XPM */
+#define ERROR_W(w,m)	(STRING_WIDTH (fail, m) + LOGO_W(w))
 
 #define FAIL_W(w)	max(ERROR_W(w, w->login.failMsg), \
 			    ERROR_W(w, w->login.passwdChangeMsg))
@@ -381,14 +377,9 @@ realizeValue (LoginWidget w, int cursor, int promptNum, GC gc)
     x = VALUE_X (w,promptNum);
     y = PROMPT_Y (w,promptNum);
 
-    height = PROMPT_H(w);
-    width = PROMPT_W(w) - x - 3;
+    height = PROMPT_H(w) - (w->login.inframeswidth * 2);
+    width = PROMPT_W(w) - x - 3 - (w->login.inframeswidth * 2) - LOGO_W(w);
 
-    height -= (w->login.inframeswidth * 2);
-    width -= (w->login.inframeswidth * 2);
-#ifdef XPM
-    width -= (w->login.logoWidth + (w->login.logoPadding * 2));
-#endif
     if (cursor > VALUE_SHOW_START(w, promptNum))
 	curoff = TEXT_WIDTH (text, text, cursor);
     else
@@ -739,14 +730,10 @@ draw_it (LoginWidget w)
 	int in_frame_y
 	    = PROMPT_Y(w,p) - w->login.inframeswidth - 1 - TEXT_Y_INC(w);
 
-	int in_width = PROMPT_W(w) - VALUE_X(w,p);
+	int in_width = PROMPT_W(w) - VALUE_X(w,p) - LOGO_W(w);
 	int in_height = PROMPT_H(w) + w->login.inframeswidth + 2;
 
 	GC topLeftGC, botRightGC;
-
-#ifdef XPM
-	in_width -= (w->login.logoWidth + 2*(w->login.logoPadding));
-#endif /* XPM */
 
 	if ((PROMPT_STATE(w, p) == LOGIN_PROMPT_ECHO_ON) ||
 	    (PROMPT_STATE(w, p) == LOGIN_PROMPT_ECHO_OFF)) {
