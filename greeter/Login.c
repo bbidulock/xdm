@@ -323,6 +323,9 @@ XmuXftTextWidth(Display *dpy, XftFont *font, FcChar8 *string, int len);
 #define PROMPT_W(w)	(w->core.width - (2 * TEXT_X_INC(w)))
 #define PROMPT_H(w)	(3 * Y_INC(w) / 2)
 #define VALUE_X(w,n)	(PROMPT_X(w) + CUR_PROMPT_W(w,n))
+#define CURSOR_W	5
+#define MAX_VALUE_W(w,n) (PROMPT_W(w) - VALUE_X (w,n) - CURSOR_W - 1 - \
+			  (w->login.inframeswidth * 2) - LOGO_W(w))
 #define PROMPT_SPACE_Y(w)	(10 * Y_INC(w) / 5)
 
 #define ERROR_X(w,m)	((int)(w->core.width - STRING_WIDTH (fail, m)) / 2)
@@ -378,7 +381,7 @@ realizeValue (LoginWidget w, int cursor, int promptNum, GC gc)
     y = PROMPT_Y (w,promptNum);
 
     height = PROMPT_H(w) - (w->login.inframeswidth * 2);
-    width = PROMPT_W(w) - x - 3 - (w->login.inframeswidth * 2) - LOGO_W(w);
+    width = MAX_VALUE_W(w,promptNum);
 
     if (cursor > VALUE_SHOW_START(w, promptNum))
 	curoff = TEXT_WIDTH (text, text, cursor);
@@ -486,7 +489,11 @@ realizeCursor (LoginWidget w, GC gc)
 	    } else {
 		/* Move cursor one pixel per character to give some feedback
 		   without giving away the password length */
-		x += PROMPT_CURSOR(w, w->login.activePrompt);
+		if (PROMPT_CURSOR(w, w->login.activePrompt) <
+		    MAX_VALUE_W(w, w->login.activePrompt))
+		    x += PROMPT_CURSOR(w, w->login.activePrompt);
+		else
+		    x += MAX_VALUE_W(w, w->login.activePrompt);
 	    }
 	}
 	break;
