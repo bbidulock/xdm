@@ -501,7 +501,7 @@ the amount of time the server is run.  The default value is ``false.''
 .I Xdm
 sets the PATH environment variable for the session to this value.  It should
 be a colon separated list of directories; see
-.IR sh (1)
+.IR sh (__appmansuffix__)
 for a full description.
 The default value is ``DEF_USER_PATH''.
 .IP "\fBDisplayManager.\fP\fIDISPLAY\fP\fB.systemPath\fP"
@@ -1362,7 +1362,7 @@ shutting down the system.
 .PP
 .I Xdm
 attempts to mark its various sub-processes for
-.IR ps (1)
+.IR ps (__appmansuffix__)
 by editing the
 command line argument list in place.  Because
 .I xdm
