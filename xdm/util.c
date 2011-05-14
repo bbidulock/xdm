@@ -234,6 +234,7 @@ parseArgs (char **argv, char *string)
 				if (!newargv || !save) {
 					LogOutOfMem ("parseArgs");
 					free ((char *) argv);
+					free (newargv);
 					if (save)
 						free (save);
 					return NULL;
