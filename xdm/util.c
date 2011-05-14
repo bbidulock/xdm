@@ -150,11 +150,11 @@ setEnv (char **e, char *name, char *value)
 			return e;
 		}
 		envsize = old - e;
-		new = (char **) realloc ((char *) e,
+		new = realloc ((char *) e,
 				(unsigned) ((envsize + 2) * sizeof (char *)));
 	} else {
 		envsize = 0;
-		new = (char **) malloc (2 * sizeof (char *));
+		new = malloc (2 * sizeof (char *));
 	}
 	if (!new) {
 		LogOutOfMem ("setEnv");
@@ -218,7 +218,7 @@ parseArgs (char **argv, char *string)
 	while (argv && argv[i])
 		++i;
 	if (!argv) {
-		argv = (char **) malloc (sizeof (char *));
+		argv = malloc (sizeof (char *));
 		if (!argv) {
 			LogOutOfMem ("parseArgs");
 			return NULL;
@@ -228,7 +228,7 @@ parseArgs (char **argv, char *string)
 	for (;;) {
 		if (!*string || isblank (*string)) {
 			if (word != string) {
-				newargv = (char **) realloc ((char *) argv,
+				newargv = realloc ((char *) argv,
 					(unsigned) ((i + 2) * sizeof (char *)));
 				save = malloc ((unsigned) (string - word + 1));
 				if (!newargv || !save) {

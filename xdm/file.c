@@ -76,14 +76,13 @@ splitIntoWords (char *s)
 	    ++s;
 	if (!args)
 	{
-	    args = (char **) malloc (2 * sizeof (char *));
+	    args = malloc (2 * sizeof (char *));
 	    if (!args)
 		return NULL;
 	}
 	else
 	{
-	    newargs = (char **) realloc ((char *) args,
-					 (nargs+2)*sizeof (char *));
+	    newargs = realloc ((char *) args, (nargs+2)*sizeof (char *));
 	    if (!newargs)
 	    {
 		freeFileArgs (args);
@@ -113,7 +112,7 @@ copyArgs (char **args)
     for (a = args; *a; a++)
 	/* SUPPRESS 530 */
 	;
-    new = (char **) malloc ((a - args + 1) * sizeof (char *));
+    new = malloc ((a - args + 1) * sizeof (char *));
     if (!new)
 	return NULL;
     n = new;

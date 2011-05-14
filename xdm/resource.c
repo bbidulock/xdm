@@ -403,7 +403,7 @@ ReinitResources (void)
     char	**argv;
     XrmDatabase newDB;
 
-    argv = (char **) malloc ((originalArgc + 1) * sizeof (char *));
+    argv = malloc ((originalArgc + 1) * sizeof (char *));
     if (!argv)
 	LogPanic ("no space for argument realloc\n");
     for (argc = 0; argc < originalArgc; argc++)

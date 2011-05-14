@@ -506,13 +506,12 @@ SetLocalAuthorization (struct display *d)
 	;
     d->authNameNum = i;
     free (d->authNameLens);
-    d->authNameLens = (unsigned short *) malloc
-				(d->authNameNum * sizeof (unsigned short));
+    d->authNameLens = malloc (d->authNameNum * sizeof (unsigned short));
     if (!d->authNameLens)
 	return;
     for (i = 0; i < d->authNameNum; i++)
 	d->authNameLens[i] = strlen (d->authNames[i]);
-    auths = (Xauth **) malloc (d->authNameNum * sizeof (Xauth *));
+    auths = malloc (d->authNameNum * sizeof (Xauth *));
     if (!auths)
 	return;
     j = 0;
@@ -675,7 +674,7 @@ saveEntry (Xauth *auth)
 {
 	struct addrList	*new;
 
-	new = (struct addrList *) malloc (sizeof (struct addrList));
+	new = malloc (sizeof (struct addrList));
 	if (!new) {
 		LogOutOfMem ("saveEntry");
 		return;

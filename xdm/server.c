@@ -265,7 +265,7 @@ GetRemoteAddress (struct display *d, int fd)
     d->peerlen = 0;
     if (len)
     {
-	d->peer = (XdmcpNetaddr) malloc (len);
+	d->peer = malloc (len);
 	if (d->peer)
 	{
 	    memmove( (char *) d->peer, buf, len);

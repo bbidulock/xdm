@@ -181,7 +181,7 @@ NewDisplay (char *name, char *class)
 {
     struct display	*d;
 
-    d = (struct display *) calloc (1, sizeof (struct display));
+    d = calloc (1, sizeof (struct display));
     if (!d) {
 	LogOutOfMem ("NewDisplay");
 	return NULL;

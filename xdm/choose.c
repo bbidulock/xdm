@@ -127,7 +127,7 @@ RememberIndirectClient (
 	if (XdmcpARRAY8Equal (clientAddress, &i->client) &&
 	    connectionType == i->connectionType)
 	    return 1;
-    i = (IndirectUsersPtr) malloc (sizeof (IndirectUsersRec));
+    i = malloc (sizeof (IndirectUsersRec));
     if (!XdmcpCopyARRAY8 (clientAddress, &i->client))
     {
 	free (i);
@@ -311,7 +311,7 @@ RegisterIndirectChoice (
     insert = 0;
     if (!c)
     {
-	c = (ChoicePtr) malloc (sizeof (ChoiceRec));
+	c = malloc (sizeof (ChoiceRec));
 	insert = 1;
 	if (!c)
 	    return 0;

@@ -95,7 +95,7 @@ Krb5GetAuthFor(unsigned short namelen, char *name, char *dname)
     char *filename;
     struct stat statbuf;
 
-    new = (Xauth *) malloc (sizeof *new);
+    new = malloc (sizeof *new);
     if (!new)
 	return (Xauth *) 0;
     new->family = FamilyWild;
@@ -107,7 +107,7 @@ Krb5GetAuthFor(unsigned short namelen, char *name, char *dname)
     if (dname)
     {
 	filename = Krb5CCacheName(dname);
-	new->data = (char *) malloc (3 + strlen(filename) + 1);
+	new->data = malloc (3 + strlen(filename) + 1);
 	if (!new->data)
 	{
 	    free (filename);
@@ -125,7 +125,7 @@ Krb5GetAuthFor(unsigned short namelen, char *name, char *dname)
 	new->data_length = 0;
     }
 
-    new->name = (char *) malloc (namelen);
+    new->name = malloc (namelen);
     if (!new->name)
     {
 	free (new->data);
@@ -136,7 +136,6 @@ Krb5GetAuthFor(unsigned short namelen, char *name, char *dname)
     new->name_length = namelen;
     return new;
 }
-
 
 Xauth *
 Krb5GetAuth (unsigned short namelen, char *name)

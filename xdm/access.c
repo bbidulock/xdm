@@ -303,7 +303,7 @@ tryagain:
     hostOrAlias = ReadWord (file, TRUE);
     if (!hostOrAlias)
 	return NULL;
-    h = (HostEntry *) malloc (sizeof (DisplayEntry));
+    h = malloc (sizeof (DisplayEntry));
     h->hopCount = 1;
     if (*hostOrAlias == ALIAS_CHARACTER)
     {
@@ -422,7 +422,7 @@ tryagain:
     displayOrAlias = ReadWord (file, FALSE);
     if (!displayOrAlias)
 	return NULL;
-    d = (DisplayEntry *) malloc (sizeof (DisplayEntry));
+    d = malloc (sizeof (DisplayEntry));
     d->notAllowed = 0;
     d->notBroadcast = 0;
     d->chooser = 0;

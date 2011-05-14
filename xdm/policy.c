@@ -157,7 +157,7 @@ Willing (
 	    snprintf (statusBuf, sizeof(statusBuf), "Willing to manage");
     }
     status->length = strlen (statusBuf);
-    status->data = (CARD8Ptr) malloc (status->length);
+    status->data = malloc (status->length);
     if (!status->data)
 	status->length = 0;
     else

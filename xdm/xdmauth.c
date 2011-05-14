@@ -84,7 +84,7 @@ static Xauth *
 XdmGetAuthHelper (unsigned short namelen, char *name, int includeRho)
 {
     Xauth   *new;
-    new = (Xauth *) malloc (sizeof (Xauth));
+    new = malloc (sizeof (Xauth));
 
     if (!new)
 	return (Xauth *) 0;
@@ -98,13 +98,13 @@ XdmGetAuthHelper (unsigned short namelen, char *name, int includeRho)
     else
 	new->data_length = 8;
 
-    new->data = (char *) malloc (new->data_length);
+    new->data = malloc (new->data_length);
     if (!new->data)
     {
 	free (new);
 	return (Xauth *) 0;
     }
-    new->name = (char *) malloc (namelen);
+    new->name = malloc (namelen);
     if (!new->name)
     {
 	free (new->data);
@@ -148,7 +148,7 @@ XdmGetXdmcpAuth (struct protoDisplay *pdpy,
     xdmcpauth = XdmGetAuthHelper (authorizationNameLen, authorizationName, FALSE);
     if (!xdmcpauth)
 	return;
-    fileauth = (Xauth *) malloc (sizeof (Xauth));
+    fileauth = malloc (sizeof (Xauth));
     if (!fileauth)
     {
 	XauDisposeAuth(xdmcpauth);

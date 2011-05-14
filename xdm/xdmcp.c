@@ -1232,7 +1232,7 @@ manage (
 		free (class);
 		class = (char *) NULL;
 	    }
-	    from_save = (XdmcpNetaddr) malloc (fromlen);
+	    from_save = malloc (fromlen);
 	    if (!from_save)
 	    {
 		send_failed (from, fromlen, name, sessionID,
@@ -1273,7 +1273,7 @@ manage (
 	    XdmcpDisposeARRAY8 (&clientPort);
 	    if (pdpy->fileAuthorization)
 	    {
-		d->authorizations = (Xauth **) malloc (sizeof (Xauth *));
+		d->authorizations = malloc (sizeof (Xauth *));
 		if (!d->authorizations)
 		{
 		    free (from_save);
