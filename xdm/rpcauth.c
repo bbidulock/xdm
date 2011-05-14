@@ -72,14 +72,14 @@ SecureRPCGetAuth (
     new->data = (char *) malloc (new->data_length);
     if (!new->data)
     {
-	free ((char *) new);
+	free (new);
 	return (Xauth *) 0;
     }
     new->name = (char *) malloc (namelen);
     if (!new->name)
     {
-	free ((char *) new->data);
-	free ((char *) new);
+	free (new->data);
+	free (new);
 	return (Xauth *) 0;
     }
     memmove( new->name, name, namelen);

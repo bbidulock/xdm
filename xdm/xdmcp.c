@@ -1229,7 +1229,7 @@ manage (
 	    }
 	    else
 	    {
-		free ((char *) class);
+		free (class);
 		class = (char *) NULL;
 	    }
 	    from_save = (XdmcpNetaddr) malloc (fromlen);
@@ -1243,7 +1243,7 @@ manage (
 	    d = NewDisplay (name, class);
 	    if (!d)
 	    {
-		free ((char *) from_save);
+		free (from_save);
 		send_failed (from, fromlen, name, sessionID,
 		  "out of memory", fd);
 		goto abort;
@@ -1276,8 +1276,8 @@ manage (
 		d->authorizations = (Xauth **) malloc (sizeof (Xauth *));
 		if (!d->authorizations)
 		{
-		    free ((char *) from_save);
-		    free ((char *) d);
+		    free (from_save);
+		    free (d);
 		    send_failed (from, fromlen, name, sessionID,
 		      "out of memory", fd);
 		    goto abort;
@@ -1293,8 +1293,8 @@ manage (
     }
 abort:
     XdmcpDisposeARRAY8 (&displayClass);
-    free ((char*) name);
-    free ((char*) class);
+    free (name);
+    free (class);
 }
 
 void

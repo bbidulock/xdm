@@ -496,7 +496,7 @@ SetLocalAuthorization (struct display *d)
     {
 	for (i = 0; i < d->authNum; i++)
 	    XauDisposeAuth (d->authorizations[i]);
-	free ((char *) d->authorizations);
+	free (d->authorizations);
 	d->authorizations = (Xauth **) NULL;
 	d->authNum = 0;
     }
@@ -505,7 +505,7 @@ SetLocalAuthorization (struct display *d)
     for (i = 0; d->authNames[i]; i++)
 	;
     d->authNameNum = i;
-    free ((char *) d->authNameLens);
+    free (d->authNameLens);
     d->authNameLens = (unsigned short *) malloc
 				(d->authNameNum * sizeof (unsigned short));
     if (!d->authNameLens)
@@ -531,7 +531,7 @@ SetLocalAuthorization (struct display *d)
     {
 	for (i = 0; i < j; i++)
 	    XauDisposeAuth (auths[i]);
-	free ((char *) auths);
+	free (auths);
     }
 }
 
@@ -664,7 +664,7 @@ doneAddrs (void)
 		n = a->next;
 		free (a->address);
 		free (a->number);
-		free ((char *) a);
+		free (a);
 	}
 }
 
@@ -684,7 +684,7 @@ saveEntry (Xauth *auth)
 		new->address = malloc (auth->address_length);
 		if (!new->address) {
 			LogOutOfMem ("saveEntry");
-			free ((char *) new);
+			free (new);
 			return;
 		}
 		memmove( new->address, auth->address, (int) auth->address_length);
@@ -695,7 +695,7 @@ saveEntry (Xauth *auth)
 		if (!new->number) {
 			LogOutOfMem ("saveEntry");
 			free (new->address);
-			free ((char *) new);
+			free (new);
 			return;
 		}
 		memmove( new->number, auth->number, (int) auth->number_length);
@@ -707,7 +707,7 @@ saveEntry (Xauth *auth)
 			LogOutOfMem ("saveEntry");
 			free (new->number);
 			free (new->address);
-			free ((char *) new);
+			free (new);
 			return;
 		}
 		memmove( new->name, auth->name, (int) auth->name_length);

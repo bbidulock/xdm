@@ -187,7 +187,7 @@ FreeHostEntry (HostEntry *h)
     case HOST_CHOOSER:
 	break;
     }
-    free ((char *) h);
+    free (h);
 }
 
 static void
@@ -212,7 +212,7 @@ FreeDisplayEntry (DisplayEntry *d)
 	next = h->next;
 	FreeHostEntry (h);
     }
-    free ((char *) d);
+    free (d);
 }
 
 static void
@@ -310,7 +310,7 @@ tryagain:
 	h->type = HOST_ALIAS;
 	h->entry.aliasName = strdup (hostOrAlias);
 	if (!h->entry.aliasName) {
-	    free ((char *) h);
+	    free (h);
 	    return NULL;
 	}
     }
@@ -371,7 +371,7 @@ tryagain:
 	{
 	    Debug ("No such host %s\n", hostOrAlias);
 	    LogError ("Access file \"%s\", host \"%s\" not found\n", accessFile, hostOrAlias);
-	    free ((char *) h);
+	    free (h);
 # if defined(IPv6) && defined(AF_INET6)
 	    if (ai)
 		freeaddrinfo(ai);
@@ -381,7 +381,7 @@ tryagain:
 	if (!XdmcpAllocARRAY8 (&h->entry.hostAddress, addr_length))
 	{
 	    LogOutOfMem ("ReadHostEntry\n");
-	    free ((char *) h);
+	    free (h);
 # if defined(IPv6) && defined(AF_INET6)
 	    if (ai)
 		freeaddrinfo(ai);
@@ -432,7 +432,7 @@ tryagain:
 	d->entry.aliasName = strdup (displayOrAlias);
 	if (!d->entry.aliasName)
 	{
-	    free ((char *) d);
+	    free (d);
 	    return NULL;
 	}
     }
@@ -453,7 +453,7 @@ tryagain:
 	    d->entry.displayPattern = strdup (displayOrAlias);
 	    if (!d->entry.displayPattern)
 	    {
-		free ((char *) d);
+		free (d);
 		return NULL;
 	    }
 	}
@@ -490,7 +490,7 @@ tryagain:
 	    if (addr == NULL)
 	    {
 		LogError ("Access file %s, display %s unknown\n", accessFile, displayOrAlias);
-		free ((char *) d);
+		free (d);
 # if defined(IPv6) && defined(AF_INET6)
 		if (ai)
 		    freeaddrinfo(ai);
@@ -501,7 +501,7 @@ tryagain:
 	    display = &d->entry.displayAddress;
 	    if (!XdmcpAllocARRAY8 (&display->clientAddress, addr_length))
 	    {
-		free ((char *) d);
+		free (d);
 # if defined(IPv6) && defined(AF_INET6)
 		if (ai)
 		    freeaddrinfo(ai);

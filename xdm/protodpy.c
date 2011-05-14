@@ -111,7 +111,7 @@ NewProtoDisplay (
     pdpy->address = (XdmcpNetaddr) malloc (addrlen);
     if (!pdpy->address)
     {
-	free ((char *) pdpy);
+	free (pdpy);
 	return NULL;
     }
     pdpy->addrlen = addrlen;
@@ -121,8 +121,8 @@ NewProtoDisplay (
     pdpy->date = date;
     if (!XdmcpCopyARRAY8 (connectionAddress, &pdpy->connectionAddress))
     {
-	free ((char *) pdpy->address);
-	free ((char *) pdpy);
+	free (pdpy->address);
+	free (pdpy);
 	return NULL;
     }
     pdpy->sessionID = sessionID;
@@ -157,8 +157,8 @@ DisposeProtoDisplay (struct protoDisplay *pdpy)
     if (pdpy->xdmcpAuthorization)
 	XauDisposeAuth (pdpy->xdmcpAuthorization);
     XdmcpDisposeARRAY8 (&pdpy->connectionAddress);
-    free ((char *) pdpy->address);
-    free ((char *) pdpy);
+    free (pdpy->address);
+    free (pdpy);
 }
 
 #endif /* XDMCP */

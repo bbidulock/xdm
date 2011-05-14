@@ -152,7 +152,7 @@ RemoveDisplay (struct display *old)
 	    {
 		for (i = 0; i < d->authNum; i++)
 		    XauDisposeAuth (d->authorizations[i]);
-		free ((char *) d->authorizations);
+		free (d->authorizations);
 	    }
 	    free (d->clientAuthFile);
 	    if (d->authFile)
@@ -169,7 +169,7 @@ RemoveDisplay (struct display *old)
 	    XdmcpDisposeARRAY8 (&d->clientAddr);
 #endif
 	    free (d->windowPath);
-	    free ((char *) d);
+	    free (d);
 	    break;
 	}
 	p = d;
@@ -190,7 +190,7 @@ NewDisplay (char *name, char *class)
     d->name = strdup (name);
     if (!d->name) {
 	LogOutOfMem ("NewDisplay");
-	free ((char *) d);
+	free (d);
 	return NULL;
     }
     if (class)
@@ -199,7 +199,7 @@ NewDisplay (char *name, char *class)
 	if (!d->class) {
 	    LogOutOfMem ("NewDisplay");
 	    free (d->name);
-	    free ((char *) d);
+	    free (d);
 	    return NULL;
 	}
     }

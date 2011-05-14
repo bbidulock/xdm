@@ -101,23 +101,23 @@ XdmGetAuthHelper (unsigned short namelen, char *name, int includeRho)
     new->data = (char *) malloc (new->data_length);
     if (!new->data)
     {
-	free ((char *) new);
+	free (new);
 	return (Xauth *) 0;
     }
     new->name = (char *) malloc (namelen);
     if (!new->name)
     {
-	free ((char *) new->data);
-	free ((char *) new);
+	free (new->data);
+	free (new);
 	return (Xauth *) 0;
     }
     memmove( (char *)new->name, name, namelen);
     new->name_length = namelen;
     if (!GenerateAuthData ((char *)new->data, new->data_length))
     {
-	free ((char *) new->name);
-	free ((char *) new->data);
-	free ((char *) new);
+	free (new->name);
+	free (new->data);
+	free (new);
 	return (Xauth *) 0;
     }
     /*
@@ -162,9 +162,9 @@ XdmGetXdmcpAuth (struct protoDisplay *pdpy,
     if (!fileauth->name || !fileauth->data)
     {
 	XauDisposeAuth (xdmcpauth);
-	free ((char *) fileauth->name);
-	free ((char *) fileauth->data);
-	free ((char *) fileauth);
+	free (fileauth->name);
+	free (fileauth->data);
+	free (fileauth);
 	return;
     }
     /*

@@ -312,7 +312,7 @@ RebuildTable (int size)
 	qsort (newTable, size, sizeof (char *), HostnameCompare);
     }
     XawListChange (list, newTable, size, 0, TRUE);
-    free ((char *) NameTable);
+    free (NameTable);
     NameTable = newTable;
     NameTableSize = size;
 }
@@ -388,8 +388,8 @@ AddHostname (ARRAY8Ptr hostname, ARRAY8Ptr status, struct sockaddr *addr, int wi
 	}
 	if (!XdmcpAllocARRAY8 (&new->hostaddr, hostAddr.length))
 	{
-	    free ((char *) new->fullname);
-	    free ((char *) new);
+	    free (new->fullname);
+	    free (new);
 	    return 0;
 	}
 	memmove( new->hostaddr.data, hostAddr.data, hostAddr.length);
@@ -436,8 +436,8 @@ DisposeHostname (HostName *host)
     XdmcpDisposeARRAY8 (&host->hostname);
     XdmcpDisposeARRAY8 (&host->hostaddr);
     XdmcpDisposeARRAY8 (&host->status);
-    free ((char *) host->fullname);
-    free ((char *) host);
+    free (host->fullname);
+    free (host);
 }
 
 #if 0
@@ -551,7 +551,7 @@ RegisterHostaddr (struct sockaddr *addr, int len, xdmOpCode type)
     host->addr = (struct sockaddr *) malloc (len);
     if (!host->addr)
     {
-	free ((char *) host);
+	free (host);
 	return;
     }
     memmove( (char *) host->addr, (char *) addr, len);

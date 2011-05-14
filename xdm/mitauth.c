@@ -69,23 +69,23 @@ MitGetAuth (unsigned short namelen, char *name)
     new->data = (char *) malloc (AUTH_DATA_LEN);
     if (!new->data)
     {
-	free ((char *) new);
+	free (new);
 	return (Xauth *) 0;
     }
     new->name = (char *) malloc (namelen);
     if (!new->name)
     {
-	free ((char *) new->data);
-	free ((char *) new);
+	free (new->data);
+	free (new);
 	return (Xauth *) 0;
     }
     memmove( (char *)new->name, name, namelen);
     new->name_length = namelen;
     if (!GenerateAuthData (new->data, AUTH_DATA_LEN))
     {
-	free((char *) new->name);
-	free((char *) new->data);
-	free((char *) new);
+	free (new->name);
+	free (new->data);
+	free (new);
 	return (Xauth *) 0;
     }
     new->data_length = AUTH_DATA_LEN;

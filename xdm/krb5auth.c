@@ -111,7 +111,7 @@ Krb5GetAuthFor(unsigned short namelen, char *name, char *dname)
 	if (!new->data)
 	{
 	    free (filename);
-	    free ((char *) new);
+	    free (new);
 	    return (Xauth *) 0;
 	}
 	strcpy(new->data, "UU:");
@@ -128,8 +128,8 @@ Krb5GetAuthFor(unsigned short namelen, char *name, char *dname)
     new->name = (char *) malloc (namelen);
     if (!new->name)
     {
-	free ((char *) new->data);
-	free ((char *) new);
+	free (new->data);
+	free (new);
 	return (Xauth *) 0;
     }
     memmove( new->name, name, namelen);

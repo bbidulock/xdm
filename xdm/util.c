@@ -233,7 +233,7 @@ parseArgs (char **argv, char *string)
 				save = malloc ((unsigned) (string - word + 1));
 				if (!newargv || !save) {
 					LogOutOfMem ("parseArgs");
-					free ((char *) argv);
+					free (argv);
 					free (newargv);
 					free (save);
 					return NULL;
@@ -264,7 +264,7 @@ freeArgs (char **argv)
 
     for (a = argv; *a; a++)
 	free (*a);
-    free ((char *) argv);
+    free (argv);
 }
 
 void

@@ -130,7 +130,7 @@ RememberIndirectClient (
     i = (IndirectUsersPtr) malloc (sizeof (IndirectUsersRec));
     if (!XdmcpCopyARRAY8 (clientAddress, &i->client))
     {
-	free ((char *) i);
+	free (i);
 	return 0;
     }
     i->connectionType = connectionType;
@@ -157,7 +157,7 @@ ForgetIndirectClient (
 	    else
 		indirectUsers = i->next;
 	    XdmcpDisposeARRAY8 (&i->client);
-	    free ((char *) i);
+	    free (i);
 	    break;
 	}
 	prev = i;
@@ -268,7 +268,7 @@ IndirectChoice (
 		choices = next;
 	    XdmcpDisposeARRAY8 (&c->client);
 	    XdmcpDisposeARRAY8 (&c->choice);
-	    free ((char *) c);
+	    free (c);
 	}
 	else
 	{
@@ -318,7 +318,7 @@ RegisterIndirectChoice (
 	c->connectionType = connectionType;
 	if (!XdmcpCopyARRAY8 (clientAddress, &c->client))
 	{
-	    free ((char *) c);
+	    free (c);
 	    return 0;
 	}
     }
@@ -329,7 +329,7 @@ RegisterIndirectChoice (
     if (!XdmcpCopyARRAY8 (choice, &c->choice))
     {
 	XdmcpDisposeARRAY8 (&c->client);
-	free ((char *) c);
+	free (c);
 	return 0;
     }
     if (insert)
@@ -361,7 +361,7 @@ RemoveIndirectChoice (clientAddress, connectionType)
 		choices = c->next;
 	    XdmcpDisposeARRAY8 (&c->client);
 	    XdmcpDisposeARRAY8 (&c->choice);
-	    free ((char *) c);
+	    free (c);
 	    return;
 	}
 	prev = c;
