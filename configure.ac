@@ -59,8 +59,9 @@ AM_CONDITIONAL(HAVE_MKTEMP_COMMAND, test x$MKTEMP_COMMAND != x)
 #                 pre-pends the found library to $LIBS.
 #
 #------------------------------------------------------------------------------
-# Function getifaddrs() comes from the C library or the -lnsl name service library
-AC_SEARCH_LIBS([getifaddrs], [nsl])
+# Function getifaddrs() comes from the C library, Solaris 11 -lsocket, or
+# the -lnsl name service library
+AC_SEARCH_LIBS([getifaddrs], [socket nsl])
 
 # Function getspnam() comes from the C library, System V -lsec, UnixWare 7 -lgen
 # or Old Linux versions -lshadow
