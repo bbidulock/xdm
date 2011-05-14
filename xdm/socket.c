@@ -228,8 +228,7 @@ DestroyListeningSocket (struct socklist *s)
 
 	for (g = s->mcastgroups; g != NULL; g = n) {
 	    n = g->next;
-	    if (g->addr)
-		free(g->addr);
+	    free(g->addr);
 	    free(g);
 	}
 	s->mcastgroups = NULL;

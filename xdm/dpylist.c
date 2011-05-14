@@ -118,8 +118,6 @@ FindDisplayByAddress (XdmcpNetaddr addr, int addrlen, CARD16 displayNumber)
 
 #endif /* XDMCP */
 
-#define IfFree(x)  if (x) free ((char *) x)
-
 void
 RemoveDisplay (struct display *old)
 {
@@ -134,43 +132,43 @@ RemoveDisplay (struct display *old)
 		p->next = d->next;
 	    else
 		displays = d->next;
-	    IfFree (d->name);
-	    IfFree (d->class);
+	    free (d->name);
+	    free (d->class);
 	    for (x = d->argv; x && *x; x++)
-		IfFree (*x);
-	    IfFree (d->argv);
-	    IfFree (d->resources);
-	    IfFree (d->xrdb);
-	    IfFree (d->setup);
-	    IfFree (d->startup);
-	    IfFree (d->reset);
-	    IfFree (d->session);
-	    IfFree (d->userPath);
-	    IfFree (d->systemPath);
-	    IfFree (d->systemShell);
-	    IfFree (d->failsafeClient);
-	    IfFree (d->chooser);
+		free (*x);
+	    free (d->argv);
+	    free (d->resources);
+	    free (d->xrdb);
+	    free (d->setup);
+	    free (d->startup);
+	    free (d->reset);
+	    free (d->session);
+	    free (d->userPath);
+	    free (d->systemPath);
+	    free (d->systemShell);
+	    free (d->failsafeClient);
+	    free (d->chooser);
 	    if (d->authorizations)
 	    {
 		for (i = 0; i < d->authNum; i++)
 		    XauDisposeAuth (d->authorizations[i]);
 		free ((char *) d->authorizations);
 	    }
-	    IfFree (d->clientAuthFile);
+	    free (d->clientAuthFile);
 	    if (d->authFile)
 		(void) unlink (d->authFile);
-	    IfFree (d->authFile);
-	    IfFree (d->userAuthDir);
+	    free (d->authFile);
+	    free (d->userAuthDir);
 	    for (x = d->authNames; x && *x; x++)
-		IfFree (*x);
-	    IfFree (d->authNames);
-	    IfFree (d->authNameLens);
+		free (*x);
+	    free (d->authNames);
+	    free (d->authNameLens);
 #ifdef XDMCP
-	    IfFree (d->peer);
-	    IfFree (d->from);
+	    free (d->peer);
+	    free (d->from);
 	    XdmcpDisposeARRAY8 (&d->clientAddr);
 #endif
-	    IfFree (d->windowPath);
+	    free (d->windowPath);
 	    free ((char *) d);
 	    break;
 	}

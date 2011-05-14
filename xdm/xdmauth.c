@@ -162,10 +162,8 @@ XdmGetXdmcpAuth (struct protoDisplay *pdpy,
     if (!fileauth->name || !fileauth->data)
     {
 	XauDisposeAuth (xdmcpauth);
-	if (fileauth->name)
-	    free ((char *) fileauth->name);
-	if (fileauth->data)
-	    free ((char *) fileauth->data);
+	free ((char *) fileauth->name);
+	free ((char *) fileauth->data);
 	free ((char *) fileauth);
 	return;
     }

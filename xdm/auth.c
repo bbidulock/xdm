@@ -505,8 +505,7 @@ SetLocalAuthorization (struct display *d)
     for (i = 0; d->authNames[i]; i++)
 	;
     d->authNameNum = i;
-    if (d->authNameLens)
-	free ((char *) d->authNameLens);
+    free ((char *) d->authNameLens);
     d->authNameLens = (unsigned short *) malloc
 				(d->authNameNum * sizeof (unsigned short));
     if (!d->authNameLens)
@@ -663,10 +662,8 @@ doneAddrs (void)
 	struct addrList	*a, *n;
 	for (a = addrs; a; a = n) {
 		n = a->next;
-		if (a->address)
-			free (a->address);
-		if (a->number)
-			free (a->number);
+		free (a->address);
+		free (a->number);
 		free ((char *) a);
 	}
 }

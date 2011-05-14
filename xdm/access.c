@@ -784,8 +784,7 @@ int ForEachMatchingIndirectHost (
 	}
 	break;
     }
-    if (clientName)
-	free (clientName);
+    free (clientName);
     return haveLocalhost;
 }
 
@@ -823,14 +822,12 @@ int UseChooser (
 	if (d->notAllowed)
 	    break;
 	if (d->chooser && !IndirectChoice (clientAddress, connectionType)) {
-	    if (clientName)
-		free (clientName);
+	    free (clientName);
 	    return 1;
 	}
 	break;
     }
-    if (clientName)
-	free (clientName);
+    free (clientName);
     return 0;
 }
 
@@ -879,8 +876,7 @@ void ForEachChooserHost (
 	}
 	break;
     }
-    if (clientName)
-	free (clientName);
+    free (clientName);
     if (haveLocalhost)
 	(*function) (connectionType, getLocalAddress(), closure);
 }
@@ -928,8 +924,7 @@ int AcceptableDisplayAddress (
 	}
 	break;
     }
-    if (clientName)
-	free (clientName);
+    free (clientName);
     return (d != 0) && (d->notAllowed == 0)
 	&& (type == BROADCAST_QUERY ? d->notBroadcast == 0 : 1);
 }

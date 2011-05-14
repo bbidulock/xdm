@@ -252,8 +252,7 @@ GetRemoteAddress (struct display *d, int fd)
     struct netbuf	netb;
 # endif
 
-    if (d->peer)
-	free ((char *) d->peer);
+    free ((char *) d->peer);
 # ifdef STREAMSCONN
     netb.maxlen = sizeof(buf);
     netb.buf = buf;

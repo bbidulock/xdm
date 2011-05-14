@@ -733,8 +733,7 @@ SetWindowPath(struct display *d)
 	} else {
 		asprintf(&newwindowpath, "%s:%lu", windowpath, num);
 	}
-	if (d->windowPath)
-		free(d->windowPath);
+	free(d->windowPath);
 	d->windowPath = newwindowpath;
 }
 

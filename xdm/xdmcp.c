@@ -1293,8 +1293,8 @@ manage (
     }
 abort:
     XdmcpDisposeARRAY8 (&displayClass);
-    if (name) free ((char*) name);
-    if (class) free ((char*) class);
+    free ((char*) name);
+    free ((char*) class);
 }
 
 void

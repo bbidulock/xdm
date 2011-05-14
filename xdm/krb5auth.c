@@ -249,8 +249,7 @@ Krb5Init(
 	else
 	    LogError("%s while getting initial Krb5 credentials for \"%s\"\n",
 		     error_message(code), code2 ? name : my_name);
-	if (my_name)
-	    free (my_name);
+	free (my_name);
 	return 1;
     }
     krb5_cc_close(ccache);

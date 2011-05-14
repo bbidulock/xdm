@@ -312,8 +312,7 @@ RebuildTable (int size)
 	qsort (newTable, size, sizeof (char *), HostnameCompare);
     }
     XawListChange (list, newTable, size, 0, TRUE);
-    if (NameTable)
-	free ((char *) NameTable);
+    free ((char *) NameTable);
     NameTable = newTable;
     NameTableSize = size;
 }
