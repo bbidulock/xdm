@@ -851,6 +851,7 @@ DefineSelf(int fd, FILE *file, Xauth *auth)
 # endif
 	writeAddr(family, len, addr, file, auth);
     }
+    freeifaddrs(ifap);
     Debug("DefineSelf done\n");
 }
 #else  /* GETIFADDRS */
