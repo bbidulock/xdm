@@ -769,7 +769,7 @@ to the chosen host, which starts a session on that display.
 The following configuration directive is also defined for the Xaccess
 configuration file:
 .IP "\fBLISTEN\fP \fIinterface\fP \fI[list of multicast group addresses]\fP"
-\fIinterface\fP may be a hostname or IP addresss representing a
+\fIinterface\fP may be a hostname or IP address representing a
 network interface on this machine, or the wildcard * to represent all
 available network interfaces.
 .PP
