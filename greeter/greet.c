@@ -537,8 +537,25 @@ greet_user_rtn GreetUser(
 					(*pamhp, PAM_RHOST, hostname));
 		free(hostname);
 	    }
-	} else
-	    RUN_AND_CHECK_PAM_ERROR(pam_set_item, (*pamhp, PAM_TTY, d->name));
+	} else {			/* Displaying on local host */
+	    const char *ttyname = NULL;
+
+#ifdef __sun
+	    /* Solaris PAM & auditing insist this is a device file that can
+	       be found under /dev, so we can't use the display name */
+	    char vtpath[16];
+
+	    if ((d->windowPath) && !(strchr(d->windowPath, ':'))) {
+		/* if path is simply a VT, with no intermediaries, use it */
+		snprintf(vtpath, sizeof(vtpath), "/dev/vt/%s", d->windowPath);
+		ttyname = vtpath;
+	    }
+#else
+	    /* On all other OS'es we just pass the display name for PAM_TTY */
+	    ttyname = d->name;
+#endif
+	    RUN_AND_CHECK_PAM_ERROR(pam_set_item, (*pamhp, PAM_TTY, ttyname));
+	}
 
 	if (!greet->allow_null_passwd) {
 	    pam_flags |= PAM_DISALLOW_NULL_AUTHTOK;
