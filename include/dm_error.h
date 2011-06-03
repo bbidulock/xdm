@@ -34,19 +34,13 @@ authorization.
 #ifndef _DM_ERROR_H_
 # define _DM_ERROR_H_ 1
 
-# if defined(GCC_PRINTFLIKE) && defined(__GNUC__)
-#  define GCC_PRINTFLIKE(fmt,var) __attribute__((format(printf,fmt,var)))
-# else
-#  define GCC_PRINTFLIKE(fmt,var) /*nothing*/
-# endif
-
-extern void Debug        (const char * fmt, ...) GCC_PRINTFLIKE(1,2);
+extern void Debug        (const char * fmt, ...) _X_ATTRIBUTE_PRINTF(1,2);
 extern void InitErrorLog (void);
-extern void LogAppend    (const char * fmt, ...) GCC_PRINTFLIKE(1,2);
-extern void LogError     (const char * fmt, ...) GCC_PRINTFLIKE(1,2);
-extern void LogInfo      (const char * fmt, ...) GCC_PRINTFLIKE(1,2);
-extern void LogOutOfMem  (const char * fmt, ...) GCC_PRINTFLIKE(1,2);
-extern void LogPanic     (const char * fmt, ...) GCC_PRINTFLIKE(1,2);
+extern void LogAppend    (const char * fmt, ...) _X_ATTRIBUTE_PRINTF(1,2);
+extern void LogError     (const char * fmt, ...) _X_ATTRIBUTE_PRINTF(1,2);
+extern void LogInfo      (const char * fmt, ...) _X_ATTRIBUTE_PRINTF(1,2);
+extern void LogOutOfMem  (const char * fmt, ...) _X_ATTRIBUTE_PRINTF(1,2);
+extern void LogPanic     (const char * fmt, ...) _X_ATTRIBUTE_PRINTF(1,2);
 
 
 #endif /* _DM_ERROR_H_ */
