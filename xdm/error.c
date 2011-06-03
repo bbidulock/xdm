@@ -43,7 +43,7 @@ from The Open Group.
 #include "dm_error.h"
 
 /* This function does the actual log message writes. */
-static inline void
+static inline void _X_ATTRIBUTE_PRINTF(1,0)
 LogVWrite(const char *fmt, va_list args)
 {
     char buf[1024];
