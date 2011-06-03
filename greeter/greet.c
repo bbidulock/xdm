@@ -615,6 +615,10 @@ greet_user_rtn GreetUser(
 		greet->name = username;
 	    }
 	    FailedLogin (d, greet);
+	    if (greet->name == username) {
+		/* pam_end frees the value returned by pam_get_item */
+		greet->name = NULL;
+	    }
 	    RUN_AND_CHECK_PAM_ERROR(pam_end,
 				    (*pamhp, pam_error));
 	}
