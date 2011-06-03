@@ -1892,10 +1892,10 @@ static void Realize (
          * Create pixmap window
          */
         {
-            XSetWindowAttributes windowAttributes = { 0 };
-
-            windowAttributes.background_pixel = w->core.background_pixel;
-            windowAttributes.background_pixmap = None;
+            XSetWindowAttributes windowAttributes = {
+                .background_pixel = w->core.background_pixel,
+                .background_pixmap = None
+            };
 
             w->login.logoWindow = XCreateWindow(XtDisplay(w),
                 XtWindow(w),
