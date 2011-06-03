@@ -351,7 +351,7 @@ static int
 Greet (struct display *d, struct greet_info *greet)
 {
     XEvent		event;
-    Arg		arglist[3];
+    Arg		arglist[1];
 
     XtSetArg (arglist[0], XtNallowAccess, False);
     XtSetValues (login, arglist, 1);
@@ -394,9 +394,7 @@ Greet (struct display *d, struct greet_info *greet)
 	greet->password = password;
 #endif  /* USE_PAM */
 	XtSetArg (arglist[0], XtNsessionArgument, (char *) &(greet->string));
-	XtSetArg (arglist[1], XtNallowNullPasswd, (char *) &(greet->allow_null_passwd));
-	XtSetArg (arglist[2], XtNallowRootLogin, (char *) &(greet->allow_root_login));
-	XtGetValues (login, arglist, 3);
+	XtGetValues (login, arglist, 1);
 	Debug ("sessionArgument: %s\n", greet->string ? greet->string : "<NULL>");
     }
     return code;
@@ -432,6 +430,7 @@ greet_user_rtn GreetUser(
     struct dlfuncs        *dlfuncs)
 {
     int i;
+    Arg		arglist[2];
 
 /*
  * These must be set before they are used.
@@ -484,6 +483,12 @@ greet_user_rtn GreetUser(
 	LogError ("Cannot reopen display %s for greet window\n", d->name);
 	exit (RESERVER_DISPLAY);
     }
+
+    XtSetArg (arglist[0], XtNallowNullPasswd,
+	      (char *) &(greet->allow_null_passwd));
+    XtSetArg (arglist[1], XtNallowRootLogin,
+	      (char *) &(greet->allow_root_login));
+    XtGetValues (login, arglist, 2);
 
     for (;;) {
 #ifdef USE_PAM
