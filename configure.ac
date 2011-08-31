@@ -145,6 +145,27 @@ if test "x$USE_SELINUX" != "xno" ; then
     )
 fi
 
+# Check whether to install systemd unit files, as suggested in daemon(7).
+AC_ARG_WITH([systemdsystemunitdir], AS_HELP_STRING([--with-systemdsystemunitdir=DIR],
+	[Directory for systemd service files (default from the System and Service Manager)]),,
+	[with_systemdsystemunitdir=auto])
+AS_IF([test "x$with_systemdsystemunitdir" = "xyes" -o "x$with_systemdsystemunitdir" = "xauto"], [
+    def_systemdsystemunitdir=$($PKG_CONFIG --variable=systemdsystemunitdir systemd)
+
+    AS_IF([test "x$def_systemdsystemunitdir" = "x"], [
+	AS_IF([test "x$with_systemdsystemunitdir" = "xyes"], [
+	    AC_MSG_ERROR([systemd support requested but pkg-config unable to query systemd package])
+	])
+	with_systemdsystemunitdir=no
+    ], [
+	with_systemdsystemunitdir=$def_systemdsystemunitdir
+    ])
+])
+AS_IF([test "x$with_systemdsystemunitdir" != "xno"], [
+	AC_SUBST([systemdsystemunitdir], [$with_systemdsystemunitdir])
+])
+AM_CONDITIONAL(HAVE_SYSTEMD, [test "x$with_systemdsystemunitdir" != "xno"])
+
 # FIXME: Find better test for which OS'es use su -m  - for now, just try to
 # mirror the Imakefile setting of:
 # if  defined(OpenBSDArchitecture) || defined(NetBSDArchitecture) || defined(FreeBSDArchitecture) || defined(DarwinArchitecture)

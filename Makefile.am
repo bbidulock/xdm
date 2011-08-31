@@ -24,7 +24,9 @@ SUBDIRS = app-defaults chooser config greeter include man xdm xdmshell
 ACLOCAL_AMFLAGS = -I m4
 
 # This ensures distcheck is performed in a location where user has write access
-DISTCHECK_CONFIGURE_FLAGS = --with-appdefaultdir=\$${datadir}/X11/app-defaults
+DISTCHECK_CONFIGURE_FLAGS = \
+	--with-appdefaultdir=\$${datadir}/X11/app-defaults \
+	--with-systemdsystemunitdir=\$${libdir}/systemd/system
 
 if LINT
 ALL_LINT_FLAGS=$(LINT_FLAGS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
@@ -37,6 +39,15 @@ lint:
 	(cd greeter && $(MAKE) $(AM_MAKEFLAGS) lint)
 	(cd chooser && $(MAKE) $(AM_MAKEFLAGS) lint)
 endif LINT
+
+if HAVE_SYSTEMD
+systemdsystemunit_DATA = xdm.service
+
+xdm.service: xdm.service.in
+	$(AM_V_GEN)$(SED) -e 's|BINDIR|$(bindir)|g' < $< > $@
+endif HAVE_SYSTEMD
+CLEANFILES = xdm.service
+EXTRA_DIST = xdm.service.in
 
 MAINTAINERCLEANFILES = ChangeLog INSTALL
 
