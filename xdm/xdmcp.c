@@ -74,7 +74,7 @@ static void request_respond (struct sockaddr *from, int fromlen, int length, int
 static void send_accept (struct sockaddr *to, int tolen, CARD32 sessionID, ARRAY8Ptr authenticationName, ARRAY8Ptr authenticationData, ARRAY8Ptr authorizationName, ARRAY8Ptr authorizationData, int fd);
 static void send_alive (struct sockaddr *from, int fromlen, int length, int fd);
 static void send_decline (struct sockaddr *to, int tolen, ARRAY8Ptr authenticationName, ARRAY8Ptr authenticationData, ARRAY8Ptr status, int fd);
-static void send_failed (struct sockaddr *from, int fromlen, char *name, CARD32 sessionID, char *reason, int fd);
+static void send_failed (struct sockaddr *from, int fromlen, const char *name, CARD32 sessionID, const char *reason, int fd);
 static void send_refuse (struct sockaddr *from, int fromlen, CARD32 sessionID, int fd);
 static void send_unwilling (struct sockaddr *from, int fromlen, ARRAY8Ptr authenticationName, ARRAY8Ptr status, int fd);
 static void send_willing (struct sockaddr *from, int fromlen, ARRAY8Ptr authenticationName, ARRAY8Ptr status, int fd);
@@ -1300,7 +1300,7 @@ abort:
 void
 SendFailed (
     struct display  *d,
-    char	    *reason)
+    const char	    *reason)
 {
     Debug ("Display start failed, sending Failed\n");
     send_failed ((struct sockaddr *)(d->from), d->fromlen, d->name,
@@ -1311,9 +1311,9 @@ static void
 send_failed (
     struct sockaddr *from,
     int		    fromlen,
-    char	    *name,
+    const char	    *name,
     CARD32	    sessionID,
-    char	    *reason,
+    const char	    *reason,
     int		    fd)
 {
     static char	buf[256];
@@ -1416,7 +1416,7 @@ NetworkAddressToHostname (
 # else
 	    char dotted[20];
 # endif
-	    char *local_name = "";
+	    const char *local_name = "";
 	    int af_type;
 
 # if defined(IPv6) && defined(AF_INET6)

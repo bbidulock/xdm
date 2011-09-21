@@ -443,7 +443,7 @@ extern void UnsecureDisplay (struct display *d, Display *dpy);
 extern void execute(char **argv, char **environ);
 
 /* server.c */
-extern char *_SysErrorMsg (int n);
+extern const char *_SysErrorMsg (int n);
 extern int StartServer (struct display *d);
 extern int WaitForServer (struct display *d);
 extern void ResetServer (struct display *d);
@@ -462,10 +462,10 @@ extern int Asprintf(char ** ret, const char *restrict format, ...)
     _X_ATTRIBUTE_PRINTF(2,3);
 # endif
 extern char *localHostname (void);
-extern char **parseArgs (char **argv, char *string);
-extern char **setEnv (char **e, char *name, char *value);
+extern char **parseArgs (char **argv, const char *string);
+extern char **setEnv (char **e, const char *name, const char *value);
 extern char **putEnv(const char *string, char **env);
-extern char *getEnv (char **e, char *name);
+extern char *getEnv (char **e, const char *name);
 extern void CleanUpChild (void);
 extern void freeArgs (char **argv);
 extern void freeEnv (char **env);
@@ -478,7 +478,7 @@ extern int Verify (struct display *d, struct greet_info *greet, struct verify_in
 extern char *NetworkAddressToHostname (CARD16 connectionType, ARRAY8Ptr connectionAddress);
 extern int AnyWellKnownSockets (void);
 extern void DestroyWellKnownSockets (void);
-extern void SendFailed (struct display *d, char *reason);
+extern void SendFailed (struct display *d, const char *reason);
 extern void StopDisplay (struct display *d);
 extern void WaitForChild (void);
 extern void WaitForSomething (void);

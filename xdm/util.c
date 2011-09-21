@@ -97,7 +97,7 @@ printEnv (char **e)
 }
 
 static char *
-makeEnv (char *name, char *value)
+makeEnv (const char *name, const char *value)
 {
 	char	*result;
 
@@ -111,7 +111,7 @@ makeEnv (char *name, char *value)
 }
 
 char *
-getEnv (char **e, char *name)
+getEnv (char **e, const char *name)
 {
 	int	l = strlen (name);
 
@@ -127,7 +127,7 @@ getEnv (char **e, char *name)
 }
 
 char **
-setEnv (char **e, char *name, char *value)
+setEnv (char **e, const char *name, const char *value)
 {
 	char	**new, **old;
 	char	*newe;
@@ -207,9 +207,9 @@ freeEnv (char **env)
 #define isblank(c)	((c) == ' ' || c == '\t')
 
 char **
-parseArgs (char **argv, char *string)
+parseArgs (char **argv, const char *string)
 {
-	char	*word;
+	const char *word;
 	char	*save;
 	char    **newargv;
 	int	i;

@@ -667,7 +667,7 @@ scanHostlist (
 /* Returns non-0 iff string is matched by pattern.  Does case folding.
  */
 static int
-patternMatch (char *string, char *pattern)
+patternMatch (const char *string, char *pattern)
 {
     int	    p, s;
 

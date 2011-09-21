@@ -145,10 +145,10 @@ int	choiceTimeout;	/* chooser choice timeout */
 #define DEF_UDP_PORT	"177"	    /* registered XDMCP port, dont change */
 
 struct dmResources {
-	char	*name, *class;
-	int	type;
-	char	**dm_value;
-	char	*default_value;
+	const char	*name, *class;
+	int		type;
+	char		**dm_value;
+	const char	*default_value;
 } DmResources[] = {
 { "servers",	"Servers", 	DM_STRING,	&servers,
 				DEF_SERVER_LINE} ,
@@ -203,10 +203,10 @@ struct dmResources {
 #define boffset(f)	XtOffsetOf(struct display, f)
 
 struct displayResource {
-	char	*name, *class;
-	int	type;
-	int	offset;
-	char	*default_value;
+	const char	*name, *class;
+	int		type;
+	int		offset;
+	const char	*default_value;
 };
 
 /* resources for managing the server */
@@ -289,15 +289,16 @@ XrmDatabase	DmResourceDB;
 
 static void
 GetResource (
-    char    *name,
-    char    *class,
-    int	    valueType,
-    char    **valuep,
-    char    *default_value)
+    const char    *name,
+    const char    *class,
+    int            valueType,
+    char         **valuep,
+    const char    *default_value)
 {
     char	*type;
     XrmValue	value;
-    char	*string, *new_string;
+    const char	*string;
+    char	*new_string;
     char	str_buf[50];
     int	len;
 

@@ -116,7 +116,7 @@ int chown(int a,int b,int c) {}
 
 struct AuthProtocol {
     unsigned short  name_length;
-    char	    *name;
+    const char	    *name;
     void	    (*InitAuth)(unsigned short len, char *name);
     Xauth	    *(*GetAuth)(unsigned short len, char *name);
     void	    (*GetXdmcpAuth)(

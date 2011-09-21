@@ -61,7 +61,7 @@ from The Open Group.
 extern char *crypt(const char *, const char *);
 #endif
 
-static char *envvars[] = {
+static const char *envvars[] = {
     "TZ",			/* SYSV and SVR4, but never hurts */
 #if defined(sony) && !defined(SYSTYPE_SYSV) && !defined(_SYSTYPE_SYSV)
     "bootdev",
@@ -94,8 +94,8 @@ static char **
 userEnv (struct display *d, int useSystemPath, char *user, char *home, char *shell)
 {
     char	**env;
-    char	**envvar;
-    char	*str;
+    const char	**envvar;
+    const char	*str;
 
     env = defaultEnv ();
     env = setEnv (env, "DISPLAY", d->name);
