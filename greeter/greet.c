@@ -310,7 +310,7 @@ InitGreet (struct display *d)
 
     if (d->pingInterval)
     {
-    	pingTimeout = XtAppAddTimeOut (context, d->pingInterval * 60 * 1000,
+	pingTimeout = XtAppAddTimeOut (context, d->pingInterval * 60 * 1000,
 				       GreetPingServer, (XtPointer) d);
     }
     return dpy;

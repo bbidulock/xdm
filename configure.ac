@@ -1,5 +1,5 @@
 dnl  Copyright 2005 Red Hat, Inc.
-dnl 
+dnl
 dnl  Permission to use, copy, modify, distribute, and sell this software and its
 dnl  documentation for any purpose is hereby granted without fee, provided that
 dnl  the above copyright notice appear in all copies and that both that
@@ -9,7 +9,7 @@ dnl  advertising or publicity pertaining to distribution of the software without
 dnl  specific, written prior permission.  Red Hat makes no
 dnl  representations about the suitability of this software for any purpose.  It
 dnl  is provided "as is" without express or implied warranty.
-dnl 
+dnl
 dnl  RED HAT DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
 dnl  INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN NO
 dnl  EVENT SHALL RED HAT BE LIABLE FOR ANY SPECIAL, INDIRECT OR
@@ -292,7 +292,7 @@ if test "x$WTMP_FILE" = "xyes" ; then
 	AC_MSG_ERROR([path was not specified to --with-wtmp-file])
 fi
 if test "x$WTMP_FILE" = "x" ; then
-	for WTMP_FILE in /var/adm/wtmpx /var/log/wtmp /var/adm/wtmp /usr/adm/wtmp /etc/wtmp ; do 
+	for WTMP_FILE in /var/adm/wtmpx /var/log/wtmp /var/adm/wtmp /usr/adm/wtmp /etc/wtmp ; do
 		AC_CHECK_FILE([$WTMP_FILE], [break], [WTMP_FILE=""])
 	done
 	if test "x$WTMP_FILE" = "x" ; then
@@ -315,7 +315,7 @@ AC_SUBST(SHELL_CMD)
 PKG_CHECK_MODULES(XDM, xmu x11 xau)
 
 PKG_CHECK_EXISTS(xinerama, [
-	AC_DEFINE([USE_XINERAMA], 1, 
+	AC_DEFINE([USE_XINERAMA], 1,
 		[Define to 1 to use XINERAMA in greeter & chooser])
 	PKG_CHECK_MODULES(XINERAMA, xinerama)
 	CHOOSER_CFLAGS="$CHOOSER_CFLAGS $XINERAMA_CFLAGS"
@@ -325,31 +325,31 @@ PKG_CHECK_EXISTS(xinerama, [
 ])
 
 # Xft text drawing for the greeter screen
-AC_ARG_WITH(xft, 
-    	AS_HELP_STRING([--with-xft], 
+AC_ARG_WITH(xft,
+	AS_HELP_STRING([--with-xft],
 			[Use Xft to draw text (default is YES if installed)]),
-	[USE_XFT="$withval"], 
+	[USE_XFT="$withval"],
 	PKG_CHECK_EXISTS(xft, [USE_XFT="yes"], [USE_XFT="no"]))
 
 if test "x$USE_XFT" = "xyes" ; then
 	PKG_CHECK_MODULES(XFT, xft)
 	GREETER_CFLAGS="$GREETER_CFLAGS $XFT_CFLAGS"
 	GREETER_LIBS="$GREETER_LIBS $XFT_LIBS"
-	AC_DEFINE([USE_XFT], 1, 
+	AC_DEFINE([USE_XFT], 1,
 	    [Define to 1 to use Xft for text on greeter screen])
 fi
 
 # XPM logos for the greeter screen
-AC_ARG_ENABLE(xpm-logos, 
-    	AS_HELP_STRING([--enable-xpm-logos], 
+AC_ARG_ENABLE(xpm-logos,
+	AS_HELP_STRING([--enable-xpm-logos],
 			[Display xpm logos in greeter (default is YES)]),
-	[USE_XPM="$enableval"], 
+	[USE_XPM="$enableval"],
 	PKG_CHECK_EXISTS(xpm, [USE_XPM="yes"], [USE_XPM="no"]))
 if test "x$USE_XPM" = "xyes" ; then
 	PKG_CHECK_MODULES(XPM, xpm)
 	GREETER_CFLAGS="$GREETER_CFLAGS $XPM_CFLAGS"
 	GREETER_LIBS="$GREETER_LIBS $XPM_LIBS"
-	AC_DEFINE([XPM], 1, 
+	AC_DEFINE([XPM], 1,
 		[Define to 1 to display XPM logos on greeter screen])
 fi
 AM_CONDITIONAL(USE_XPM, test "x$USE_XPM" = "xyes")
@@ -365,7 +365,7 @@ AC_ARG_WITH(bw-pixmap,
 AC_ARG_WITH(pixmapdir,
 	AS_HELP_STRING([--with-pixmapdir=<pathname>],
 	[specify directory for xpm files (default=xdmlibdir/pixmaps)]),
-	[XDM_PIXMAPDIR="$withval"], 
+	[XDM_PIXMAPDIR="$withval"],
 	[XDM_PIXMAPDIR='${XDMLIBDIR}/pixmaps'])
 
 AC_SUBST(XDM_PIXMAP)
@@ -444,10 +444,10 @@ AC_SUBST(CHOOSER_LIBS)
 # Currently just trying to mirror what defaults were set in Imake
 
 # -DDEF_SERVER_LINE=":0 local $(DEF_SERVER) :0"
-if test -z "$DEF_SERVER" ; then 
+if test -z "$DEF_SERVER" ; then
 	DEF_SERVER="${bindir}/X"
 fi
-if test -z "$DEF_SERVER_LINE" ; then 
+if test -z "$DEF_SERVER_LINE" ; then
 	DEF_SERVER_LINE=":0 local ${DEF_SERVER} :0"
 fi
 AX_DEFINE_DIR(DEF_SERVER_LINE, DEF_SERVER_LINE,

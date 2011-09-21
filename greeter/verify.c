@@ -389,7 +389,7 @@ Verify (struct display *d, struct greet_info *greet, struct verify_info *verify)
                         Debug("Not on system console\n");
 			if (greet->password != NULL)
 			    bzero(greet->password, strlen(greet->password));
-             		free(console);
+			free(console);
 	                return 0;
                 }
 		free(console);

@@ -103,7 +103,7 @@ authorization.
 	------------------------------------------------------------
 
 md5 code in genauth.c implements something close to the MD5 message-digest
-algorithm.  This code is based on code written by Colin Plumb in 1993, 
+algorithm.  This code is based on code written by Colin Plumb in 1993,
 no copyright is claimed.
 This code is in the public domain; do with it what you wish.
 

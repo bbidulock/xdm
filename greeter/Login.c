@@ -162,11 +162,11 @@ static XtResource resources[] = {
 
 #ifndef USE_XFT
     {XtNfont, XtCFont, XtRFontStruct, sizeof (XFontStruct *),
-    	offset (textFont), XtRString,	"*-new century schoolbook-medium-r-normal-*-180-*"},
+	offset (textFont), XtRString,	"*-new century schoolbook-medium-r-normal-*-180-*"},
     {XtNpromptFont, XtCFont, XtRFontStruct, sizeof (XFontStruct *),
-    	offset (promptFont), XtRString, "*-new century schoolbook-bold-r-normal-*-180-*"},
+	offset (promptFont), XtRString, "*-new century schoolbook-bold-r-normal-*-180-*"},
     {XtNgreetFont, XtCFont, XtRFontStruct, sizeof (XFontStruct *),
-    	offset (greetFont), XtRString,	"*-new century schoolbook-bold-i-normal-*-240-*"},
+	offset (greetFont), XtRString,	"*-new century schoolbook-bold-i-normal-*-240-*"},
     {XtNfailFont, XtCFont, XtRFontStruct, sizeof (XFontStruct *),
 	offset (failFont), XtRString,	"*-new century schoolbook-bold-r-normal-*-180-*"},
 #else /* USE_XFT */
@@ -188,7 +188,7 @@ static XtResource resources[] = {
 	offset(failcolor), XtRString,	XtDefaultForeground},
 #endif
     {XtNgreeting, XtCGreeting, XtRString, sizeof (char *),
-    	offset(greeting), XtRString, "X Window System"},
+	offset(greeting), XtRString, "X Window System"},
     {XtNunsecureGreeting, XtCGreeting, XtRString, sizeof (char *),
 	offset(unsecure_greet), XtRString, "This is an unsecure session"},
     {XtNnamePrompt, XtCNamePrompt, XtRString, sizeof (char *),
@@ -502,21 +502,21 @@ realizeCursor (LoginWidget w, GC gc)
     XFillRectangle (XtDisplay (w), XtWindow (w), gc,
 		    x, y+1 - F_ASCENT(text), width, height-1);
     XDrawPoint     (XtDisplay (w), XtWindow (w), gc,
-    		    x-1 , y - F_ASCENT(text));
+		    x-1 , y - F_ASCENT(text));
     XDrawPoint     (XtDisplay (w), XtWindow (w), gc,
-    		    x+1 , y - F_ASCENT(text));
+		    x+1 , y - F_ASCENT(text));
     XDrawPoint     (XtDisplay (w), XtWindow (w), gc,
-    		    x-1 , y - F_ASCENT(text)+height);
+		    x-1 , y - F_ASCENT(text)+height);
     XDrawPoint     (XtDisplay (w), XtWindow (w), gc,
-    		    x+1 , y - F_ASCENT(text)+height);
+		    x+1 , y - F_ASCENT(text)+height);
     XDrawPoint     (XtDisplay (w), XtWindow (w), gc,
-    		    x-2 , y - F_ASCENT(text));
+		    x-2 , y - F_ASCENT(text));
     XDrawPoint     (XtDisplay (w), XtWindow (w), gc,
-    		    x+2 , y - F_ASCENT(text));
+		    x+2 , y - F_ASCENT(text));
     XDrawPoint     (XtDisplay (w), XtWindow (w), gc,
-    		    x-2 , y - F_ASCENT(text)+height);
+		    x-2 , y - F_ASCENT(text)+height);
     XDrawPoint     (XtDisplay (w), XtWindow (w), gc,
-    		    x+2 , y - F_ASCENT(text)+height);
+		    x+2 , y - F_ASCENT(text)+height);
 
     XFlush (XtDisplay(w));
 }
@@ -702,13 +702,13 @@ draw_it (LoginWidget w)
     for(i=1;i<=(w->login.outframewidth);i++)
     {
       XDrawLine(XtDisplay (w), XtWindow (w), w->login.hiGC,
-    		i-1,i-1,w->core.width-i,i-1);
+		i-1,i-1,w->core.width-i,i-1);
       XDrawLine(XtDisplay (w), XtWindow (w), w->login.hiGC,
-    		i-1,i-1,i-1,w->core.height-i);
+		i-1,i-1,i-1,w->core.height-i);
       XDrawLine(XtDisplay (w), XtWindow (w), w->login.shdGC,
-    		w->core.width-i,i-1,w->core.width-i,w->core.height-i);
+		w->core.width-i,i-1,w->core.width-i,w->core.height-i);
       XDrawLine(XtDisplay (w), XtWindow (w), w->login.shdGC,
-    		i-1,w->core.height-i,w->core.width-i,w->core.height-i);
+		i-1,w->core.height-i,w->core.width-i,w->core.height-i);
     }
 
     /* make separator line */
@@ -1718,7 +1718,7 @@ static void Initialize (
 
     xvaluemask = valuemask;
     if (w->login.greetFont == NULL)
-    	w->login.greetFont = w->login.textFont;
+	w->login.greetFont = w->login.textFont;
     else
 	xvaluemask |= GCFont;
 
