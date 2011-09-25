@@ -383,7 +383,7 @@ PKG_CHECK_MODULES(AUTH, xau)
 # Greeter
 #
 
-PKG_CHECK_MODULES(XDMGREET, xt x11 xext)
+PKG_CHECK_MODULES(XDMGREET, xt >= 1.0 x11 xext)
 
 GREETERLIB="${XDMLIBDIR}/libXdmGreet.so"
 AX_DEFINE_DIR(DEF_GREETER_LIB, GREETERLIB, [Location of Xdm Greeter library])
