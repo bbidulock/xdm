@@ -43,8 +43,13 @@ endif LINT
 if HAVE_SYSTEMD
 systemdsystemunit_DATA = xdm.service
 
-xdm.service: xdm.service.in
-	$(AM_V_GEN)$(SED) -e 's|BINDIR|$(bindir)|g' < $< > $@
+xdm.service: xdm.service.in Makefile
+if USE_SYSTEMD_DAEMON
+	$(AM_V_GEN)$(SED) -e 's|BINDIR|$(bindir)|g' < xdm.service.in > $@
+else !USE_SYSTEMD_DAEMON
+	$(AM_V_GEN)$(SED) -e 's|BINDIR|$(bindir)|g' -e '/[Nn]otify/d' < xdm.service.in > $@
+endif !USE_SYSTEMD_DAEMON
+
 endif HAVE_SYSTEMD
 CLEANFILES = xdm.service
 EXTRA_DIST = xdm.service.in

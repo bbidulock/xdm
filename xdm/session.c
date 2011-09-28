@@ -81,6 +81,10 @@ extern int key_setnet(struct key_netstarg *arg);
 #  define RTLD_NOW 1
 # endif
 
+#ifdef USE_SYSTEMD_DAEMON
+#include <systemd/sd-daemon.h>
+#endif
+
 #ifdef USE_SELINUX
 /* This should be run just before we exec the user session. */
 static int
@@ -348,6 +352,12 @@ ManageSession (struct display *d)
 	LogError ("%s while loading %s\n", dlerror(), greeterLib);
 	exit(UNMANAGE_DISPLAY);
 	}
+
+#ifdef USE_SYSTEMD_DAEMON
+	/* Subsequent notifications will be ignored by systemd
+	 * and calling this function will clean up the env */
+	sd_notify(1, "READY=1");
+#endif
 
     /* tell the possibly dynamically loaded greeter function
      * what data structure formats to expect.
