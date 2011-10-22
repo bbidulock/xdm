@@ -345,10 +345,10 @@ AC_ARG_WITH(xft,
 	AS_HELP_STRING([--with-xft],
 			[Use Xft to draw text (default is YES if installed)]),
 	[USE_XFT="$withval"],
-	PKG_CHECK_EXISTS(xft, [USE_XFT="yes"], [USE_XFT="no"]))
+	PKG_CHECK_EXISTS(xft xrender, [USE_XFT="yes"], [USE_XFT="no"]))
 
 if test "x$USE_XFT" = "xyes" ; then
-	PKG_CHECK_MODULES(XFT, xft)
+	PKG_CHECK_MODULES(XFT, xft xrender)
 	GREETER_CFLAGS="$GREETER_CFLAGS $XFT_CFLAGS"
 	GREETER_LIBS="$GREETER_LIBS $XFT_LIBS"
 	AC_DEFINE([USE_XFT], 1,

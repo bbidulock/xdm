@@ -86,6 +86,10 @@ from The Open Group.
 # include <X11/extensions/Xinerama.h>
 #endif
 
+#ifdef USE_XFT
+# include <X11/extensions/Xrender.h>
+#endif
+
 #ifndef DEBUG
 # define XDM_ASSERT(a)	/* do nothing */
 #else
