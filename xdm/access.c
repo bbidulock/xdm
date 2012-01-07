@@ -304,6 +304,11 @@ tryagain:
     if (!hostOrAlias)
 	return NULL;
     h = malloc (sizeof (DisplayEntry));
+    if (!h)
+    {
+	LogOutOfMem ("ReadHostEntry: DisplayEntry\n");
+	return NULL;
+    }
     h->hopCount = 1;
     if (*hostOrAlias == ALIAS_CHARACTER)
     {
@@ -423,6 +428,11 @@ tryagain:
     if (!displayOrAlias)
 	return NULL;
     d = malloc (sizeof (DisplayEntry));
+    if (!d)
+    {
+	LogOutOfMem ("ReadDisplayEntry: DisplayEntry\n");
+	return NULL;
+    }
     d->notAllowed = 0;
     d->notBroadcast = 0;
     d->chooser = 0;

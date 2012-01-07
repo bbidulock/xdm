@@ -128,6 +128,11 @@ RememberIndirectClient (
 	    connectionType == i->connectionType)
 	    return 1;
     i = malloc (sizeof (IndirectUsersRec));
+    if (!i)
+    {
+	LogOutOfMem ("RememberIndirectClient\n");
+	return 0;
+    }
     if (!XdmcpCopyARRAY8 (clientAddress, &i->client))
     {
 	free (i);
