@@ -46,9 +46,6 @@ from The Open Group.
 #   include <sys/un.h>		/* struct sockaddr_un */
 #  endif
 # endif
-# ifdef DNETCONN
-#  include <netdnet/dn.h>		/* struct sockaddr_dn */
-# endif
 
 /* given an XdmcpNetaddr, returns the socket protocol family used,
    e.g., AF_INET */
@@ -111,11 +108,6 @@ char * NetaddrAddress(XdmcpNetaddr netaddrp, int *lenp)
     }
 #  endif
 # endif
-# ifdef DNETCONN
-    case AF_DECnet:
-        *lenp = sizeof (struct dn_naddr);
-        return (char *) &(((struct sockaddr_dn *)netaddrp)->sdn_add);
-# endif
 # ifdef AF_CHAOS
     case AF_CHAOS:
 # endif
@@ -163,11 +155,6 @@ int ConvertAddr (XdmcpNetaddr saddr, int *len, char **addr)
 	    retval = FamilyInternet6;
 	break;
 #  endif
-# endif
-# ifdef DNETCONN
-      case AF_DECnet:
-        retval = FamilyDECnet;
-	break;
 # endif
 # ifdef AF_CHAOS
     case AF_CHAOS:

@@ -51,10 +51,6 @@ from The Open Group.
 #ifdef TCPCONN
 # include "dm_socket.h"
 #endif
-#ifdef DNETCONN
-# include <netdnet/dn.h>
-# include <netdnet/dnetdb.h>
-#endif
 
 #if defined(hpux)
 # include <sys/utsname.h>
@@ -1080,56 +1076,43 @@ DefineSelf (int fd, FILE *file, Xauth *auth)
     for (cp = (char *) IFC_IFC_REQ; cp < cplim; cp += ifr_size (ifr))
     {
 	ifr = (ifr_type *) cp;
-#   ifdef DNETCONN
-	/*
-	 * this is ugly but SIOCGIFCONF returns decnet addresses in
-	 * a different form from other decnet calls
-	 */
-	if (IFR_IFR_ADDR.sa_family == AF_DECnet) {
-		len = sizeof (struct dn_naddr);
-		addr = (char *)ifr->ifr_addr.sa_data;
-		family = FamilyDECnet;
-	} else
-#   endif
-	{
-	    family = ConvertAddr ((XdmcpNetaddr) &IFR_IFR_ADDR, &len, &addr);
-	    if (family < 0)
-		continue;
+	family = ConvertAddr ((XdmcpNetaddr) &IFR_IFR_ADDR, &len, &addr);
+	if (family < 0)
+	    continue;
 
-	    if (len == 0)
-	    {
-		Debug ("Skipping zero length address\n");
+	if (len == 0)
+	{
+	    Debug ("Skipping zero length address\n");
+	    continue;
+	}
+	/*
+	 * don't write out 'localhost' entries, as
+	 * they may conflict with other local entries.
+	 * DefineLocal will always be called to add
+	 * the local entry anyway, so this one can
+	 * be tossed.
+	 */
+	if (family == FamilyInternet && len == 4 &&
+	    addr[0] == 127 && addr[1] == 0 &&
+	    addr[2] == 0 && addr[3] == 1)
+	{
+	    Debug ("Skipping localhost address\n");
+	    continue;
+	}
+#   if defined(IPv6) && defined(AF_INET6)
+	if (family == FamilyInternet6) {
+	    if (IN6_IS_ADDR_LOOPBACK(((struct in6_addr *)addr))) {
+		Debug ("Skipping IPv6 localhost address\n");
 		continue;
 	    }
-	    /*
-	     * don't write out 'localhost' entries, as
-	     * they may conflict with other local entries.
-	     * DefineLocal will always be called to add
-	     * the local entry anyway, so this one can
-	     * be tossed.
-	     */
-	    if (family == FamilyInternet && len == 4 &&
-		addr[0] == 127 && addr[1] == 0 &&
-		addr[2] == 0 && addr[3] == 1)
-	    {
-		    Debug ("Skipping localhost address\n");
-		    continue;
+	    /* Also skip XDM-AUTHORIZATION-1 */
+	    if (auth->name_length == 19 &&
+		strcmp(auth->name, "XDM-AUTHORIZATION-1") == 0) {
+		Debug ("Skipping IPv6 XDM-AUTHORIZATION-1\n");
+		continue;
 	    }
-#   if defined(IPv6) && defined(AF_INET6)
-	    if(family == FamilyInternet6) {
-		if (IN6_IS_ADDR_LOOPBACK(((struct in6_addr *)addr))) {
-		    Debug ("Skipping IPv6 localhost address\n");
-		    continue;
-		}
-		/* Also skip XDM-AUTHORIZATION-1 */
-		if (auth->name_length == 19 &&
-		    strcmp(auth->name, "XDM-AUTHORIZATION-1") == 0) {
-		    Debug ("Skipping IPv6 XDM-AUTHORIZATION-1\n");
-		    continue;
-		}
-	    }
-#   endif
 	}
+#   endif
 	Debug ("DefineSelf: write network address, length %d\n", len);
 	writeAddr (family, len, addr, file, auth);
     }
@@ -1224,11 +1207,6 @@ writeLocalAuth (FILE *file, Xauth *auth, char *name)
     if (fd < 0)
 # endif
     fd = socket (AF_INET, SOCK_STREAM, 0);
-    DefineSelf (fd, file, auth);
-    close (fd);
-#endif
-#ifdef DNETCONN
-    fd = socket (AF_DECnet, SOCK_STREAM, 0);
     DefineSelf (fd, file, auth);
     close (fd);
 #endif
