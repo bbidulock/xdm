@@ -906,99 +906,23 @@ ifioctl (int fd, int cmd, char *arg)
 # endif /* SYSV_SIOCGIFCONF */
 
 
-# ifdef WINTCP /* NCR with Wollongong TCP */
 
-#  include <sys/un.h>
-#  include <stropts.h>
-#  include <tiuser.h>
+# if defined(SIOCGIFCONF) || defined (USE_SIOCGLIFCONF)
 
-#  include <sys/stream.h>
-#  include <net/if.h>
-#  include <netinet/ip.h>
-#  include <netinet/ip_var.h>
-#  include <netinet/in.h>
-#  include <netinet/in_var.h>
-
-static void
-DefineSelf (int fd, FILE *file, Xauth *auth)
-{
-    /*
-     * The Wollongong drivers used by NCR SVR4/MP-RAS don't understand the
-     * socket IO calls that most other drivers seem to like. Because of
-     * this, this routine must be special cased for NCR. Eventually,
-     * this will be cleared up.
-     */
-
-    struct ipb ifnet;
-    struct in_ifaddr ifaddr;
-    struct strioctl str;
-    unsigned char *addr;
-    int	len, ipfd;
-
-    if ((ipfd = open ("/dev/ip", O_RDWR, 0 )) < 0)
-        LogError ("cannot get interface configuration; cannot open /dev/ip: "
-		  "%s\n", _SysErrorMsg (errno));
-
-    /* Indicate that we want to start at the begining */
-    ifnet.ib_next = (struct ipb *) 1;
-
-    while (ifnet.ib_next)
-    {
-	str.ic_cmd = IPIOC_GETIPB;
-	str.ic_timout = 0;
-	str.ic_len = sizeof (struct ipb);
-	str.ic_dp = (char *) &ifnet;
-
-	if (ioctl (ipfd, (int) I_STR, (char *) &str) < 0)
-	{
-	    LogError ("cannot get interface configuration; ioctl failed: %s\n",
-		      _SysErrorMsg (errno));
-	    close (ipfd);
-	}
-
-	ifaddr.ia_next = (struct in_ifaddr *) ifnet.if_addrlist;
-	str.ic_cmd = IPIOC_GETINADDR;
-	str.ic_timout = 0;
-	str.ic_len = sizeof (struct in_ifaddr);
-	str.ic_dp = (char *) &ifaddr;
-
-	if (ioctl (ipfd, (int) I_STR, (char *) &str) < 0)
-	{
-	    LogError ("cannot get interface configuration; ioctl failed: %s\n",
-		      _SysErrorMsg (errno));
-	    close (ipfd);
-	}
-
-	/*
-	 * Ignore the 127.0.0.1 entry.
-	 */
-	if (IA_SIN(&ifaddr)->sin_addr.s_addr == htonl(0x7f000001) )
-		continue;
-
-	writeAddr (FamilyInternet, 4, (char *)&(IA_SIN(&ifaddr)->sin_addr), file, auth);
-
-    }
-    close(ipfd);
-}
-
-# else /* WINTCP */
-
-#  if defined(SIOCGIFCONF) || defined (USE_SIOCGLIFCONF)
-
-#   ifdef USE_SIOCGLIFCONF
-#    define ifr_type    struct lifreq
-#   else
-#    define ifr_type    struct ifreq
-#   endif
+#  ifdef USE_SIOCGLIFCONF
+#   define ifr_type    struct lifreq
+#  else
+#   define ifr_type    struct ifreq
+#  endif
 
 /* Handle variable length ifreq in BNR2 and later */
-#   ifdef VARIABLE_IFREQ
-#    define ifr_size(p) (sizeof (struct ifreq) + \
+#  ifdef VARIABLE_IFREQ
+#   define ifr_size(p) (sizeof (struct ifreq) + \
 		     (p->ifr_addr.sa_len > sizeof (p->ifr_addr) ? \
 		      p->ifr_addr.sa_len - sizeof (p->ifr_addr) : 0))
-#   else
-#    define ifr_size(p) (sizeof (ifr_type))
-#   endif
+#  else
+#   define ifr_size(p) (sizeof (ifr_type))
+#  endif
 
 /* Define this host for access control.  Find all the hosts the OS knows about
  * for this fd and add them to the selfhosts list.
@@ -1011,18 +935,18 @@ DefineSelf (int fd, FILE *file, Xauth *auth)
     char 		*addr;
     int 		family;
     register ifr_type  *ifr;
-#   ifdef USE_SIOCGLIFCONF
+#  ifdef USE_SIOCGLIFCONF
     void *		bufptr = buf;
     size_t		buflen = sizeof(buf);
     struct lifconf	ifc;
-#    ifdef SIOCGLIFNUM
+#   ifdef SIOCGLIFNUM
     struct lifnum	ifn;
-#    endif
-#   else
-    struct ifconf	ifc;
 #   endif
+#  else
+    struct ifconf	ifc;
+#  endif
 
-#   if defined(SIOCGLIFNUM) && defined(SIOCGLIFCONF)
+#  if defined(SIOCGLIFNUM) && defined(SIOCGLIFCONF)
     ifn.lifn_family = AF_UNSPEC;
     ifn.lifn_flags = 0;
     if (ioctl (fd, (int) SIOCGLIFNUM, (char *) &ifn) < 0)
@@ -1031,43 +955,43 @@ DefineSelf (int fd, FILE *file, Xauth *auth)
 	buflen = ifn.lifn_count * sizeof(struct lifreq);
 	bufptr = malloc(buflen);
     }
-#   endif
+#  endif
 
-#   ifdef USE_SIOCGLIFCONF
+#  ifdef USE_SIOCGLIFCONF
     ifc.lifc_family = AF_UNSPEC;
     ifc.lifc_flags = 0;
     ifc.lifc_len = buflen;
     ifc.lifc_buf = bufptr;
 
-#    define IFC_IOCTL_REQ SIOCGLIFCONF
-#    define IFC_IFC_REQ ifc.lifc_req
-#    define IFC_IFC_LEN ifc.lifc_len
-#    define IFR_IFR_ADDR ifr->lifr_addr
-#    define IFR_IFR_NAME ifr->lifr_name
+#   define IFC_IOCTL_REQ SIOCGLIFCONF
+#   define IFC_IFC_REQ ifc.lifc_req
+#   define IFC_IFC_LEN ifc.lifc_len
+#   define IFR_IFR_ADDR ifr->lifr_addr
+#   define IFR_IFR_NAME ifr->lifr_name
 
-#   else
+#  else
     ifc.ifc_len = sizeof (buf);
     ifc.ifc_buf = buf;
 
-#    define IFC_IOCTL_REQ SIOCGIFCONF
-#    ifdef ISC
-#     define IFC_IFC_REQ (struct ifreq *) ifc.ifc_buf
-#    else
-#     define IFC_IFC_REQ ifc.ifc_req
-#    endif
-#    define IFC_IFC_LEN ifc.ifc_len
-#    define IFR_IFR_ADDR ifr->ifr_addr
-#    define IFR_IFR_NAME ifr->ifr_name
+#   define IFC_IOCTL_REQ SIOCGIFCONF
+#   ifdef ISC
+#    define IFC_IFC_REQ (struct ifreq *) ifc.ifc_buf
+#   else
+#    define IFC_IFC_REQ ifc.ifc_req
 #   endif
+#   define IFC_IFC_LEN ifc.ifc_len
+#   define IFR_IFR_ADDR ifr->ifr_addr
+#   define IFR_IFR_NAME ifr->ifr_name
+#  endif
 
     if (ifioctl (fd, IFC_IOCTL_REQ, (char *) &ifc) < 0) {
         LogError ("Trouble getting network interface configuration");
 
-#   ifdef USE_SIOCGLIFCONF
+#  ifdef USE_SIOCGLIFCONF
 	if (bufptr != buf) {
 	    free(bufptr);
 	}
-#   endif
+#  endif
 	return;
     }
 
@@ -1099,7 +1023,7 @@ DefineSelf (int fd, FILE *file, Xauth *auth)
 	    Debug ("Skipping localhost address\n");
 	    continue;
 	}
-#   if defined(IPv6) && defined(AF_INET6)
+#  if defined(IPv6) && defined(AF_INET6)
 	if (family == FamilyInternet6) {
 	    if (IN6_IS_ADDR_LOOPBACK(((struct in6_addr *)addr))) {
 		Debug ("Skipping IPv6 localhost address\n");
@@ -1112,13 +1036,13 @@ DefineSelf (int fd, FILE *file, Xauth *auth)
 		continue;
 	    }
 	}
-#   endif
+#  endif
 	Debug ("DefineSelf: write network address, length %d\n", len);
 	writeAddr (family, len, addr, file, auth);
     }
 }
 
-#  else /* SIOCGIFCONF */
+# else /* SIOCGIFCONF */
 
 /* Define this host for access control.  Find all the hosts the OS knows about
  * for this fd and add them to the selfhosts list.
@@ -1162,8 +1086,7 @@ DefineSelf (int fd, int file, int auth)
 }
 
 
-#  endif /* SIOCGIFCONF else */
-# endif /* WINTCP else */
+# endif /* SIOCGIFCONF else */
 #endif /* HAVE_GETIFADDRS */
 
 static void

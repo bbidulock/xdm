@@ -584,57 +584,22 @@ RegisterHostname (char *name)
 
     if (!strcmp (name, BROADCAST_HOSTNAME))
     {
-#ifdef WINTCP /* NCR with Wollongong TCP */
-    int                 ipfd;
-    struct ifconf       *ifcp;
-    struct strioctl     ioc;
-    int			n;
-
-	ifcp = (struct ifconf *)buf;
-	ifcp->ifc_buf = buf+4;
-	ifcp->ifc_len = sizeof (buf) - 4;
-
-	if ((ipfd=open( "/dev/ip", O_RDONLY )) < 0 )
-	    {
-	    t_error( "RegisterHostname() t_open(/dev/ip) failed" );
-	    return;
-	    }
-
-	ioc.ic_cmd = IPIOC_GETIFCONF;
-	ioc.ic_timout = 60;
-	ioc.ic_len = sizeof( buf );
-	ioc.ic_dp = (char *)ifcp;
-
-	if (ioctl (ipfd, (int) I_STR, (char *) &ioc) < 0)
-	    {
-	    perror( "RegisterHostname() ioctl(I_STR(IPIOC_GETIFCONF)) failed" );
-	    close( ipfd );
-	    return;
-	    }
-
-	for (ifr = ifcp->ifc_req, n = ifcp->ifc_len / sizeof (struct ifreq);
-	    --n >= 0;
-	    ifr++)
-#else /* WINTCP */
 	ifc.ifc_len = sizeof (buf);
 	ifc.ifc_buf = buf;
 	if (ifioctl (socketFD, (int) SIOCGIFCONF, (char *) &ifc) < 0)
 	    return;
 
-# ifdef ISC
-#  define IFC_IFC_REQ (struct ifreq *) ifc.ifc_buf
-# else
-#  define IFC_IFC_REQ ifc.ifc_req
-# endif
+#ifdef ISC
+# define IFC_IFC_REQ (struct ifreq *) ifc.ifc_buf
+#else
+# define IFC_IFC_REQ ifc.ifc_req
+#endif
 
 	cplim = (char *) IFC_IFC_REQ + ifc.ifc_len;
 
 	for (cp = (char *) IFC_IFC_REQ; cp < cplim; cp += ifr_size (ifr))
-#endif /* WINTCP */
 	{
-#ifndef WINTCP
 	    ifr = (struct ifreq *) cp;
-#endif
 	    if (ifr->ifr_addr.sa_family != AF_INET)
 		continue;
 
@@ -646,31 +611,13 @@ RegisterHostname (char *name)
 		struct ifreq    broad_req;
 
 		broad_req = *ifr;
-# ifdef WINTCP /* NCR with Wollongong TCP */
-		ioc.ic_cmd = IPIOC_GETIFFLAGS;
-		ioc.ic_timout = 0;
-		ioc.ic_len = sizeof( broad_req );
-		ioc.ic_dp = (char *)&broad_req;
-
-		if (ioctl (ipfd, I_STR, (char *) &ioc) != -1 &&
-# else /* WINTCP */
 		if (ifioctl (socketFD, SIOCGIFFLAGS, (char *) &broad_req) != -1 &&
-# endif /* WINTCP */
 		    (broad_req.ifr_flags & IFF_BROADCAST) &&
 		    (broad_req.ifr_flags & IFF_UP)
 		    )
 		{
 		    broad_req = *ifr;
-# ifdef WINTCP /* NCR with Wollongong TCP */
-		    ioc.ic_cmd = IPIOC_GETIFBRDADDR;
-		    ioc.ic_timout = 0;
-		    ioc.ic_len = sizeof( broad_req );
-		    ioc.ic_dp = (char *)&broad_req;
-
-		    if (ioctl (ipfd, I_STR, (char *) &ioc) != -1)
-# else /* WINTCP */
 		    if (ifioctl (socketFD, SIOCGIFBRDADDR, &broad_req) != -1)
-# endif /* WINTCP */
 			broad_addr = broad_req.ifr_addr;
 		    else
 			continue;
