@@ -239,29 +239,15 @@ abortOpen (int n)
 
 #ifdef XDMCP
 
-# ifdef STREAMSCONN
-#  include <tiuser.h>
-# endif
 
 static void
 GetRemoteAddress (struct display *d, int fd)
 {
     char    buf[512];
     int	    len = sizeof (buf);
-# ifdef STREAMSCONN
-    struct netbuf	netb;
-# endif
 
     free (d->peer);
-# ifdef STREAMSCONN
-    netb.maxlen = sizeof(buf);
-    netb.buf = buf;
-    t_getname(fd, &netb, REMOTENAME);
-    len = 8;
-    /* lucky for us, t_getname returns something that looks like a sockaddr */
-# else
     getpeername (fd, (struct sockaddr *) buf, (void *)&len);
-# endif
     d->peerlen = 0;
     if (len)
     {
@@ -299,17 +285,6 @@ WaitForServer (struct display *d)
 	    errno = 0;
 	    (void) XSetIOErrorHandler (openErrorHandler);
 	    d->dpy = XOpenDisplay (d->name);
-#ifdef STREAMSCONN
-	    {
-		/* For some reason, the next XOpenDisplay we do is
-		   going to fail, so we might as well get that out
-		   of the way.  There is something broken here. */
-		Display *bogusDpy = XOpenDisplay (d->name);
-		Debug ("bogus XOpenDisplay %s\n",
-		       bogusDpy ? "succeeded" : "failed");
-		if (bogusDpy) XCloseDisplay(bogusDpy); /* just in case */
-	    }
-#endif
 	    (void) alarm ((unsigned) 0);
 	    (void) Signal (SIGALRM, SIG_DFL);
 	    (void) XSetIOErrorHandler ((int (*)(Display *)) 0);

@@ -79,9 +79,6 @@ static void send_refuse (struct sockaddr *from, int fromlen, CARD32 sessionID, i
 static void send_unwilling (struct sockaddr *from, int fromlen, ARRAY8Ptr authenticationName, ARRAY8Ptr status, int fd);
 static void send_willing (struct sockaddr *from, int fromlen, ARRAY8Ptr authenticationName, ARRAY8Ptr status, int fd);
 
-# ifdef STREAMSCONN
-int	xdmcpFd = -1;
-# endif
 int	chooserFd = -1;
 # if defined(IPv6) && defined(AF_INET6)
 int	chooserFd6 = -1;
@@ -95,14 +92,6 @@ int	WellKnownSocketsMax;
 void
 DestroyWellKnownSockets (void)
 {
-# ifdef STREAMSCONN
-    if (xdmcpFd != -1)
-    {
-	close (xdmcpFd);
-	FD_CLR(xdmcpFd, &WellKnownSocketsMask);
-	xdmcpFd = -1;
-    }
-# endif
     if (chooserFd != -1)
     {
 	close (chooserFd);
@@ -137,9 +126,6 @@ int
 AnyWellKnownSockets (void)
 {
     return
-# ifdef STREAMS_CONN
-      xdmcpFd != -1 ||
-# endif
 # if defined(IPv6) && defined(AF_INET6)
       chooserFd6 != -1 ||
 # endif
@@ -411,10 +397,6 @@ WaitForSomething (void)
 		nready, Rescan, ChildReady);
 	if (nready > 0)
 	{
-# ifdef STREAMSCONN
-	    if (xdmcpFd >= 0 && FD_ISSET (xdmcpFd, &reads))
-		ProcessRequestSocket (xdmcpFd);
-# endif
 	    if (chooserFd >= 0 && FD_ISSET (chooserFd, &reads))
 	    {
 # ifdef ISC

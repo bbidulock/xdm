@@ -448,7 +448,7 @@ extern int StartServer (struct display *d);
 extern int WaitForServer (struct display *d);
 extern void ResetServer (struct display *d);
 
-/* socket.c or streams.c */
+/* socket.c */
 extern int GetChooserAddr (char *addr, int *lenp);
 extern void CreateWellKnownSockets (void);
 extern void UpdateListenSockets (void);

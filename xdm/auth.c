@@ -48,7 +48,7 @@ from The Open Group.
 
 #include <sys/ioctl.h>
 
-#if defined(TCPCONN) || defined(STREAMSCONN)
+#ifdef TCPCONN
 # include "dm_socket.h"
 #endif
 #ifdef DNETCONN
@@ -100,7 +100,7 @@ from The Open Group.
 #endif
 
 #ifdef HAVE_SYS_PARAM_H
-#include <sys/param.h>
+# include <sys/param.h>
 # ifdef BSD
 #  if (BSD >= 199103)
 #   define VARIABLE_IFREQ
@@ -909,42 +909,19 @@ ifioctl (int fd, int cmd, char *arg)
 #  define ifioctl ioctl
 # endif /* SYSV_SIOCGIFCONF */
 
-# if defined(STREAMSCONN) && !defined(SYSV_SIOCGIFCONF) && !defined(NCR)
 
+# ifdef WINTCP /* NCR with Wollongong TCP */
+
+#  include <sys/un.h>
+#  include <stropts.h>
 #  include <tiuser.h>
 
-/* Define this host for access control.  Find all the hosts the OS knows about
- * for this fd and add them to the selfhosts list.
- * TLI version, written without sufficient documentation.
- */
-static void
-DefineSelf (int fd, FILE *file, Xauth *auth)
-{
-    struct netbuf	netb;
-    char		addrret[1024]; /* easier than t_alloc */
-
-    netb.maxlen = sizeof(addrret);
-    netb.buf = addrret;
-    if (t_getname (fd, &netb, LOCALNAME) == -1)
-	t_error ("t_getname");
-    /* what a kludge */
-    writeAddr (FamilyInternet, 4, netb.buf+4, file, auth);
-}
-
-# else
-
-#  ifdef WINTCP /* NCR with Wollongong TCP */
-
-#   include <sys/un.h>
-#   include <stropts.h>
-#   include <tiuser.h>
-
-#   include <sys/stream.h>
-#   include <net/if.h>
-#   include <netinet/ip.h>
-#   include <netinet/ip_var.h>
-#   include <netinet/in.h>
-#   include <netinet/in_var.h>
+#  include <sys/stream.h>
+#  include <net/if.h>
+#  include <netinet/ip.h>
+#  include <netinet/ip_var.h>
+#  include <netinet/in.h>
+#  include <netinet/in_var.h>
 
 static void
 DefineSelf (int fd, FILE *file, Xauth *auth)
@@ -1008,24 +985,24 @@ DefineSelf (int fd, FILE *file, Xauth *auth)
     close(ipfd);
 }
 
-#  else /* WINTCP */
+# else /* WINTCP */
 
-#   if defined(SIOCGIFCONF) || defined (USE_SIOCGLIFCONF)
+#  if defined(SIOCGIFCONF) || defined (USE_SIOCGLIFCONF)
 
-#    ifdef USE_SIOCGLIFCONF
-#     define ifr_type    struct lifreq
-#    else
-#     define ifr_type    struct ifreq
-#    endif
+#   ifdef USE_SIOCGLIFCONF
+#    define ifr_type    struct lifreq
+#   else
+#    define ifr_type    struct ifreq
+#   endif
 
 /* Handle variable length ifreq in BNR2 and later */
-#    ifdef VARIABLE_IFREQ
-#     define ifr_size(p) (sizeof (struct ifreq) + \
+#   ifdef VARIABLE_IFREQ
+#    define ifr_size(p) (sizeof (struct ifreq) + \
 		     (p->ifr_addr.sa_len > sizeof (p->ifr_addr) ? \
 		      p->ifr_addr.sa_len - sizeof (p->ifr_addr) : 0))
-#    else
-#     define ifr_size(p) (sizeof (ifr_type))
-#    endif
+#   else
+#    define ifr_size(p) (sizeof (ifr_type))
+#   endif
 
 /* Define this host for access control.  Find all the hosts the OS knows about
  * for this fd and add them to the selfhosts list.
@@ -1038,18 +1015,18 @@ DefineSelf (int fd, FILE *file, Xauth *auth)
     char 		*addr;
     int 		family;
     register ifr_type  *ifr;
-#    ifdef USE_SIOCGLIFCONF
+#   ifdef USE_SIOCGLIFCONF
     void *		bufptr = buf;
     size_t		buflen = sizeof(buf);
     struct lifconf	ifc;
-#     ifdef SIOCGLIFNUM
+#    ifdef SIOCGLIFNUM
     struct lifnum	ifn;
-#     endif
-#    else
-    struct ifconf	ifc;
 #    endif
+#   else
+    struct ifconf	ifc;
+#   endif
 
-#    if defined(SIOCGLIFNUM) && defined(SIOCGLIFCONF)
+#   if defined(SIOCGLIFNUM) && defined(SIOCGLIFCONF)
     ifn.lifn_family = AF_UNSPEC;
     ifn.lifn_flags = 0;
     if (ioctl (fd, (int) SIOCGLIFNUM, (char *) &ifn) < 0)
@@ -1058,43 +1035,43 @@ DefineSelf (int fd, FILE *file, Xauth *auth)
 	buflen = ifn.lifn_count * sizeof(struct lifreq);
 	bufptr = malloc(buflen);
     }
-#    endif
+#   endif
 
-#    ifdef USE_SIOCGLIFCONF
+#   ifdef USE_SIOCGLIFCONF
     ifc.lifc_family = AF_UNSPEC;
     ifc.lifc_flags = 0;
     ifc.lifc_len = buflen;
     ifc.lifc_buf = bufptr;
 
-#     define IFC_IOCTL_REQ SIOCGLIFCONF
-#     define IFC_IFC_REQ ifc.lifc_req
-#     define IFC_IFC_LEN ifc.lifc_len
-#     define IFR_IFR_ADDR ifr->lifr_addr
-#     define IFR_IFR_NAME ifr->lifr_name
+#    define IFC_IOCTL_REQ SIOCGLIFCONF
+#    define IFC_IFC_REQ ifc.lifc_req
+#    define IFC_IFC_LEN ifc.lifc_len
+#    define IFR_IFR_ADDR ifr->lifr_addr
+#    define IFR_IFR_NAME ifr->lifr_name
 
-#    else
+#   else
     ifc.ifc_len = sizeof (buf);
     ifc.ifc_buf = buf;
 
-#     define IFC_IOCTL_REQ SIOCGIFCONF
-#     ifdef ISC
-#      define IFC_IFC_REQ (struct ifreq *) ifc.ifc_buf
-#     else
-#      define IFC_IFC_REQ ifc.ifc_req
-#     endif
-#     define IFC_IFC_LEN ifc.ifc_len
-#     define IFR_IFR_ADDR ifr->ifr_addr
-#     define IFR_IFR_NAME ifr->ifr_name
+#    define IFC_IOCTL_REQ SIOCGIFCONF
+#    ifdef ISC
+#     define IFC_IFC_REQ (struct ifreq *) ifc.ifc_buf
+#    else
+#     define IFC_IFC_REQ ifc.ifc_req
 #    endif
+#    define IFC_IFC_LEN ifc.ifc_len
+#    define IFR_IFR_ADDR ifr->ifr_addr
+#    define IFR_IFR_NAME ifr->ifr_name
+#   endif
 
     if (ifioctl (fd, IFC_IOCTL_REQ, (char *) &ifc) < 0) {
         LogError ("Trouble getting network interface configuration");
 
-#    ifdef USE_SIOCGLIFCONF
+#   ifdef USE_SIOCGLIFCONF
 	if (bufptr != buf) {
 	    free(bufptr);
 	}
-#    endif
+#   endif
 	return;
     }
 
@@ -1103,7 +1080,7 @@ DefineSelf (int fd, FILE *file, Xauth *auth)
     for (cp = (char *) IFC_IFC_REQ; cp < cplim; cp += ifr_size (ifr))
     {
 	ifr = (ifr_type *) cp;
-#    ifdef DNETCONN
+#   ifdef DNETCONN
 	/*
 	 * this is ugly but SIOCGIFCONF returns decnet addresses in
 	 * a different form from other decnet calls
@@ -1113,7 +1090,7 @@ DefineSelf (int fd, FILE *file, Xauth *auth)
 		addr = (char *)ifr->ifr_addr.sa_data;
 		family = FamilyDECnet;
 	} else
-#    endif
+#   endif
 	{
 	    family = ConvertAddr ((XdmcpNetaddr) &IFR_IFR_ADDR, &len, &addr);
 	    if (family < 0)
@@ -1138,7 +1115,7 @@ DefineSelf (int fd, FILE *file, Xauth *auth)
 		    Debug ("Skipping localhost address\n");
 		    continue;
 	    }
-#    if defined(IPv6) && defined(AF_INET6)
+#   if defined(IPv6) && defined(AF_INET6)
 	    if(family == FamilyInternet6) {
 		if (IN6_IS_ADDR_LOOPBACK(((struct in6_addr *)addr))) {
 		    Debug ("Skipping IPv6 localhost address\n");
@@ -1151,14 +1128,14 @@ DefineSelf (int fd, FILE *file, Xauth *auth)
 		    continue;
 		}
 	    }
-#    endif
+#   endif
 	}
 	Debug ("DefineSelf: write network address, length %d\n", len);
 	writeAddr (family, len, addr, file, auth);
     }
 }
 
-#   else /* SIOCGIFCONF */
+#  else /* SIOCGIFCONF */
 
 /* Define this host for access control.  Find all the hosts the OS knows about
  * for this fd and add them to the selfhosts list.
@@ -1202,9 +1179,8 @@ DefineSelf (int fd, int file, int auth)
 }
 
 
-#   endif /* SIOCGIFCONF else */
-#  endif /* WINTCP else */
-# endif /* STREAMSCONN && !SYSV_SIOCGIFCONF else */
+#  endif /* SIOCGIFCONF else */
+# endif /* WINTCP else */
 #endif /* HAVE_GETIFADDRS */
 
 static void
@@ -1242,13 +1218,6 @@ writeLocalAuth (FILE *file, Xauth *auth, char *name)
 
     Debug ("writeLocalAuth: %s %.*s\n", name, auth->name_length, auth->name);
     setAuthNumber (auth, name);
-#ifdef STREAMSCONN
-    fd = t_open ("/dev/tcp", O_RDWR, 0);
-    t_bind(fd, NULL, NULL);
-    DefineSelf (fd, file, auth);
-    t_unbind (fd);
-    t_close (fd);
-#endif
 #ifdef TCPCONN
 # if defined(IPv6) && defined(AF_INET6)
     fd = socket (AF_INET6, SOCK_STREAM, 0);

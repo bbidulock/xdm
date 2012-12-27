@@ -47,7 +47,6 @@ xdm_SOURCES =		\
         server.c	\
         session.c	\
         socket.c	\
-        streams.c	\
         util.c		\
         xdmcp.c
 
