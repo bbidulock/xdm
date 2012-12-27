@@ -80,10 +80,6 @@ in this Software without prior written authorization from The Open Group.
 #endif
 #if defined(SYSV) && defined(i386)
 # include    <sys/stream.h>
-# ifdef ISC
-#  include    <sys/sioctl.h>
-#  include    <sys/stropts.h>
-# endif
 #endif
 
 #include    "dm_socket.h"
@@ -197,7 +193,7 @@ static int  pingTry;
 static XdmcpBuffer	directBuffer, broadcastBuffer;
 static XdmcpBuffer	buffer;
 
-#if ((defined(SVR4) && !defined(sun) && !defined(__sgi) && !defined(NCR)) || defined(ISC)) && defined(SIOCGIFCONF)
+#if (defined(SVR4) && !defined(sun) && !defined(__sgi) && !defined(NCR)) && defined(SIOCGIFCONF)
 
 /* Deal with different SIOCGIFCONF ioctl semantics on these OSs */
 
@@ -214,17 +210,6 @@ ifioctl (int fd, int cmd, char *arg)
     {
 	ioc.ic_len = ((struct ifconf *) arg)->ifc_len;
 	ioc.ic_dp = ((struct ifconf *) arg)->ifc_buf;
-# ifdef ISC
-	/* SIOCGIFCONF is somewhat brain damaged on ISC. The argument
-	 * buffer must contain the ifconf structure as header. Ifc_req
-	 * is also not a pointer but a one element array of ifreq
-	 * structures. On return this array is extended by enough
-	 * ifreq fields to hold all interfaces. The return buffer length
-	 * is placed in the buffer header.
-	 */
-        ((struct ifconf *) ioc.ic_dp)->ifc_len =
-                                         ioc.ic_len - sizeof(struct ifconf);
-# endif
     }
     else
     {
@@ -233,22 +218,12 @@ ifioctl (int fd, int cmd, char *arg)
     }
     ret = ioctl(fd, I_STR, (char *) &ioc);
     if (ret >= 0 && cmd == SIOCGIFCONF)
-# ifdef SVR4
 	((struct ifconf *) arg)->ifc_len = ioc.ic_len;
-# endif
-# ifdef ISC
-    {
-	((struct ifconf *) arg)->ifc_len =
-				 ((struct ifconf *)ioc.ic_dp)->ifc_len;
-	((struct ifconf *) arg)->ifc_buf =
-			(caddr_t)((struct ifconf *)ioc.ic_dp)->ifc_req;
-    }
-# endif
     return(ret);
 }
-#else /* ((SVR4 && !sun && !NCR) || ISC) && SIOCGIFCONF */
+#else /* (SVR4 && !sun && !NCR) && SIOCGIFCONF */
 # define ifioctl ioctl
-#endif /* ((SVR4 && !sun) || ISC) && SIOCGIFCONF */
+#endif /* (SVR4 && !sun && !NCR) && SIOCGIFCONF */
 
 
 /* ARGSUSED */
@@ -589,15 +564,9 @@ RegisterHostname (char *name)
 	if (ifioctl (socketFD, (int) SIOCGIFCONF, (char *) &ifc) < 0)
 	    return;
 
-#ifdef ISC
-# define IFC_IFC_REQ (struct ifreq *) ifc.ifc_buf
-#else
-# define IFC_IFC_REQ ifc.ifc_req
-#endif
+	cplim = (char *) ifc.ifc_req + ifc.ifc_len;
 
-	cplim = (char *) IFC_IFC_REQ + ifc.ifc_len;
-
-	for (cp = (char *) IFC_IFC_REQ; cp < cplim; cp += ifr_size (ifr))
+	for (cp = (char *) ifc.ifc_req; cp < cplim; cp += ifr_size (ifr))
 	{
 	    ifr = (struct ifreq *) cp;
 	    if (ifr->ifr_addr.sa_family != AF_INET)

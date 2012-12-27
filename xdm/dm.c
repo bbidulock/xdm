@@ -430,9 +430,6 @@ ChildNotify (int n)
     int olderrno = errno;
 
     ChildReady = 1;
-# ifdef ISC
-    (void) Signal (SIGCHLD, ChildNotify);
-# endif
     errno = olderrno;
 }
 #endif

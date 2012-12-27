@@ -399,22 +399,12 @@ WaitForSomething (void)
 	{
 	    if (chooserFd >= 0 && FD_ISSET (chooserFd, &reads))
 	    {
-# ifdef ISC
-	        if (!ChildReady) {
-	           WaitForSomething ();
-                } else
-# endif
 		ProcessChooserSocket (chooserFd);
 		FD_CLR(chooserFd, &reads);
 	    }
 # if defined(IPv6) && defined(AF_INET6)
 	    if (chooserFd6 >= 0 && FD_ISSET (chooserFd6, &reads))
 	    {
-#  ifdef ISC
-	        if (!ChildReady) {
-	           WaitForSomething ();
-                } else
-#  endif
 		ProcessChooserSocket (chooserFd6);
 		FD_CLR(chooserFd6, &reads);
 	    }
