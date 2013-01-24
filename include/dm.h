@@ -105,7 +105,13 @@ typedef union wait	waitType;
 # endif /* X_NOT_POSIX */
 
 # ifdef USE_PAM
-#  include <security/pam_appl.h>
+#  ifdef HAVE_SECURITY_PAM_APPL_H
+#   include <security/pam_appl.h>
+#  elif defined(HAVE_PAM_PAM_APPL_H)
+#   include <pam/pam_appl.h>
+#  else
+#   error "Unable to determine pam headers"
+#  endif
 # endif
 
 # ifdef CSRG_BASED

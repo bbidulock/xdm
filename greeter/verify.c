@@ -41,7 +41,6 @@ from The Open Group.
 #include	<pwd.h>
 
 #if defined(USE_PAM)
-# include	<security/pam_appl.h>
 # include	<stdlib.h>
 #elif defined(HAVE_GETSPNAM)
 # include	<shadow.h>

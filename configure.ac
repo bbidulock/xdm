@@ -120,6 +120,10 @@ AC_ARG_WITH(pam, AS_HELP_STRING([--with-pam],
 	[Use PAM for authentication (default is autodetected)]),
 	[USE_PAM=$withval], [USE_PAM=auto])
 if test "x$USE_PAM" != "xno" ; then
+    AC_CHECK_HEADERS([security/pam_appl.h pam/pam_appl.h],
+                     [found=yes ; break ;], [found=no])
+    AS_IF([test "x$USE_PAM" = "xyes" -a  "x$found" = "xno"],
+	[AC_MSG_ERROR([PAM support requested, but we could not find the pam headers.])])
     AC_SEARCH_LIBS([pam_open_session], [pam],
 	[AC_CHECK_FUNC([pam_open_session],
 	    [AC_DEFINE(USE_PAM,1,[Use PAM for authentication])]
