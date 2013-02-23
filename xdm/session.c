@@ -226,7 +226,7 @@ static struct verify_info	verify;
 static Jmp_buf	abortSession;
 
 /* ARGSUSED */
-static SIGVAL
+static void
 catchTerm (int n)
 {
     Longjmp (abortSession, 1);
@@ -235,7 +235,7 @@ catchTerm (int n)
 static Jmp_buf	pingTime;
 
 /* ARGSUSED */
-static SIGVAL
+static void
 catchAlrm (int n)
 {
     Longjmp (pingTime, 1);
@@ -244,7 +244,7 @@ catchAlrm (int n)
 static Jmp_buf	tenaciousClient;
 
 /* ARGSUSED */
-static SIGVAL
+static void
 waitAbort (int n)
 {
 	Longjmp (tenaciousClient, 1);
@@ -466,7 +466,7 @@ DeleteXloginResources (struct display *d, Display *dpy)
 static Jmp_buf syncJump;
 
 /* ARGSUSED */
-static SIGVAL
+static void
 syncTimeout (int n)
 {
     Longjmp (syncJump, 1);

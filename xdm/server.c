@@ -49,7 +49,7 @@ static int receivedUsr1;
 static int serverPause (unsigned t, pid_t serverPid);
 
 /* ARGSUSED */
-static SIGVAL
+static void
 CatchUsr1 (int n)
 {
     int olderrno = errno;
@@ -149,14 +149,14 @@ static Jmp_buf	pauseAbort;
 static int	serverPauseRet;
 
 /* ARGSUSED */
-static SIGVAL
+static void
 serverPauseAbort (int n)
 {
     Longjmp (pauseAbort, 1);
 }
 
 /* ARGSUSED */
-static SIGVAL
+static void
 serverPauseUsr1 (int n)
 {
     Debug ("display manager paused til SIGUSR1\n");
@@ -231,7 +231,7 @@ serverPause (unsigned t, pid_t serverPid)
 static Jmp_buf	openAbort;
 
 /* ARGSUSED */
-static SIGVAL
+static void
 abortOpen (int n)
 {
 	Longjmp (openAbort, 1);
@@ -339,7 +339,7 @@ PingLostIOErr (Display *dpy)
 }
 
 /* ARGSUSED */
-static SIGVAL
+static void
 PingLostSig (int n)
 {
     PingLost();
@@ -349,7 +349,7 @@ int
 PingServer (struct display *d, Display *alternateDpy)
 {
     int	    (*oldError)(Display *);
-    SIGVAL  (*oldSig)(int);
+    void  (*oldSig)(int);
     int	    oldAlarm;
     static Display *aDpy;
 

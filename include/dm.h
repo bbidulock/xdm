@@ -501,8 +501,6 @@ extern void ProcessRequestSocket(int fd);
 
 # include <stdlib.h>
 
-# define SIGVAL RETSIGTYPE
-
 # if defined(X_NOT_POSIX) || defined(__UNIXOS2__) || defined(__NetBSD__) && defined(__sparc__)
 #  if defined(SYSV) || defined(__UNIXOS2__)
 #   define SIGNALS_RESET_WHEN_CAUGHT
@@ -517,8 +515,8 @@ extern void ProcessRequestSocket(int fd);
 #  define Jmp_buf		sigjmp_buf
 # endif
 
-typedef SIGVAL (*SIGFUNC)(int);
+typedef void (*SIGFUNC)(int);
 
-SIGVAL (*Signal(int, SIGFUNC Handler))(int);
+void (*Signal(int, SIGFUNC Handler))(int);
 
 #endif /* _DM_H_ */

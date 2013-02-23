@@ -295,7 +295,7 @@ localHostname (void)
     return localHostbuf;
 }
 
-SIGVAL (*Signal (int sig, SIGFUNC handler))(int)
+void (*Signal (int sig, SIGFUNC handler))(int)
 {
 #ifdef HAVE_SIGACTION
     struct sigaction sigact, osigact;

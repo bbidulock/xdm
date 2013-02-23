@@ -90,7 +90,7 @@ from The Open Group.
 extern FILE    *fdopen();
 #endif
 
-static SIGVAL	StopAll (int n), RescanNotify (int n);
+static void	StopAll (int n), RescanNotify (int n);
 static void	RescanServers (void);
 static void	RestartDisplay (struct display *d, int forceReserver);
 static void	ScanServers (void);
@@ -110,7 +110,7 @@ static int TitleLen;
 #endif
 
 #ifndef UNRELIABLE_SIGNALS
-static SIGVAL ChildNotify (int n);
+static void ChildNotify (int n);
 #endif
 
 static long StorePid (void);
@@ -237,7 +237,7 @@ main (int argc, char **argv)
 }
 
 /* ARGSUSED */
-static SIGVAL
+static void
 RescanNotify (int n)
 {
     int olderrno = errno;
@@ -381,7 +381,7 @@ RescanIfMod (void)
  */
 
 /* ARGSUSED */
-static SIGVAL
+static void
 StopAll (int n)
 {
     int olderrno = errno;
@@ -424,7 +424,7 @@ int	ChildReady;
 
 #ifndef UNRELIABLE_SIGNALS
 /* ARGSUSED */
-static SIGVAL
+static void
 ChildNotify (int n)
 {
     int olderrno = errno;

@@ -95,9 +95,6 @@ AC_CHECK_DECL(key_setnet,
 #include <rpc/key_prot.h>
 ])
 
-# Checks for typedefs, structures, and compiler characteristics.
-AC_TYPE_SIGNAL
-
 # Check for system library functions
 # Required system libraries have been searched for and are listed in $LIBS
 AC_FUNC_FORK
