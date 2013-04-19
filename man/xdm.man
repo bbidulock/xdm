@@ -328,10 +328,7 @@ be shared between
 .I xdm
 and the terminal.  This resource specifies the file containing those
 values.  Each entry in the file consists of a display name and the shared
-key.  By default,
-.I xdm
-does not include support for XDM-AUTHENTICATION-1, as it requires DES which
-is not generally distributable because of United States export restrictions.
+key.
 .IP \fBDisplayManager.accessFile\fP
 To prevent unauthorized XDMCP service and to allow forwarding of XDMCP
 IndirectQuery requests, this file contains a database of hostnames which are
