@@ -571,8 +571,11 @@ openFiles (char *name, char *new_name, FILE **oldp, FILE **newp)
 	 */
 	(void) unlink (new_name);
 	newfd = open (new_name, O_WRONLY | O_CREAT | O_EXCL, 0600);
-	if (newfd >= 0)
+	if (newfd >= 0) {
 	    *newp = fdopen (newfd, "w");
+	    if (*newp == NULL)
+		close(newfd);
+	}
 	else
 	{
 	    LogError ("Cannot create file %s: %s\n", new_name,
