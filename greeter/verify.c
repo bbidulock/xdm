@@ -329,6 +329,7 @@ Verify (struct display *d, struct greet_info *greet, struct verify_info *verify)
 	struct spwd	*sp;
 #  endif
 	char		*user_pass = NULL;
+	char		*crypted_pass = NULL;
 # endif
 # ifdef __OpenBSD__
 	char            *s;
@@ -464,7 +465,9 @@ Verify (struct display *d, struct greet_info *greet, struct verify_info *verify)
 #  if defined(ultrix) || defined(__ultrix__)
 	if (authenticate_user(p, greet->password, NULL) < 0)
 #  else
-	if (strcmp (crypt (greet->password, user_pass), user_pass))
+	crypted_pass = crypt (greet->password, user_pass);
+	if ((crypted_pass == NULL)
+	    || (strcmp (crypted_pass, user_pass)))
 #  endif
 	{
 		if(!greet->allow_null_passwd || strlen(p->pw_passwd) > 0) {
