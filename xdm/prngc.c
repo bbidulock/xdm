@@ -45,6 +45,12 @@
 
 static ssize_t atomicio(ssize_t (*)(int, void *, size_t), int, void *, size_t);
 
+static ssize_t
+voidwrite(int d, void *buf, size_t nbytes)
+{
+	return write(d, buf, nbytes);
+}
+
 #ifndef offsetof
 # define offsetof(TYPE, MEMBER) ((size_t) &((TYPE *)0)->MEMBER)
 #endif
@@ -130,7 +136,7 @@ reopen:
 	msg[0] = 0x02;
 	msg[1] = len;
 
-	if (atomicio(write, fd, msg, sizeof(msg)) != sizeof(msg)) {
+	if (atomicio(voidwrite, fd, msg, sizeof(msg)) != sizeof(msg)) {
 		if (errno == EPIPE && errors < 10) {
 			close(fd);
 			errors++;
