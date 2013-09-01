@@ -168,7 +168,48 @@ main (int argc, char **argv)
 	exit (1);
     }
 
-    LogInfo ("Starting\n");
+    LogInfo ("Starting %s\n", PACKAGE_STRING);
+    if (debugLevel > 0)
+    {
+	Debug("%s was built with these options:\n", PACKAGE_STRING);
+#ifdef USE_PAM
+	Debug(" - USE_PAM = yes\n");
+#else
+	Debug(" - USE_PAM = no\n");
+#endif
+#ifdef USE_SELINUX
+	Debug(" - USE_SELINUX = yes\n");
+#else
+	Debug(" - USE_SELINUX = no\n");
+#endif
+#ifdef USE_SYSTEMD_DAEMON
+	Debug(" - USE_SYSTEMD_DAEMON = yes\n");
+#else
+	Debug(" - USE_SYSTEMD_DAEMON = no\n");
+#endif
+#ifdef USE_XFT
+	Debug(" - USE_XFT = yes\n");
+#else
+	Debug(" - USE_XFT = no\n");
+#endif
+#ifdef USE_XINERAMA
+	Debug(" - USE_XINERAMA = yes\n");
+#else
+	Debug(" - USE_XINERAMA = no\n");
+#endif
+#ifdef XPM
+	Debug(" - XPM = yes\n");
+#else
+	Debug(" - XPM = no\n");
+#endif
+#ifdef HAVE_ARC4RANDOM
+	Debug(" - Random number source: arc4random()\n\n");
+#elif defined(DEV_RANDOM)
+	Debug(" - Random number source: %s\n", DEV_RANDOM);
+#else
+	Debug(" - Random number source: built-in PRNG\n\n");
+#endif
+    }
 
     if (atexit (RemovePid))
 	LogError ("could not register RemovePid() with atexit()\n");
