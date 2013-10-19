@@ -295,7 +295,6 @@ static void
 ScanServers (void)
 {
     char	lineBuf[10240];
-    int		len;
     FILE	*serversFile;
     struct stat	statb;
     static DisplayType	acceptableTypes[] =
@@ -320,10 +319,12 @@ ScanServers (void)
 	}
 	while (fgets (lineBuf, sizeof (lineBuf)-1, serversFile))
 	{
-	    len = strlen (lineBuf);
-	    if (lineBuf[len-1] == '\n')
-		lineBuf[len-1] = '\0';
-	    ParseDisplay (lineBuf, acceptableTypes, NumTypes);
+	    size_t len = strlen (lineBuf);
+	    if (len > 0) {
+		if (lineBuf[len-1] == '\n')
+		    lineBuf[len-1] = '\0';
+		ParseDisplay (lineBuf, acceptableTypes, NumTypes);
+	    }
 	}
 	fclose (serversFile);
     }

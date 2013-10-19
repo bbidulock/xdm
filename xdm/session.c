@@ -969,6 +969,8 @@ execute (char **argv, char **environ)
 	    return;
 	}
 	fclose (f);
+	if (program[0] == '\0')
+	    return;
 	e = program + strlen (program) - 1;
 	if (*e == '\n')
 	    *e = '\0';
