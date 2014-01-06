@@ -51,6 +51,15 @@ from The Open Group.
 #include <ctype.h>
 #include <grp.h>	/* for initgroups */
 
+# ifdef HAVE_SETPROCTITLE
+#  include <sys/types.h>
+#  ifdef __linux__
+#   include <bsd/unistd.h>
+#  else
+#   include <unistd.h>
+#  endif
+# endif
+
 #ifndef USE_PAM        /* PAM modules should handle these */
 # ifdef SECURE_RPC
 #  include <rpc/rpc.h>
