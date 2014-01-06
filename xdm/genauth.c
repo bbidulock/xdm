@@ -40,6 +40,14 @@ from The Open Group.
 
 #include <errno.h>
 
+#ifdef HAVE_ARC4RANDOM
+# ifdef __linux__
+#  include <bsd/stdlib.h>
+# else
+#  include <stdlib.h>
+# endif
+#endif
+
 #include <time.h>
 #define Time_t time_t
 
