@@ -53,11 +53,7 @@ startup=$HOME/.xsession
 resources=$HOME/.Xresources
 
 if [ -s "$startup" ]; then
-	if [ -x "$startup" ]; then
-		exec "$startup"
-	else
-		exec /bin/sh "$startup"
-	fi
+	exec /bin/sh -ls -c "$startup"
 else
 	if [ -r "$resources" ]; then
 		BINDIR/xrdb -load "$resources"
