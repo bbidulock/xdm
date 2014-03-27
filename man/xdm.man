@@ -412,6 +412,10 @@ Specifies the program run to offer a host menu for Indirect queries
 redirected to the special host name CHOOSER.
 \fI CHOOSERPATH \fP is the default.
 See the sections \fBXDMCP Access Control\fP and \fBChooser\fP.
+.IP "\fBDisplayManager.\fP\fIDISPLAY\fP\fB.greeter\fP"
+Specifies the program run to offer a graphical login prompt.  When
+this resource is specified, the value of \fBDisplayManager.greeterLib\fP
+is ignored for the specified \fIDISPLAY\fP.
 .IP "\fBDisplayManager.\fP\fIDISPLAY\fP\fB.xrdb\fP"
 Specifies the program used to load the resources.  By default,
 .I xdm
