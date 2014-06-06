@@ -106,6 +106,9 @@ int	choiceTimeout;	/* chooser choice timeout */
 #ifndef DEF_CHOOSER
 # define DEF_CHOOSER "/usr/lib/X11/xdm/chooser"
 #endif
+#ifndef DEF_GREETER
+# define DEF_GREETER ""
+#endif
 #ifndef DEF_AUTH_NAME
 # ifdef HASXDMAUTH
 #  define DEF_AUTH_NAME	"XDM-AUTHORIZATION-1 MIT-MAGIC-COOKIE-1"
@@ -280,6 +283,8 @@ struct displayResource sessionResources[] = {
 				DEF_USER_AUTH_DIR },
 { "chooser",	"Chooser",	DM_STRING,	boffset(chooser),
 				DEF_CHOOSER },
+{ "greeter",	"Greeter",	DM_STRING,	boffset(greeter),
+				DEF_GREETER },
 };
 
 #define NUM_SESSION_RESOURCES	(sizeof sessionResources/\

@@ -148,6 +148,7 @@ RemoveDisplay (struct display *old)
 	    free (d->systemShell);
 	    free (d->failsafeClient);
 	    free (d->chooser);
+	    free (d->greeter);
 	    if (d->authorizations)
 	    {
 		for (i = 0; i < d->authNum; i++)
@@ -224,6 +225,7 @@ NewDisplay (char *name, char *class)
     d->systemShell = NULL;
     d->failsafeClient = NULL;
     d->chooser = NULL;
+    d->greeter = NULL;
     d->authorize = FALSE;
     d->authorizations = NULL;
     d->authNum = 0;

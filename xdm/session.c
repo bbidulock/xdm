@@ -344,6 +344,22 @@ ManageSession (struct display *d)
      */
     LoadXloginResources (d);
 
+    if (d->greeter && d->greeter[0] != 0) {
+	char	**args;
+	char	**env;
+
+	args = parseArgs ((char **) 0, d->greeter);
+	env = systemEnv (d, (char *) 0, (char *) 0);
+#ifdef USE_SYSTEMD_DAEMON
+	sd_notify(1, "READY=1");
+#endif
+	Debug ("ManageSession: running %s\n", args[0]);
+	execute (args, env);
+	Debug ("ManageSession: couldn't run %s\n", args[0]);
+	LogError ("Cannot execute %s\n", args[0]);
+	exit (UNMANAGE_DISPLAY);
+    }
+
     Debug ("ManageSession: loading greeter library %s\n", greeterLib);
     greet_lib_handle = dlopen(greeterLib, RTLD_NOW);
     if (greet_lib_handle != NULL)

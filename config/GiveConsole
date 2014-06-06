@@ -7,3 +7,5 @@
 # causing serious grief.
 #
 chown $USER /dev/console
+exec /usr/bin/sessreg  -a -w "/var/log/wtmp" -u "/run/utmp" \
+        -x "/etc/X11/xdm/Xservers" -l $DISPLAY -h "" $USER

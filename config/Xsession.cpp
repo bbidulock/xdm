@@ -51,13 +51,10 @@ XCOMM The startup script is not intended to have arguments.
 
 startup=$HOME/.xsession
 resources=$HOME/.Xresources
+xinitrc=$HOME/.xinitrc
 
 if [ -s "$startup" ]; then
-	if [ -x "$startup" ]; then
-		exec "$startup"
-	else
-		exec /bin/sh "$startup"
-	fi
+	exec /bin/sh -ls -c "$startup"
 else
 	if [ -r "$resources" ]; then
 		BINDIR/xrdb -load "$resources"
@@ -80,5 +77,9 @@ else
                 exec `eval $XDESKTOP`
         }
 #endif
-	exec BINDIR/xsm
+	if [ -r "$xinitrc" ]; then
+		exec /bin/sh -ls -c "$xinitrc"
+	else
+		exec /bin/sh -l /etc/X11/xinit/xinitrc
+        fi
 fi

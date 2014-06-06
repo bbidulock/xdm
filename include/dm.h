@@ -228,6 +228,7 @@ struct display {
 	char		*systemShell;	/* interpreter for startup/reset */
 	char		*failsafeClient;/* a client to start when the session fails */
 	char		*chooser;	/* chooser program */
+	char		*greeter;	/* greeter program */
 
 	/* authorization resources */
 	int		authorize;	/* enable authorization */
