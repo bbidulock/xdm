@@ -77,3 +77,6 @@ core
 # For example, !report.pc overrides *.pc. See 'man gitignore'
 #
 xdm.service
+.*.sw[nop]
+cscope.files
+cscope.out
