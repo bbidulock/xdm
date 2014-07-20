@@ -78,5 +78,5 @@ core
 #
 xdm.service
 .*.sw[nop]
-cscope.files
-cscope.out
+cscope.*
+configure.sh
