@@ -889,8 +889,8 @@ StartDisplay (struct display *d)
     {
 	struct pam_xauth_data data;
 
-	data.namelen = d->authNameLens[0];
-	data.name = d->authNames[0];
+	data.namelen = d->authorizations[0]->name_length;
+	data.name = d->authorizations[0]->name;
 
 	data.datalen = d->authorizations[0]->data_length;
 	data.data = d->authorizations[0]->data;
