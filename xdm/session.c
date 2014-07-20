@@ -81,10 +81,6 @@ extern int key_setnet(struct key_netstarg *arg);
 #  define RTLD_NOW 1
 # endif
 
-#ifdef USE_SYSTEMD_DAEMON
-#include <systemd/sd-daemon.h>
-#endif
-
 #ifdef HAVE_SETPROCTITLE
 # include <sys/types.h>
 # include <bsd/unistd.h>
@@ -359,9 +355,6 @@ ManageSession (struct display *d)
 #else
 	env = systemEnv (d, (char *) 0, (char *) 0);
 #endif
-#ifdef USE_SYSTEMD_DAEMON
-	sd_notify(1, "READY=1");
-#endif
 	Debug ("ManageSession: running %s\n", args[0]);
 	execute (args, env);
 	Debug ("ManageSession: couldn't run %s\n", args[0]);
@@ -377,12 +370,6 @@ ManageSession (struct display *d)
 	LogError ("%s while loading %s\n", dlerror(), greeterLib);
 	exit(UNMANAGE_DISPLAY);
 	}
-
-#ifdef USE_SYSTEMD_DAEMON
-	/* Subsequent notifications will be ignored by systemd
-	 * and calling this function will clean up the env */
-	sd_notify(1, "READY=1");
-#endif
 
     /* tell the possibly dynamically loaded greeter function
      * what data structure formats to expect.

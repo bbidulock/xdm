@@ -86,6 +86,10 @@ from The Open Group.
 # endif
 #endif
 
+#ifdef USE_SYSTEMD_DAEMON
+#include <systemd/sd-daemon.h>
+#endif
+
 #if defined(SVR4) && !defined(sun)
 extern FILE    *fdopen();
 #endif
@@ -259,6 +263,9 @@ main (int argc, char **argv)
     (void) Signal (SIGCHLD, ChildNotify);
 #endif
     Debug ("startup successful; entering main loop\n");
+#ifdef USE_SYSTEMD_DAEMON
+    sd_notify(1, "READY=1");
+#endif
     while (
 #ifdef XDMCP
 	   AnyWellKnownSockets() ||
