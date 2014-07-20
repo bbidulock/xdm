@@ -354,6 +354,11 @@ ManageSession (struct display *d)
 	char	**env;
 
 	args = parseArgs ((char **) 0, d->greeter);
+#ifdef USE_SYSTEMD_LOGIN
+	env = pam_getenvlist (d->pamh);
+#else
+	env = systemEnv (d, (char *) 0, (char *) 0);
+#endif
 #ifdef USE_SYSTEMD_DAEMON
 	sd_notify(1, "READY=1");
 #endif
@@ -1066,5 +1071,11 @@ systemEnv (struct display *d, char *user, char *home)
 	    env = setEnv (env, "XAUTHORITY", d->authFile);
     if (d->windowPath)
 	    env = setEnv (env, "WINDOWPATH", d->windowPath);
+#ifdef USE_SYSTEMD_LOGIN
+    if (d->vt) {
+	    env = setEnv (env, "XDG_VTNR", d->vt);
+	    env = setEnv (env, "XDG_SEAT", "seat0");
+    }
+#endif
     return env;
 }

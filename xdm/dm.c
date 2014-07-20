@@ -187,6 +187,11 @@ main (int argc, char **argv)
 #else
 	Debug(" - USE_SYSTEMD_DAEMON = no\n");
 #endif
+#ifdef USE_SYSTEMD_LOGIN
+	Debug(" - USE_SYSTEMD_LOGIN = yes\n");
+#else
+	Debug(" - USE_SYSTEMD_LOGIN = no\n");
+#endif
 #ifdef USE_XFT
 	Debug(" - USE_XFT = yes\n");
 #else
@@ -524,6 +529,16 @@ WaitForChild (void)
 	/* SUPPRESS 560 */
 	if ((d = FindDisplayByPid (pid))) {
 	    d->pid = -1;
+#ifdef USE_SYSTEMD_LOGIN
+	    if (d->pamh)
+	    {
+		int result;
+
+		result = pam_close_session (d->pamh, 0);
+		pam_end (d->pamh, result);
+		d->pamh = NULL;
+	    }
+#endif
 	    switch (waitVal (status)) {
 	    case UNMANAGE_DISPLAY:
 		Debug ("Display exited with UNMANAGE_DISPLAY\n");
@@ -724,6 +739,9 @@ SetWindowPath(struct display *d)
 	const char *windowpath;
 	char *newwindowpath;
 	unsigned long num;
+#ifdef USE_SYSTEMD_LOGIN
+	char *vt;
+#endif
 
 	prop = XInternAtom(d->dpy, "XFree86_VT", False);
 	if (prop == None) {
@@ -775,12 +793,27 @@ SetWindowPath(struct display *d)
 	}
 	free(d->windowPath);
 	d->windowPath = newwindowpath;
+#ifdef USE_SYSTEMD_LOGIN
+	asprintf(&vt, "%lu", num);
+	free(d->vt);
+	d->vt = vt;
+#endif
+}
+
+static int
+pam_conv_cb (int len, const struct pam_message **msg, struct pam_response **resp, void *data)
+{
+    return PAM_SUCCESS;
 }
 
 void
 StartDisplay (struct display *d)
 {
     pid_t	pid;
+#ifdef USE_SYSTEMD_LOGIN
+    int		result;
+    struct pam_conv conv = { pam_conv_cb, NULL };
+#endif
 
     Debug ("StartDisplay %s\n", d->name);
     LogInfo ("Starting X server on %s\n", d->name);
@@ -818,6 +851,73 @@ StartDisplay (struct display *d)
 	if (d->authorizations)
 	    SaveServerAuthorizations (d, d->authorizations, d->authNum);
     }
+#ifdef USE_SYSTEMD_LOGIN
+    setenv("XDG_SESSION_TYPE", "x11", 1);
+
+    if (d->useChooser)
+	setenv("XDG_SESSION_CLASS", "chooser", 1);
+    else
+	setenv("XDG_SESSION_CLASS", "greeter", 1);
+
+    if (d->displayType.location == Local)
+	setenv("XDG_SEAT", "seat0", 1);
+    else
+	unsetenv("XDG_SEAT");
+
+    unsetenv("XDG_VTNR");
+
+    result = pam_start("greeter", "root", &conv, &d->pamh);
+    if (result != PAM_SUCCESS)
+    {
+	LogError ("Failed to start PAM: %s\n", pam_strerror (NULL, result));
+	RemoveDisplay (d);
+	return;
+    }
+    pam_set_item (d->pamh, PAM_TTY, d->name);
+#ifdef PAM_XDISPLAY
+    pam_set_item (d->pamh, PAM_XDISPLAY, d->name);
+#endif
+#ifdef PAM_XAUTHDATA
+    if (d->authorizations && d->authNum > 0)
+    {
+	struct pam_xauth_data data;
+
+	data.namelen = d->authNameLens[0];
+	data.name = d->authNames[0];
+
+	data.datalen = d->authorizations[0]->data_length;
+	data.data = d->authorizations[0]->data;
+
+	pam_set_item (d->pamh, PAM_XAUTHDATA, &data);
+    }
+#endif
+    {
+	char **env, **var;
+
+	env = systemEnv(d, NULL, NULL);
+	for (var = env; var && *var; var++)
+	    pam_putenv (d->pamh, *var);
+	freeEnv (env);
+    }
+    result = pam_setcred (d->pamh, PAM_ESTABLISH_CRED);
+    if (result != PAM_SUCCESS)
+    {
+	LogError ("Failed to establish PAM credentials: %s\n", pam_strerror (d->pamh, result));
+	pam_end (d->pamh, result);
+	d->pamh = NULL;
+	RemoveDisplay(d);
+	return;
+    }
+    result = pam_open_session (d->pamh, 0);
+    if (result != PAM_SUCCESS)
+    {
+	LogError ("Failed to open PAM session: %s\n", pam_strerror (d->pamh, result));
+	pam_end (d->pamh, result);
+	d->pamh = NULL;
+	RemoveDisplay(d);
+	return;
+    }
+#endif
     if (!nofork_session)
 	pid = fork ();
     else

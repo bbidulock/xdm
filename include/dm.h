@@ -251,6 +251,12 @@ struct display {
 	char		*willing;	/* "Willing to manage" program */
 	Display		*dpy;		/* Display */
 	char		*windowPath;	/* path to server "window" */
+
+#ifdef USE_SYSTEMD_LOGIN
+	/* pam handle for the greeter process */
+	pam_handle_t	*pamh;		/* pam handle for greeter session */
+	char		*vt;		/* virtual terminal */
+#endif
 };
 
 # ifdef XDMCP

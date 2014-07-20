@@ -182,6 +182,20 @@ AS_IF([test "x$USE_SYSTEMD_DAEMON" != "xno"], [
 ])
 AM_CONDITIONAL(USE_SYSTEMD_DAEMON, [test "x$USE_SYSTEMD_DAEMON" != "xno"])
 
+# Check whether to enable systemd login services.
+# This requires libsystemd-login.
+AC_ARG_WITH([systemd-login], AS_HELP_STRING([--with-systemd-login],
+	[Add support for systemd login services (default is autodetected)]),
+	[USE_SYSTEMD_LOGIN=$withval], [USE_SYSTEMD_LOGIN=auto])
+AS_IF([test "x$USE_SYSTEMD_LOGIN" != "xno"], [
+    PKG_CHECK_MODULES([SYSTEMD_LOGIN], [libsystemd-login],
+	[AC_DEFINE(USE_SYSTEMD_LOGIN,1,[Use systemd login services])],
+	[AS_IF([test "x$USE_SYSTEMD_LOGIN" = "xyes"],
+	    [AC_MSG_ERROR([systemd login services support requested, but libsystemd-login not found.])]
+	)]
+    )
+])
+
 # FIXME: Find better test for which OS'es use su -m  - for now, just try to
 # mirror the Imakefile setting of:
 # if  defined(OpenBSDArchitecture) || defined(NetBSDArchitecture) || defined(FreeBSDArchitecture) || defined(DarwinArchitecture)
