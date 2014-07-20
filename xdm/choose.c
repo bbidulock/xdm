@@ -54,6 +54,11 @@ in this Software without prior written authorization from The Open Group.
 # include <time.h>
 # define Time_t time_t
 
+# ifdef HAVE_SETPROCTITLE
+#  include <sys/types.h>
+#  include <bsd/unistd.h>
+# endif
+
 static int
 FormatBytes (
     unsigned char *data,

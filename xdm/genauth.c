@@ -43,6 +43,10 @@ from The Open Group.
 #include <time.h>
 #define Time_t time_t
 
+#ifdef HAVE_ARC4RANDOM
+#include <bsd/stdlib.h>
+#endif
+
 #ifdef HASXDMAUTH
 static unsigned char	key[8];
 #endif

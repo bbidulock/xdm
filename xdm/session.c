@@ -85,6 +85,11 @@ extern int key_setnet(struct key_netstarg *arg);
 #include <systemd/sd-daemon.h>
 #endif
 
+#ifdef HAVE_SETPROCTITLE
+# include <sys/types.h>
+# include <bsd/unistd.h>
+#endif
+
 #ifdef USE_SELINUX
 /* This should be run just before we exec the user session. */
 static int
@@ -349,7 +354,6 @@ ManageSession (struct display *d)
 	char	**env;
 
 	args = parseArgs ((char **) 0, d->greeter);
-	env = systemEnv (d, (char *) 0, (char *) 0);
 #ifdef USE_SYSTEMD_DAEMON
 	sd_notify(1, "READY=1");
 #endif
