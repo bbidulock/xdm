@@ -129,6 +129,7 @@ if test "x$USE_PAM" != "xno" ; then
 	)]
     )
 fi
+AM_CONDITIONAL(USE_PAM, [test "x$USE_PAM" != "xno"])
 
 # Check for Security-Enhanced Linux (SELinux) support
 AC_ARG_WITH(selinux, AS_HELP_STRING([--with-selinux],

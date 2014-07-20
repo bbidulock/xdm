@@ -24,6 +24,14 @@ dist_xdmscript_SCRIPTS = \
 	Xsetup_0 \
 	Xwilling
 
+#if USE_PAM
+
+pamdir = $(sysconfdir)/pam.d
+
+pam_DATA = xdm greeter
+
+#endif USE_PAM
+
 pixmapdir = $(XDM_PIXMAPDIR)
 
 dist_pixmap_DATA = xorg-bw.xpm xorg.xpm
@@ -33,7 +41,8 @@ BUILT_SOURCES = Xservers.ws xdm-config Xreset Xresources Xsession Xstartup
 CLEANFILES = $(BUILT_SOURCES) Xservers
 
 EXTRA_DIST = Xservers.ws.cpp Xservers.fs \
-	xdm-config.cpp Xreset.cpp Xresources.cpp Xsession.cpp Xstartup.cpp
+	xdm-config.cpp Xreset.cpp Xresources.cpp Xsession.cpp Xstartup.cpp \
+	xdm greeter
 
 Xservers: Xservers.$(SERVERSTYPE)
 	ln -s Xservers.$(SERVERSTYPE) Xservers
