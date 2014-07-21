@@ -1139,10 +1139,6 @@ systemEnv (struct display *d, char *user, char *home)
 	env = setEnv (env, "WINDOWPATH", d->windowPath);
 #ifdef USE_SYSTEMD_LOGIN
     env = setEnv (env, "XDG_SESSION_TYPE", "x11");
-    if (d->vtnr)
-	env = setEnv (env, "XDG_VTNR", d->vtnr);
-    if (d->seat)
-	env = setEnv (env, "XDG_SEAT", d->seat);
     if (d->displayType.location == Foreign)
     {
 	char *tmp;
@@ -1154,6 +1150,13 @@ systemEnv (struct display *d, char *user, char *home)
 		env = setEnv (env, "REMOTEHOST", tmp);
 	}
 	free (tmp);
+    }
+    else
+    {
+	if (d->vtnr)
+	    env = setEnv (env, "XDG_VTNR", d->vtnr);
+	if (d->seat)
+	    env = setEnv (env, "XDG_SEAT", d->seat);
     }
 #endif
     return env;
