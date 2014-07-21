@@ -10,3 +10,6 @@ XCOMM look like:
 XCOMM	XTerminalName:0 foreign
 XCOMM
 :0 local BINDIR/X :0 DEFAULTVT
+:20 dynamic BINDIR/X :20
+:21 dynamic BINDIR/X :21
+:22 dynamic BINDIR/X :22

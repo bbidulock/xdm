@@ -399,6 +399,7 @@ extern void SetTitle (char *name, ...);
 /* in dpylist.c */
 extern int AnyDisplaysLeft (void);
 extern void ForEachDisplay (void (*f)(struct display *));
+extern int UntilDisplay(int (*f)(struct display *));
 extern void RemoveDisplay (struct display *old);
 
 /* in file.c */

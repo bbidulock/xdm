@@ -837,6 +837,7 @@ The display types are:
 l l.
 local	local display: \fIxdm\fP must run the server
 foreign	remote display: \fIxdm\fP opens an X connection to a running server
+dynamic	local display: \fIxdm\fP will run the server only when requested
 .TE
 .PP
 The display name must be something that can be passed in the \fB\-display\fP
@@ -1355,7 +1356,7 @@ required to close all other connections.
 .SH "CONTROLLING XDM"
 .PP
 .I Xdm
-responds to two signals: SIGHUP and SIGTERM.  When sent a SIGHUP,
+responds to three signals: SIGHUP, SIGTERM and SIGUSR2.  When sent a SIGHUP,
 .I xdm
 rereads the configuration file, the access control file, and the servers
 file.  For the servers file, it notices if entries have been added or
@@ -1369,6 +1370,12 @@ When sent a SIGTERM,
 .I xdm
 terminates all sessions in progress and exits.  This can be used when
 shutting down the system.
+.PP
+When sent a SIGUSR2,
+.I xdm
+will check for any unused dynamic displays and start a session on the
+first one found.  This can be used to dynamically allocate a new server
+on a virtual terminal.
 .PP
 .I Xdm
 attempts to mark its various sub-processes for

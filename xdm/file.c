@@ -230,6 +230,7 @@ static struct displayMatch {
 } displayTypes[] = {
 	{ "local",		{ Local, Permanent, FromFile } },
 	{ "foreign",		{ Foreign, Permanent, FromFile } },
+	{ "dynamic",		{ Local, Transient, FromFile } },
 	{ NULL,			{ Local, Permanent, FromFile } },
 };
 

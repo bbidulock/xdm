@@ -55,6 +55,19 @@ ForEachDisplay (void (*f)(struct display *))
 	}
 }
 
+int
+UntilDisplay (int (*f)(struct display *))
+{
+	struct display *d, *next;
+
+	for (d = displays; d; d = next) {
+		next = d->next;
+		if ((*f) (d))
+			return 1;
+	}
+	return 0;
+}
+
 struct display *
 FindDisplayByName (char *name)
 {

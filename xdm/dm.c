@@ -94,16 +94,17 @@ from The Open Group.
 extern FILE    *fdopen();
 #endif
 
-static void	StopAll (int n), RescanNotify (int n);
+static void	StopAll (int n), RescanNotify (int n), AddRequest (int n);
 static void	RescanServers (void);
 static void	RestartDisplay (struct display *d, int forceReserver);
 static void	ScanServers (void);
 static void	SetAccessFileTime (void);
 static void	SetConfigFileTime (void);
 static void	StartDisplays (void);
+static void	AddDisplay (void);
 static void	TerminateProcess (pid_t pid, int signal);
 
-volatile int	Rescan;
+volatile int	Rescan, AddOne;
 static long	ServersModTime, ConfigModTime, AccessFileModTime;
 
 int nofork_session = 0;
@@ -259,6 +260,7 @@ main (int argc, char **argv)
     AddOtherEntropy();
 #endif
     (void) Signal (SIGHUP, RescanNotify);
+    (void) Signal (SIGUSR2, AddRequest);
 #ifndef UNRELIABLE_SIGNALS
     (void) Signal (SIGCHLD, ChildNotify);
 #endif
@@ -276,6 +278,11 @@ main (int argc, char **argv)
 	{
 	    RescanServers ();
 	    Rescan = 0;
+	}
+	if (AddOne)
+	{
+	    AddDisplay ();
+	    AddOne = 0;
 	}
 #if defined(UNRELIABLE_SIGNALS) || !defined(XDMCP)
 	WaitForChild ();
@@ -303,6 +310,20 @@ RescanNotify (int n)
     errno = olderrno;
 }
 
+/* ARGSUSED */
+static void
+AddRequest (int n)
+{
+    int olderrno = errno;
+
+    Debug ("Caught SIGUSR2\n");
+    AddOne = 1;
+#ifdef SIGNALS_RESET_WHEN_CAUGHT
+    (void) Signal (SIGUSR1, AddRequest);
+#endif
+    errno = olderrno;
+}
+
 static void
 ScanServers (void)
 {
@@ -312,6 +333,7 @@ ScanServers (void)
     static DisplayType	acceptableTypes[] =
 	    { { Local, Permanent, FromFile },
 	      { Foreign, Permanent, FromFile },
+	      { Local, Transient, FromFile }
 	    };
 
 #define NumTypes    (sizeof (acceptableTypes) / sizeof (acceptableTypes[0]))
@@ -710,7 +732,7 @@ CheckDisplayStatus (struct display *d)
 	case NewEntry:
 	    d->state = OldEntry;
 	case OldEntry:
-	    if (d->status == notRunning)
+	    if (d->displayType.lifetime == Permanent && d->status == notRunning)
 		StartDisplay (d);
 	    break;
 	}
@@ -721,6 +743,24 @@ static void
 StartDisplays (void)
 {
     ForEachDisplay (CheckDisplayStatus);
+}
+
+static int
+AddDynamicDisplay (struct display *d)
+{
+    if (d->displayType.origin == FromFile &&
+	d->displayType.lifetime == Transient &&
+	d->status == notRunning) {
+	StartDisplay (d);
+	return 1;
+    }
+    return 0;
+}
+
+static void
+AddDisplay (void)
+{
+    UntilDisplay (AddDynamicDisplay);
 }
 
 static void
