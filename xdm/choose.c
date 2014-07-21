@@ -484,11 +484,7 @@ RunChooser (struct display *d)
     args = parseArgs (args, buf);
     ForEachChooserHost (&d->clientAddr, d->connectionType, AddChooserHost,
 			(char *) &args);
-#ifdef USE_SYSTEMD_LOGIN
-    env = pam_getenvlist (d->pamh);
-#else
     env = systemEnv (d, (char *) 0, (char *) 0);
-#endif
     Debug ("Running %s\n", args[0]);
     execute (args, env);
     Debug ("Couldn't run %s\n", args[0]);

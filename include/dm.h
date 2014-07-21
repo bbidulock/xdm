@@ -253,9 +253,8 @@ struct display {
 	char		*windowPath;	/* path to server "window" */
 
 #ifdef USE_SYSTEMD_LOGIN
-	/* pam handle for the greeter process */
-	pam_handle_t	*pamh;		/* pam handle for greeter session */
-	char		*vt;		/* virtual terminal */
+	char		*vtnr;		/* virtual terminal */
+	char		*seat;		/* seat */
 #endif
 };
 

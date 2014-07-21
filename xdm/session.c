@@ -323,6 +323,14 @@ ErrorHandler(Display *dpy, XErrorEvent *event)
     /*NOTREACHED*/
 }
 
+#ifdef USE_SYSTEMD_LOGIN
+static int
+pam_conv_cb (int len, const struct pam_message **msg, struct pam_response **resp, void *data)
+{
+    return PAM_SUCCESS;
+}
+#endif
+
 void
 ManageSession (struct display *d)
 {
@@ -331,6 +339,11 @@ ManageSession (struct display *d)
     greet_user_rtn	greet_stat;
     static GreetUserProc greet_user_proc = NULL;
     void		*greet_lib_handle;
+#ifdef USE_SYSTEMD_LOGIN
+    int			result;
+    struct pam_conv	conv = { pam_conv_cb, NULL };
+    pam_handle_t	*pamh;
+#endif
 
     Debug ("ManageSession %s\n", d->name);
     (void)XSetIOErrorHandler(IOErrorHandler);
@@ -350,11 +363,7 @@ ManageSession (struct display *d)
 	char	**env;
 
 	args = parseArgs ((char **) 0, d->greeter);
-#ifdef USE_SYSTEMD_LOGIN
-	env = pam_getenvlist (d->pamh);
-#else
 	env = systemEnv (d, (char *) 0, (char *) 0);
-#endif
 	Debug ("ManageSession: running %s\n", args[0]);
 	execute (args, env);
 	Debug ("ManageSession: couldn't run %s\n", args[0]);
@@ -371,6 +380,66 @@ ManageSession (struct display *d)
 	exit(UNMANAGE_DISPLAY);
 	}
 
+#ifdef USE_SYSTEMD_LOGIN
+    setenv("XDG_SESSION_TYPE", "x11", 1);
+    setenv("XDG_SESSION_CLASS", "greeter", 1);
+    if (d->seat)
+	setenv("XDG_SEAT", d->seat, 1);
+    else
+	unsetenv("XDG_SEAT");
+    if (d->vtnr)
+	setenv("XDG_VTNR", d->vtnr, 1);
+    else
+	unsetenv("XDG_VTNR");
+    result = pam_start("greeter", "root", &conv, &pamh);
+    if (result != PAM_SUCCESS)
+    {
+	LogError ("Failed to start PAM: %s\n", pam_strerror (NULL, result));
+	exit (UNMANAGE_DISPLAY);
+    }
+    pam_set_item (pamh, PAM_TTY, d->name);
+#ifdef PAM_XDISPLAY
+    pam_set_item (pamh, PAM_XDISPLAY, d->name);
+#endif
+#ifdef PAM_XAUTHDATA
+    if (d->authorizations && d->authNum > 0)
+    {
+	struct pam_xauth_data data;
+
+	data.namelen = d->authorizations[0]->name_length;
+	data.name = d->authorizations[0]->name;
+
+	data.datalen = d->authorizations[0]->data_length;
+	data.data = d->authorizations[0]->data;
+
+	pam_set_item (pamh, PAM_XAUTHDATA, &data);
+    }
+#endif
+    {
+	char **env, **var;
+
+	env = systemEnv(d, NULL, NULL);
+	for (var = env; var && *var; var++)
+	    pam_putenv (pamh, *var);
+	freeEnv (env);
+    }
+
+    result = pam_setcred (pamh, PAM_ESTABLISH_CRED);
+    if (result != PAM_SUCCESS)
+    {
+	LogError ("Failed to establish PAM credentials: %s\n", pam_strerror (pamh, result));
+	pam_end (pamh, result);
+	exit (UNMANAGE_DISPLAY);
+    }
+    result = pam_open_session (pamh, 0);
+    if (result != PAM_SUCCESS)
+    {
+	LogError ("Failed to open PAM session: %s\n", pam_strerror (pamh, result));
+	pam_end (pamh, result);
+	exit (UNMANAGE_DISPLAY);
+    }
+#endif
+
     /* tell the possibly dynamically loaded greeter function
      * what data structure formats to expect.
      * These version numbers are registered with The Open Group. */
@@ -382,6 +451,11 @@ ManageSession (struct display *d)
 	clientPid = 0;
 	if (!Setjmp (abortSession)) {
 	    (void) Signal (SIGTERM, catchTerm);
+#ifdef USE_SYSTEMD_LOGIN
+	    /* close greeter session before starting client session */
+	    result = pam_close_session (pamh, 0);
+	    pam_end (pamh, result);
+#endif
 	    /*
 	     * Start the clients, changing uid/groups
 	     *	   setting up environment and running the session
@@ -423,6 +497,11 @@ ManageSession (struct display *d)
 	     */
 	    AbortClient (clientPid);
 	}
+    } else {
+#ifdef USE_SYSTEMD_LOGIN
+	result = pam_close_session (pamh, 0);
+	pam_end (pamh, result);
+#endif
     }
     /*
      * run system-wide reset file
@@ -1059,10 +1138,11 @@ systemEnv (struct display *d, char *user, char *home)
     if (d->windowPath)
 	    env = setEnv (env, "WINDOWPATH", d->windowPath);
 #ifdef USE_SYSTEMD_LOGIN
-    if (d->vt) {
-	    env = setEnv (env, "XDG_VTNR", d->vt);
-	    env = setEnv (env, "XDG_SEAT", "seat0");
-    }
+    env = setEnv (env, "XDG_SESSION_TYPE", "x11");
+    if (d->vtnr)
+	    env = setEnv (env, "XDG_VTNR", d->vtnr);
+    if (d->seat)
+	    env = setEnv (env, "XDG_SEAT", d->seat);
 #endif
     return env;
 }

@@ -171,11 +171,8 @@ RemoveDisplay (struct display *old)
 #endif
 	    free (d->windowPath);
 #ifdef USE_SYSTEMD_LOGIN
-	    if (d->pamh) {
-		int result = pam_close_session (d->pamh, 0);
-		pam_end (d->pamh, result);
-	    }
-	    free (d->vt);
+	    free (d->vtnr);
+	    free (d->seat);
 #endif
 	    free (d);
 	    break;
@@ -271,8 +268,8 @@ NewDisplay (char *name, char *class)
     d->dpy = NULL;
     d->windowPath = NULL;
 #ifdef USE_SYSTEMD_LOGIN
-    d->pamh = NULL;
-    d->vt = NULL;
+    d->vtnr = NULL;
+    d->seat = NULL;
 #endif
     displays = d;
     return d;
