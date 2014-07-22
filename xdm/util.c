@@ -101,7 +101,7 @@ makeEnv (const char *name, const char *value)
 {
 	char	*result;
 
-	asprintf(&result, "%s=%s", name, value);
+	if (asprintf(&result, "%s=%s", name, value)) ;
 
 	if (!result) {
 		LogOutOfMem ("makeEnv");

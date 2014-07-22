@@ -284,7 +284,7 @@ RebuildTable (int size)
 }
 
 static int
-AddHostname (ARRAY8Ptr hostname, ARRAY8Ptr status, struct sockaddr *addr, int willing)
+AddHostname (ARRAY8Ptr hostname, ARRAY8Ptr status, struct sockaddr *addr, int willing_val)
 {
     HostName	*new, **names, *name;
     ARRAY8	hostAddr = {0, NULL};
@@ -373,7 +373,7 @@ AddHostname (ARRAY8Ptr hostname, ARRAY8Ptr status, struct sockaddr *addr, int wi
 	XdmcpDisposeARRAY8 (&new->status);
 	XdmcpDisposeARRAY8 (hostname);
     }
-    new->willing = willing;
+    new->willing = willing_val;
     new->status = *status;
 
     hostname = &new->hostname;
@@ -384,7 +384,7 @@ AddHostname (ARRAY8Ptr hostname, ARRAY8Ptr status, struct sockaddr *addr, int wi
     new->fullname = malloc (fulllen);
     if (!new->fullname)
     {
-	new->fullname = "Unknown";
+	new->fullname = strdup("Unknown");
     }
     else
     {
@@ -753,7 +753,7 @@ Choose (HostName *h)
 	int		len = 0;
 	int		fd;
 	char		buf[1024];
-	XdmcpBuffer	buffer;
+	XdmcpBuffer	xbuf;
 	char		*xdm;
 
 	xdm = (char *) app_resources.xdmAddress->data;
@@ -793,14 +793,14 @@ Choose (HostName *h)
 	    fprintf (stderr, "Cannot connect to xdm\n");
 	    exit (REMANAGE_DISPLAY);
 	}
-	buffer.data = (BYTE *) buf;
-	buffer.size = sizeof (buf);
-	buffer.pointer = 0;
-	buffer.count = 0;
-	XdmcpWriteARRAY8 (&buffer, app_resources.clientAddress);
-	XdmcpWriteCARD16 (&buffer, (CARD16) app_resources.connectionType);
-	XdmcpWriteARRAY8 (&buffer, &h->hostaddr);
-	write (fd, (char *)buffer.data, buffer.pointer);
+	xbuf.data = (BYTE *) buf;
+	xbuf.size = sizeof (buf);
+	xbuf.pointer = 0;
+	xbuf.count = 0;
+	XdmcpWriteARRAY8 (&xbuf, app_resources.clientAddress);
+	XdmcpWriteCARD16 (&xbuf, (CARD16) app_resources.connectionType);
+	XdmcpWriteARRAY8 (&xbuf, &h->hostaddr);
+	if (write (fd, (char *)xbuf.data, xbuf.pointer)) ;
 	close (fd);
     }
     else

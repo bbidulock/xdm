@@ -53,7 +53,7 @@ LogVWrite(const char *fmt, va_list args)
     if (len >= sizeof(buf)) {
 	len = sizeof(buf) - 1;
     }
-    write(STDERR_FILENO, buf, len);
+    if (write(STDERR_FILENO, buf, len)) ;
 }
 
 #define LogVarArgsWrite(fmt)	\

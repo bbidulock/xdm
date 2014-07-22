@@ -459,6 +459,7 @@ ProcessChooserSocket (int fd)
     close (client_fd);
 }
 
+
 void
 RunChooser (struct display *d)
 {

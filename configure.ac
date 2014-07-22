@@ -98,7 +98,7 @@ AC_CHECK_DECL(key_setnet,
 # Required system libraries have been searched for and are listed in $LIBS
 AC_FUNC_FORK
 AC_CHECK_FUNCS([daemon sigaction openlog asprintf setproctitle setusercontext \
-                mkstemp getifaddrs getspnam arc4random])
+                mkstemp getifaddrs getspnam arc4random setproctitle_init])
 
 XDM_CFLAGS="$XDM_CFLAGS"
 GREETER_CFLAGS="$GREETER_CFLAGS"

@@ -112,7 +112,6 @@ static void XorCursor (LoginWidget w);
 #define offset(field) XtOffsetOf(LoginRec, login.field)
 #define goffset(field) XtOffsetOf(WidgetRec, core.field)
 
-
 static XtResource resources[] = {
     {XtNwidth, XtCWidth, XtRDimension, sizeof(Dimension),
 	goffset(width), XtRImmediate,	(XtPointer) 0},

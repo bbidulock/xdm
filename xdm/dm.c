@@ -123,6 +123,10 @@ static void RemovePid (void);
 
 static pid_t parent_pid = -1; 	/* PID of parent xdm process */
 
+#ifdef SETPROCTITLE_INIT
+extern char **environ;
+#endif
+
 int
 main (int argc, char **argv)
 {
@@ -130,6 +134,9 @@ main (int argc, char **argv)
     mode_t oldumask;
     char cmdbuf[1024];
 
+#ifdef SETPROCTITLE_INIT
+    setproctitle_init(argc, argv, environ);
+#endif
     /* make sure at least world write access is disabled */
     if (((oldumask = umask(022)) & 002) == 002)
 	(void) umask (oldumask);
@@ -228,7 +235,7 @@ main (int argc, char **argv)
 	/* Clean up any old Authorization files */
 	/* AUD: all good? */
 	snprintf(cmdbuf, sizeof(cmdbuf), "/bin/rm -f %s/authdir/authfiles/A*", authDir);
-	system(cmdbuf);
+	if (system(cmdbuf)) ;
     }
 #if!defined(HAVE_ARC4RANDOM) && !defined(DEV_RANDOM)
     AddOtherEntropy ();
@@ -774,7 +781,7 @@ SetWindowPath(struct display *d)
     unsigned long bytes_after;
     unsigned char *buf = NULL;
     const char *windowpath;
-    char *newwindowpath;
+    char *newwindowpath = NULL;
     unsigned long num;
 
     if ((prop = XInternAtom (d->dpy, "XFree86_VT", True)) &&
@@ -785,15 +792,15 @@ SetWindowPath(struct display *d)
 	num = *(long *) buf;
 	windowpath = getenv ("WINDOWPATH");
 	if (!windowpath) {
-	    asprintf (&newwindowpath, "%lu", num);
+	    if (asprintf (&newwindowpath, "%lu", num)) ;
 	} else {
-	    asprintf (&newwindowpath, "%s:%lu", windowpath, num);
+	    if (asprintf (&newwindowpath, "%s:%lu", windowpath, num)) ;
 	}
 	free (d->windowPath);
 	d->windowPath = newwindowpath;
 #ifdef USE_SYSTEMD_LOGIN
 	free (d->vtnr);
-	asprintf (&d->vtnr, "%lu", num);
+	if (asprintf (&d->vtnr, "%lu", num)) ;
 #endif
     }
     if (buf) {

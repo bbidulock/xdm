@@ -99,13 +99,13 @@ extern int getdomainname(char *name, size_t len);
 
 int     (*__xdm_PingServer)(struct display *d, Display *alternateDpy) = NULL;
 void    (*__xdm_SessionPingFailed)(struct display *d) = NULL;
-void    (*__xdm_Debug)(const char * fmt, ...) = NULL;
+void    (*__xdm_Debug)(const char * fmt, ...) _X_ATTRIBUTE_PRINTF(1, 2) = NULL;
 void    (*__xdm_RegisterCloseOnFork)(int fd) = NULL;
 void    (*__xdm_SecureDisplay)(struct display *d, Display *dpy) = NULL;
 void    (*__xdm_UnsecureDisplay)(struct display *d, Display *dpy) = NULL;
 void    (*__xdm_ClearCloseOnFork)(int fd) = NULL;
 void    (*__xdm_SetupDisplay)(struct display *d) = NULL;
-void    (*__xdm_LogError)(const char * fmt, ...) = NULL;
+void    (*__xdm_LogError)(const char * fmt, ...) _X_ATTRIBUTE_PRINTF(1, 2) = NULL;
 void    (*__xdm_SessionExit)(struct display *d, int status, int removeAuth) = NULL;
 void    (*__xdm_DeleteXloginResources)(struct display *d, Display *dpy) = NULL;
 int     (*__xdm_source)(char **environ, char *file) = NULL;
@@ -115,7 +115,7 @@ char    **(*__xdm_putEnv)(const char *string, char **env) = NULL;
 char    **(*__xdm_parseArgs)(char **argv, const char *string) = NULL;
 void    (*__xdm_printEnv)(char **e) = NULL;
 char    **(*__xdm_systemEnv)(struct display *d, char *user, char *home) = NULL;
-void    (*__xdm_LogOutOfMem)(const char * fmt, ...) = NULL;
+void    (*__xdm_LogOutOfMem)(const char * fmt, ...) _X_ATTRIBUTE_PRINTF(1, 2) = NULL;
 void    (*__xdm_setgrent)(void) = NULL;
 struct group    *(*__xdm_getgrent)(void) = NULL;
 void    (*__xdm_endgrent)(void) = NULL;
@@ -663,7 +663,7 @@ greet_user_rtn GreetUser(
 	    char		netname[MAXNETNAMELEN+1];
 	    char		domainname[MAXNETNAMELEN+1];
 
-	    getdomainname(domainname, sizeof domainname);
+	    if (getdomainname(domainname, sizeof domainname)) ;
 	    user2netname (netname, verify->uid, domainname);
 	    addr.family = FamilyNetname;
 	    addr.length = strlen (netname);

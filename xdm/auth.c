@@ -341,9 +341,9 @@ MakeServerAuthFile (struct display *d, FILE ** file)
 	    r = CheckServerAuthDir(d->authFile, &statb, 0700);
 	    if (r == 0) {
 		if (statb.st_uid != 0)
-		    (void) chown(d->authFile, 0, statb.st_gid);
+		    if (chown (d->authFile, 0, statb.st_gid)) ;
 		if ((statb.st_mode & 0077) != 0)
-		    (void) chmod(d->authFile, statb.st_mode & 0700);
+		    if (chmod (d->authFile, statb.st_mode & 0700)) ;
 	    } else if (r < 0) {
 		free (d->authFile);
 		d->authFile = NULL;
@@ -1319,7 +1319,7 @@ SetUserAuthorization (struct display *d, struct verify_info *verify)
 	}
 	XauUnlockAuth (name);
 	if (envname)
-	    chown (envname, verify->uid, verify->gid);
+	    if (chown (envname, verify->uid, verify->gid)) ;
     }
     Debug ("done SetUserAuthorization\n");
 }

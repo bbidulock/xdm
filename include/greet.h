@@ -54,13 +54,13 @@ from The Open Group.
 struct dlfuncs {
     int (*_PingServer)(struct display *d, Display *alternateDpy);
     void (*_SessionPingFailed)(struct display *d);
-    void (*_Debug)(const char * fmt, ...);
+    void (*_Debug)(const char * fmt, ...) _X_ATTRIBUTE_PRINTF(1,2);
     void (*_RegisterCloseOnFork)(int fd);
     void (*_SecureDisplay)(struct display *d, Display *dpy);
     void (*_UnsecureDisplay)(struct display *d, Display *dpy);
     void (*_ClearCloseOnFork)(int fd);
     void (*_SetupDisplay)(struct display *d);
-    void (*_LogError)(const char * fmt, ...);
+    void (*_LogError)(const char * fmt, ...) _X_ATTRIBUTE_PRINTF(1,2);
     void (*_SessionExit)(struct display *d, int status, int removeAuth);
     void (*_DeleteXloginResources)(struct display *d, Display *dpy);
     int (*_source)(char **environ, char *file);
@@ -70,7 +70,7 @@ struct dlfuncs {
     char **(*_parseArgs)(char **argv, const char *string);
     void (*_printEnv)(char **e);
     char **(*_systemEnv)(struct display *d, char *user, char *home);
-    void (*_LogOutOfMem)(const char * fmt, ...);
+    void (*_LogOutOfMem)(const char * fmt, ...) _X_ATTRIBUTE_PRINTF(1,2);
     SETGRENT_TYPE (*_setgrent)(void);		/* no longer used */
     struct group *(*_getgrent)(void);	/* no longer used */
     void (*_endgrent)(void);		/* no longer used */

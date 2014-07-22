@@ -222,7 +222,7 @@ static Bool StartClient(
 
 static pid_t			clientPid;
 static struct greet_info	greet;
-static struct verify_info	verify;
+static struct verify_info	verifyInfo;
 
 static Jmp_buf	abortSession;
 
@@ -291,7 +291,7 @@ SessionPingFailed (struct display *d)
 {
     if (clientPid > 1) {
 	AbortClient (clientPid);
-	source (verify.systemEnviron, d->reset);
+	source (verifyInfo.systemEnviron, d->reset);
     }
     SessionExit (d, RESERVER_DISPLAY, TRUE);
 }
@@ -443,9 +443,9 @@ ManageSession (struct display *d)
     /* tell the possibly dynamically loaded greeter function
      * what data structure formats to expect.
      * These version numbers are registered with The Open Group. */
-    verify.version = 1;
+    verifyInfo.version = 1;
     greet.version = 1;
-    greet_stat = (*greet_user_proc)(d, &dpy, &verify, &greet, &dlfuncs);
+    greet_stat = (*greet_user_proc)(d, &dpy, &verifyInfo, &greet, &dlfuncs);
 
     if (greet_stat == Greet_Success) {
 	clientPid = 0;
@@ -460,7 +460,7 @@ ManageSession (struct display *d)
 	     * Start the clients, changing uid/groups
 	     *	   setting up environment and running the session
 	     */
-	    if (StartClient (&verify, d, &clientPid, greet.name, greet.password)) {
+	    if (StartClient (&verifyInfo, d, &clientPid, greet.name, greet.password)) {
 		Debug ("Client Started\n");
 
                 /* Save memory; close library */
@@ -507,7 +507,7 @@ ManageSession (struct display *d)
      * run system-wide reset file
      */
     Debug ("Source reset program %s\n", d->reset);
-    source (verify.systemEnviron, d->reset);
+    source (verifyInfo.systemEnviron, d->reset);
     SessionExit (d, OBEYSESS_DISPLAY, TRUE);
 }
 
@@ -625,15 +625,15 @@ SessionExit (struct display *d, int status, int removeAuth)
     else
 	ResetServer (d);
     if (removeAuth) {
-	if (setgid (verify.gid) == -1) {
+	if (setgid (verifyInfo.gid) == -1) {
 	    LogError( "SessionExit: setgid: %s\n", strerror(errno));
 	    exit(status);
 	}
-	if (setuid (verify.uid) == -1) {
+	if (setuid (verifyInfo.uid) == -1) {
 	    LogError( "SessionExit: setuid: %s\n", strerror(errno));
 	    exit(status);
 	}
-	RemoveUserAuthorization (d, &verify);
+	RemoveUserAuthorization (d, &verifyInfo);
 #if defined(K5AUTH) && !defined(USE_PAM)   /* PAM modules should handle this */
 	/* do like "kdestroy" program */
         {
@@ -934,7 +934,7 @@ StartClient (
 	    if (chdir (home) == -1) {
 		LogError ("user \"%s\": cannot chdir to home \"%s\" (err %d), using \"/\"\n",
 			  getEnv (verify->userEnviron, "USER"), home, errno);
-		chdir ("/");
+		if (chdir ("/")) ;
 		verify->userEnviron = setEnv(verify->userEnviron, "HOME", "/");
 	    }
 	if (verify->argv) {
