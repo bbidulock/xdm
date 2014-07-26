@@ -490,6 +490,14 @@ NetworkAddressToName(
     struct sockaddr   *originalAddress,
     CARD16	displayNumber)
 {
+    /* Never prefix the display name with any local address or host name */
+    if (isLocalAddress (connectionAddress, connectionType)) {
+	char *name;
+
+	if (asprintf(&name, ":%d", displayNumber) < 0)
+	    name = NULL;
+	return (name);
+    }
     switch (connectionType)
     {
     case FamilyInternet:
@@ -588,13 +596,33 @@ NetworkAddressToName(
 		    return NULL;
 		}
 		if (multiHomed) {
-		    if (connectionType == FamilyInternet) {
+		    ARRAY8 addr = {0,NULL};
+		    type = originalAddress->sa_family;
+		    switch (type) {
+		    case AF_INET:
 			data = (CARD8 *)
 			  &((struct sockaddr_in *)originalAddress)->
 			  sin_addr;
-		    } else {
+			addr.length = 4;
+			addr.data = (CARD8Ptr) data;
+			connectionType = FamilyInternet;
+			break;
+		    case AF_INET6:
 			data = (CARD8 *)
 			  &((struct sockaddr_in6 *)originalAddress)->sin6_addr;
+			addr.length = 16;
+			addr.data = (CARD8Ptr) data;
+			connectionType = FamilyInternet6;
+			break;
+		    default:
+			return NULL;
+		    }
+		    /* If we are going with the original address and the original
+		       address is local, never prefix with hostname or ip address */
+		    if (isLocalAddress (&addr, connectionType)) {
+			if (asprintf(&name, ":%d", displayNumber) < 0)
+			    name = NULL;
+			return (name);
 		    }
 		}
 		if (inet_ntop(type, data, name, INET6_ADDRSTRLEN) == NULL) {
@@ -672,9 +700,21 @@ NetworkAddressToName(
 	    }
 	    else
 	    {
-		if (multiHomed)
+		if (multiHomed) {
+		    ARRAY8 addr;
+
 		    data = (CARD8 *) &((struct sockaddr_in *)originalAddress)->
 				sin_addr.s_addr;
+		    addr.length = 4;
+		    addr.data = data;
+
+		    /* Never prefix local addresses with names or numbers */
+		    if (isLocalAddress (&addr, FamilyInternet)) {
+			if (asprintf (&name, ":%d", displayNumber) < 0)
+			    name = NULL;
+			return (name);
+		    }
+		}
 
 		if (asprintf(&name, "%d.%d.%d.%d:%d",
 			     data[0], data[1], data[2], data[3],
@@ -1402,6 +1442,11 @@ NetworkAddressToHostname (
     ARRAY8Ptr   connectionAddress)
 {
     char    *name = NULL;
+
+    if (isLocalAddress (connectionAddress, connectionType)) {
+	    name = strdup("localhost");
+	    return (name);
+    }
 
     switch (connectionType)
     {

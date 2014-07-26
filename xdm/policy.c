@@ -224,14 +224,28 @@ SelectConnectionTypeIndex (
 #  endif /* IPv6 */
 # endif /* TCPCONN */
 	    if (family == connectionTypes->data[i] &&
-		XdmcpARRAY8Equal(addr, &connectionAddresses->data[i]))
+		XdmcpARRAY8Equal(addr, &connectionAddresses->data[i])) {
+		/* if the address is the same as the request address, use it */
+		*connectionType = connectionTypes->data[i];
+		connectionAddress->length = connectionAddresses->data[i].length;
+		connectionAddress->data = connectionAddresses->data[i].data;
 		return i;
-	    *connectionType = connectionTypes->data[i];
-	    connectionAddress->length = connectionAddresses->data[i].length;
-	    connectionAddress->data = connectionAddresses->data[i].data;
-	    ret = i;
+	    }
+	    if (ret == -1) {
+		/* tentatively use the first usable address */
+		*connectionType = connectionTypes->data[i];
+		connectionAddress->length = connectionAddresses->data[i].length;
+		connectionAddress->data = connectionAddresses->data[i].data;
+		ret = i;
+	    }
 	}
     } /* for */
+    /*
+     * This is really only meant to handle old xqproxy which placed zero
+     * connections in the connection list, or for situations with Xorg servers
+     * such as: X :%d -nolisten tcp -indirect localhost, in which case there
+     * will be no connections in the connection list for Xorg servers.
+     */
     if (ret == -1 && isLocalAddress(addr, family)) {
 	/* maybe FamilyLocal or FamilyLocalHost here? */
 	*connectionType = family;
