@@ -1454,10 +1454,8 @@ NetworkAddressToHostname (
 
 			LogError("Possible DNS spoof attempt %s->%s.\n", dotted,
 			  hostent->h_name);
-			hostent = NULL;
-		    } else {
-		      local_name = hostent->h_name;
 		    }
+		    local_name = hostent->h_name;
 		    freeaddrinfo(ai);
 		} else {
 		    hostent = NULL;
@@ -1468,10 +1466,8 @@ NetworkAddressToHostname (
 			if (memcmp((char*)connectionAddress->data, hostent->h_addr,
 			    hostent->h_length) != 0) {
 				LogError("Possible DNS spoof attempt.\n");
-				hostent = NULL; /* so it enters next if() */
-			} else {
-				local_name = hostent->h_name;
 			}
+			local_name = hostent->h_name;
 		}
 		free(s);
 # endif
