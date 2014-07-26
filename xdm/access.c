@@ -72,6 +72,8 @@ in this Software without prior written authorization from the copyright holder.
 #  include        <arpa/inet.h>
 # endif
 
+# include   <ifaddrs.h>
+
 # define ALIAS_CHARACTER	    '%'
 # define NEGATE_CHARACTER    '!'
 # define CHOOSER_STRING	    "CHOOSER"
@@ -638,6 +640,76 @@ static int indirectAlias (
     int		depth,
     int		broadcast);
 
+int
+isLocalAddress (
+    ARRAY8Ptr	address,
+    CARD16	connectionType)
+{
+    int		    ret = 0;
+    ARRAY8	    addr = {0,NULL};
+
+    switch (connectionType) {
+    case FamilyLocal:
+    case FamilyLocalHost:
+    case FamilyWild:
+	ret = 1;
+	break;
+    case FamilyInternet:
+    case FamilyInternet6:
+    {
+	struct ifaddrs  *ifas = NULL, *ifa;
+	sa_family_t	family;
+
+	if (address->length == 4)
+	    family = AF_INET;
+#if defined(IPv6) && defined(AF_INET6)
+	else if (address->length == 16)
+	    family = AF_INET6;
+#endif
+	else
+	    break;
+
+	if (getifaddrs (&ifas) == -1)
+	    break;
+
+	for (ifa = ifas; ifa; ifa = ifa->ifa_next) {
+	    struct sockaddr *ifa_addr;
+	    struct sockaddr_in *sin;
+#if defined(IPv6) && defined(AF_INET6)
+	    struct sockaddr_in6 *sin6;
+#endif
+
+	    if (!(ifa_addr = ifa->ifa_addr))
+		continue;
+	    if (ifa_addr->sa_family != family)
+		continue;
+	    switch (family) {
+	    case AF_INET:
+		sin = (struct sockaddr_in *) ifa_addr;
+		addr.length = 4;
+		addr.data = (CARD8Ptr) &sin->sin_addr.s_addr;
+		if (XdmcpARRAY8Equal (&addr, address))
+		    ret = 1;
+		break;
+#if defined(IPv6) && defined(AF_INET6)
+	    case AF_INET6:
+		sin6 = (struct sockaddr_in6 *) ifa_addr;
+		addr.length = 16;
+		addr.data = (CARD8Ptr) sin6->sin6_addr.s6_addr;
+		if (XdmcpARRAY8Equal (&addr, address))
+		    ret = 1;
+		break;
+#endif
+	    }
+	    if (ret)
+		break;
+	}
+	freeifaddrs (ifas);
+	break;
+    }
+    }
+    return (ret);
+}
 
 static int
 scanHostlist (
@@ -661,7 +733,7 @@ scanHostlist (
 		haveLocalhost = 1;
 	    break;
 	case HOST_ADDRESS:
-	    if (XdmcpARRAY8Equal (getLocalAddress(), &h->entry.hostAddress))
+	    if (isLocalAddress (&h->entry.hostAddress, connectionType))
 		haveLocalhost = 1;
 	    else if (function)
 		(*function) (connectionType, &h->entry.hostAddress, closure);
@@ -792,7 +864,7 @@ int ForEachMatchingIndirectHost (
 	    ARRAY8Ptr	choice;
 
 	    choice = IndirectChoice (clientAddress, connectionType);
-	    if (!choice || XdmcpARRAY8Equal (getLocalAddress(), choice))
+	    if (!choice || isLocalAddress (choice, connectionType))
 		haveLocalhost = 1;
 	    else
 		(*function) (connectionType, choice, closure);

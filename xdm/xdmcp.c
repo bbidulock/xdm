@@ -230,7 +230,7 @@ all_query_respond (
     ARRAY8	addr  = {0, NULL};
     CARD16	connectionType;
     int		family;
-    int		length;
+    int		length = 0;
     const char	*addrstring;
 # if defined(IPv6) && defined(AF_INET6)
     char	addrbuf[INET6_ADDRSTRLEN] = "";
@@ -917,19 +917,22 @@ request_respond (
     int		    fd)
 {
     CARD16	    displayNumber;
+    CARD16	    connectionType;
     ARRAY16	    connectionTypes = {0, NULL};
     ARRAYofARRAY8   connectionAddresses = {0, NULL};
     ARRAY8	    authenticationName = {0, NULL};
     ARRAY8	    authenticationData = {0, NULL};
     ARRAYofARRAY8   authorizationNames = {0, NULL};
     ARRAY8	    manufacturerDisplayID = {0, NULL};
+    ARRAY8	    addr = {0, NULL};
     ARRAY8Ptr	    reason = NULL;
     int		    expectlen;
     int		    i, j;
+    int		    family, len;
     struct protoDisplay  *pdpy = NULL;
     ARRAY8	    authorizationName = {0, NULL},
 		    authorizationData = {0, NULL};
-    ARRAY8Ptr	    connectionAddress;
+    ARRAY8	    connectionAddress = {0, NULL};
 
     Debug ("Request respond %d\n", length);
     if (XdmcpReadCARD16 (&buffer, &displayNumber) &&
@@ -957,32 +960,61 @@ request_respond (
 	    Debug ("Request length error got %d expect %d\n", length, expectlen);
 	    goto abort;
 	}
+	/*
+	 *  First we should check if the from address is one of our addresses.
+	 *  When an Xorg server is launched with -indirect localhost --nolisten
+	 *  tcp (which is perfectly viable), it neglects to add an FamilyLocal
+	 *  address to the connection type and addresses, causing the connection
+	 *  to fail even though no tcp is really required in loopback.
+	 *
+	 *  Also, older versions of xqproxy launching requests from localhost at
+	 *  the end of a ssh command were also adding a connection list of zero.
+	 *
+	 *  Also, if there is no external network address, some local displays
+	 *  may not add localhost to the list of connections and connection
+	 *  types, resulting in a zero connection list.
+	 *
+	 *  Therefore, if the packet purports to have arrived from one of our
+	 *  own addresses, we should prepend one FamilyUnix (with address
+	 *  /tmp/X11-unix) and one FamilyLocalHost (or FamilyInternet with
+	 *  address 127.0.0.1) connection to the lists.
+	 */
+
+#if 0
 	if (connectionTypes.length == 0 ||
 	    connectionAddresses.length != connectionTypes.length)
 	{
 	    reason = &noValidAddr;
 	    goto decline;
 	}
+#endif
 	pdpy = FindProtoDisplay ((XdmcpNetaddr) from, fromlen, displayNumber);
 	if (!pdpy) {
 
+	    family = ConvertAddr ((XdmcpNetaddr) from, &len, (char **)&(addr.data));
+	    addr.length = len;
+	    if (family < 0) {
+		reason = &noValidAddr;
+		goto decline;
+	    }
+
 	    /* Check this Display against the Manager's policy */
-	    reason = Accept (from, fromlen, displayNumber);
+	    reason = Accept (&addr, family, displayNumber);
 	    if (reason)
 		goto decline;
 
 	    /* Check the Display's stream services against Manager's policy */
-	    i = SelectConnectionTypeIndex (&connectionTypes,
-					   &connectionAddresses);
+	    i = SelectConnectionTypeIndex (&addr, family,
+		    &connectionTypes, &connectionAddresses,
+		    &connectionType, &connectionAddress);
 	    if (i < 0) {
 		reason = &noValidAddr;
 		goto decline;
 	    }
 
 	    /* The Manager considers this a new session */
-	    connectionAddress = &connectionAddresses.data[i];
 	    pdpy = NewProtoDisplay ((XdmcpNetaddr) from, fromlen, displayNumber,
-				    connectionTypes.data[i], connectionAddress,
+				    connectionType, &connectionAddress,
 				    NextSessionID());
 	    Debug ("NewProtoDisplay %p\n", pdpy);
 	    if (!pdpy) {

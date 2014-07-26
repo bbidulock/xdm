@@ -165,26 +165,53 @@ Willing (
     return ret;
 }
 
+static ARRAY8 noAccessACL = { (CARD16) 33, (CARD8Ptr) "Display not authorized to connect" };
+
 /*ARGSUSED*/
 ARRAY8Ptr
 Accept (
-    struct sockaddr *from,
-    int		    fromlen,
+    ARRAY8Ptr	    addr,
+    CARD16	    connectionType,
     CARD16	    displayNumber)
 {
+    int		    ret;
+
+    /*
+     * Probably the biggest gapping security hole in XDM: all one has to do is
+     * skip the Query/Willing exchange and move directly to Request/Accept to
+     * completely bypass the ACL.
+     */
+    ret = AcceptableDisplayAddress (addr, connectionType, REQUEST);
+    if (!ret)
+	return &noAccessACL;
+
     return NULL;
 }
 
 /*ARGSUSED*/
 int
 SelectConnectionTypeIndex (
+    ARRAY8Ptr	     addr,
+    CARD16	     family,
     ARRAY16Ptr	     connectionTypes,
-    ARRAYofARRAY8Ptr connectionAddresses)
+    ARRAYofARRAY8Ptr connectionAddresses,
+    CARD16Ptr	     connectionType,
+    ARRAY8Ptr	     connectionAddress)
 {
-    int i;
+    int i, ret = -1;
 
     /*
      * Select one supported connection type
+     */
+
+    /*
+     * I suppose this was written when it was not usual to have more than one IP
+     * address or netowrk interface for a host.  I have a machine with 2 NICs
+     * with an IPv4LL allocated address on one NIC that is disconnected, and a
+     * regular IPv4 address on the other.  Both NICs have IPv6 link scope
+     * addresses assigned.  Xorg servers are sending 4 addresses in the list
+     * when looping back on IPv4: with the non-function IPv4LL address first in
+     * the list.  This function would never let it connect.
      */
 
     for (i = 0; i < connectionTypes->length; i++) {
@@ -196,10 +223,23 @@ SelectConnectionTypeIndex (
 	  case FamilyInternet6:
 #  endif /* IPv6 */
 # endif /* TCPCONN */
-	    return i;
+	    if (family == connectionTypes->data[i] &&
+		XdmcpARRAY8Equal(addr, &connectionAddresses->data[i]))
+		return i;
+	    *connectionType = connectionTypes->data[i];
+	    connectionAddress->length = connectionAddresses->data[i].length;
+	    connectionAddress->data = connectionAddresses->data[i].data;
+	    ret = i;
 	}
     } /* for */
-    return -1;
+    if (ret == -1 && isLocalAddress(addr, family)) {
+	/* maybe FamilyLocal or FamilyLocalHost here? */
+	*connectionType = family;
+	connectionAddress->length = addr->length;
+	connectionAddress->data = addr->data;
+	ret = connectionTypes->length;
+    }
+    return (ret);
 }
 
 #endif /* XDMCP */

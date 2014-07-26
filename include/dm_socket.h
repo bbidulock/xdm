@@ -39,7 +39,9 @@ authorization.
 # include <sys/socket.h>
 # include <netinet/in.h>
 
+#if 0
 /* ugly, but we need this after socket.h */
 extern ARRAY8Ptr Accept (struct sockaddr *from, int fromlen, CARD16 displayNumber);
+#endif
 
 #endif /* _DM_SOCKET_H_ */

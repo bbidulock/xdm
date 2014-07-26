@@ -365,6 +365,7 @@ extern struct protoDisplay	*NewProtoDisplay (
 extern void DrawFail (Widget ctx);
 
 /* in access.c */
+extern int isLocalAddress (ARRAY8Ptr clientAddress, CARD16 connectionType);
 extern ARRAY8Ptr getLocalAddress (void);
 extern int AcceptableDisplayAddress (ARRAY8Ptr clientAddress, CARD16 connectionType, xdmOpCode type);
 extern int ForEachMatchingIndirectHost (ARRAY8Ptr clientAddress, CARD16 connectionType, ChooserFunc function, char *closure);
@@ -413,13 +414,12 @@ extern int NetaddrFamily (XdmcpNetaddr netaddrp);
 extern int addressEqual (XdmcpNetaddr a1, int len1, XdmcpNetaddr a2, int len2);
 
 /* in policy.c */
-# if 0
-extern ARRAY8Ptr Accept (/* struct sockaddr *from, int fromlen, CARD16 displayNumber */);
-# endif
+extern ARRAY8Ptr Accept (ARRAY8Ptr addr, CARD16 connectionType, CARD16 displayNumber);
 extern ARRAY8Ptr ChooseAuthentication (ARRAYofARRAY8Ptr authenticationNames);
 extern int CheckAuthentication (struct protoDisplay *pdpy, ARRAY8Ptr displayID, ARRAY8Ptr name, ARRAY8Ptr data);
 extern int SelectAuthorizationTypeIndex (ARRAY8Ptr authenticationName, ARRAYofARRAY8Ptr authorizationNames);
-extern int SelectConnectionTypeIndex (ARRAY16Ptr connectionTypes, ARRAYofARRAY8Ptr connectionAddresses);
+extern int SelectConnectionTypeIndex (ARRAY8Ptr addr, CARD16 family, ARRAY16Ptr connectionTypes, ARRAYofARRAY8Ptr connectionAddresses,
+		CARD16Ptr connectionType, ARRAY8Ptr connectionAddress);
 extern int Willing (ARRAY8Ptr addr, CARD16 connectionType, ARRAY8Ptr authenticationName, ARRAY8Ptr status, xdmOpCode type);
 
 /* in protodpy.c */
