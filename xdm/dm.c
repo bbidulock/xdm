@@ -123,7 +123,7 @@ static void RemovePid (void);
 
 static pid_t parent_pid = -1; 	/* PID of parent xdm process */
 
-#ifdef SETPROCTITLE_INIT
+#ifdef HAVE_SETPROCTITLE_INIT
 extern char **environ;
 #endif
 
@@ -134,7 +134,7 @@ main (int argc, char **argv)
     mode_t oldumask;
     char cmdbuf[1024];
 
-#ifdef SETPROCTITLE_INIT
+#ifdef HAVE_SETPROCTITLE_INIT
     setproctitle_init(argc, argv, environ);
 #endif
     /* make sure at least world write access is disabled */
