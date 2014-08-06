@@ -438,6 +438,16 @@ registerHostname (
 	Hostname.data[i] = name[i];
 }
 
+static ARRAY8Ptr
+getHostname (
+	void)
+{
+    char *name = localHostname ();
+    registerHostname (name, strlen (name));
+    return &Hostname;
+}
+
+
 static void
 direct_query_respond (
     struct sockaddr *from,
@@ -888,7 +898,9 @@ send_willing (
     int		    fd)
 {
     XdmcpHeader	header;
+    ARRAY8Ptr hostname;
 
+    hostname = getHostname ();
     Debug ("Send willing %*.*s %*.*s\n", authenticationName->length,
 					 authenticationName->length,
 					 pS(authenticationName->data),
@@ -898,10 +910,10 @@ send_willing (
     header.version = XDM_PROTOCOL_VERSION;
     header.opcode = (CARD16) WILLING;
     header.length = 6 + authenticationName->length +
-		    Hostname.length + status->length;
+		    hostname->length + status->length;
     XdmcpWriteHeader (&buffer, &header);
     XdmcpWriteARRAY8 (&buffer, authenticationName);
-    XdmcpWriteARRAY8 (&buffer, &Hostname);
+    XdmcpWriteARRAY8 (&buffer, hostname);
     XdmcpWriteARRAY8 (&buffer, status);
     XdmcpFlush (fd, &buffer, (XdmcpNetaddr) from, fromlen);
 }
@@ -915,7 +927,9 @@ send_unwilling (
     int		    fd)
 {
     XdmcpHeader	header;
+    ARRAY8Ptr hostname;
 
+    hostname = getHostname ();
     Debug ("Send unwilling %*.*s %*.*s\n", authenticationName->length,
 					 authenticationName->length,
 					 pS(authenticationName->data),
@@ -924,9 +938,9 @@ send_unwilling (
 					 pS(status->data));
     header.version = XDM_PROTOCOL_VERSION;
     header.opcode = (CARD16) UNWILLING;
-    header.length = 4 + Hostname.length + status->length;
+    header.length = 4 + hostname->length + status->length;
     XdmcpWriteHeader (&buffer, &header);
-    XdmcpWriteARRAY8 (&buffer, &Hostname);
+    XdmcpWriteARRAY8 (&buffer, hostname);
     XdmcpWriteARRAY8 (&buffer, status);
     XdmcpFlush (fd, &buffer, (XdmcpNetaddr) from, fromlen);
 }

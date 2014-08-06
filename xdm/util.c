@@ -282,16 +282,11 @@ CleanUpChild (void)
 }
 
 static char localHostbuf[256];
-static int  gotLocalHostname;
 
 char *
 localHostname (void)
 {
-    if (!gotLocalHostname)
-    {
-	XmuGetHostname (localHostbuf, sizeof (localHostbuf) - 1);
-	gotLocalHostname = 1;
-    }
+    XmuGetHostname (localHostbuf, sizeof (localHostbuf) - 1);
     return localHostbuf;
 }
 
