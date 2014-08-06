@@ -86,6 +86,11 @@ from The Open Group.
 # endif
 #endif
 
+#ifdef HAVE_SETPROCTITLE_INIT
+#include <sys/types.h>
+#include <bsd/unistd.h>
+#endif
+
 #ifdef USE_SYSTEMD_DAEMON
 #include <systemd/sd-daemon.h>
 #endif
@@ -122,10 +127,6 @@ static long StorePid (void);
 static void RemovePid (void);
 
 static pid_t parent_pid = -1; 	/* PID of parent xdm process */
-
-#ifdef HAVE_SETPROCTITLE_INIT
-extern char **environ;
-#endif
 
 int
 main (int argc, char **argv)
