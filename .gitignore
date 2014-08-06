@@ -80,3 +80,6 @@ xdm.service
 .*.sw[nop]
 cscope.*
 configure.sh
+core
+core.*
+*.log
