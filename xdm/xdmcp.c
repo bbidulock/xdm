@@ -159,11 +159,28 @@ getClientAddress(
     int			sock;
     struct sockaddr	connAddr;
     socklen_t		connAddrLen;
+    socklen_t		salen;
 
     if ((sock = socket (to->sa_family, SOCK_DGRAM, 0)) == -1) {
 	LogError ("socket: %s\n", strerror(errno));
 	return False;
     }
+    switch (to->sa_family) {
+    case AF_INET:
+	salen = sizeof(struct sockaddr_in);
+	break;
+    case AF_INET6:
+	salen = sizeof(struct sockaddr_in6);
+	break;
+    case AF_UNIX:
+	salen = sizeof(struct sockaddr_un);
+	break;
+    default:
+	LogError ("invalid family %d\n", (int) to->sa_family);
+	return False;
+    }
+    if (tolen != salen)
+	LogError ("to length = %d != %d\n", tolen, salen);
     if (connect (sock, to, tolen) == -1) {
 	LogError ("connect: %s\n", strerror(errno));
 	switch (to->sa_family) {
