@@ -56,7 +56,7 @@ from The Open Group.
 # include <time.h>
 # define Time_t time_t
 
-# define getString(name,len)	((name = malloc (len + 1)) ? 1 : 0)
+# define getString(name,len)	((name = calloc (len + 1, 1)) ? 1 : 0)
 
 /*
  * misc externs
@@ -1425,7 +1425,7 @@ manage (
 		Debug ("Terminating active session for %s\n", d->name);
 		StopDisplay (d);
 	    }
-	    class = malloc (displayClass.length + 1);
+	    class = calloc (displayClass.length + 1, sizeof (*class));
 	    if (!class)
 	    {
 		send_failed (from, fromlen, name, sessionID,
@@ -1442,7 +1442,7 @@ manage (
 		free (class);
 		class = (char *) NULL;
 	    }
-	    from_save = malloc (fromlen);
+	    from_save = calloc (fromlen, sizeof (*from_save));
 	    if (!from_save)
 	    {
 		send_failed (from, fromlen, name, sessionID,
@@ -1483,7 +1483,7 @@ manage (
 	    XdmcpDisposeARRAY8 (&clientPort);
 	    if (pdpy->fileAuthorization)
 	    {
-		d->authorizations = malloc (sizeof (Xauth *));
+		d->authorizations = calloc (sizeof (Xauth *), sizeof (*d->authorizations));
 		if (!d->authorizations)
 		{
 		    free (from_save);

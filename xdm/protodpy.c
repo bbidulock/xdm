@@ -105,10 +105,10 @@ NewProtoDisplay (
     Debug ("NewProtoDisplay\n");
     time (&date);
     TimeoutProtoDisplays (date);
-    pdpy = malloc (sizeof *pdpy);
+    pdpy = calloc (1, sizeof (*pdpy));
     if (!pdpy)
 	return NULL;
-    pdpy->address = malloc (addrlen);
+    pdpy->address = calloc (addrlen, sizeof (*pdpy->address));
     if (!pdpy->address)
     {
 	free (pdpy);

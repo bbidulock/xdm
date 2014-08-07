@@ -332,7 +332,7 @@ GetResource (
 
     switch (valueType) {
     case DM_STRING:
-	new_string = malloc ((unsigned) (len+1));
+	new_string = calloc ((unsigned) (len+1), sizeof(*new_string));
 	if (!new_string) {
 		LogOutOfMem ("GetResource");
 		return;
@@ -409,7 +409,7 @@ ReinitResources (void)
     char	**argv;
     XrmDatabase newDB;
 
-    argv = malloc ((originalArgc + 1) * sizeof (char *));
+    argv = calloc ((originalArgc + 1), sizeof (char *));
     if (!argv)
 	LogPanic ("no space for argument realloc\n");
     for (argc = 0; argc < originalArgc; argc++)

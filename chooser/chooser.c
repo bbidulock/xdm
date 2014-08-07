@@ -270,7 +270,7 @@ RebuildTable (int size)
 
     if (size)
     {
-	newTable = malloc (size * sizeof (char *));
+	newTable = calloc (size, sizeof (char *));
 	if (!newTable)
 	    return;
 	for (names = hostNamedb, i = 0; names; names = names->next, i++)
@@ -326,7 +326,7 @@ AddHostname (ARRAY8Ptr hostname, ARRAY8Ptr status, struct sockaddr *addr, int wi
     }
     if (!*names)
     {
-	new = malloc (sizeof (HostName));
+	new = calloc (1, sizeof (HostName));
 	if (!new)
 	    return 0;
 	if (hostname->length)
@@ -381,7 +381,7 @@ AddHostname (ARRAY8Ptr hostname, ARRAY8Ptr status, struct sockaddr *addr, int wi
     if (fulllen < 30)
 	fulllen = 30;
     fulllen += status->length + 10;
-    new->fullname = malloc (fulllen);
+    new->fullname = calloc (fulllen, sizeof(*new->fullname));
     if (!new->fullname)
     {
 	new->fullname = strdup("Unknown");
@@ -511,10 +511,10 @@ RegisterHostaddr (struct sockaddr *addr, int len, xdmOpCode type)
 {
     HostAddr		*host, **prev;
 
-    host = malloc (sizeof (HostAddr));
+    host = calloc (1, sizeof (HostAddr));
     if (!host)
 	return;
-    host->addr = malloc (len);
+    host->addr = calloc (len, sizeof(*host->addr));
     if (!host->addr)
     {
 	free (host);

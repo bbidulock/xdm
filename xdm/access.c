@@ -315,7 +315,7 @@ tryagain:
     hostOrAlias = ReadWord (file, TRUE);
     if (!hostOrAlias)
 	return NULL;
-    h = malloc (sizeof (DisplayEntry));
+    h = calloc (1, sizeof (DisplayEntry));
     if (!h)
     {
 	LogOutOfMem ("ReadHostEntry: DisplayEntry\n");
@@ -439,7 +439,7 @@ tryagain:
     displayOrAlias = ReadWord (file, FALSE);
     if (!displayOrAlias)
 	return NULL;
-    d = malloc (sizeof (DisplayEntry));
+    d = calloc (1, sizeof (DisplayEntry));
     if (!d)
     {
 	LogOutOfMem ("ReadDisplayEntry: DisplayEntry\n");

@@ -157,7 +157,7 @@ Willing (
 	    snprintf (statusBuf, sizeof(statusBuf), "Willing to manage");
     }
     status->length = strlen (statusBuf);
-    status->data = malloc (status->length);
+    status->data = calloc (status->length, sizeof (*status->data));
     if (!status->data)
 	status->length = 0;
     else

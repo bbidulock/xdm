@@ -76,7 +76,7 @@ splitIntoWords (char *s)
 	    ++s;
 	if (!args)
 	{
-	    args = malloc (2 * sizeof (char *));
+	    args = calloc (2, sizeof (*args));
 	    if (!args)
 		return NULL;
 	}
@@ -90,7 +90,7 @@ splitIntoWords (char *s)
 	    }
 	    args = newargs;
 	}
-	args[nargs] = malloc (s - wordStart + 1);
+	args[nargs] = calloc (s - wordStart + 1, sizeof (*args[nargs]));
 	if (!args[nargs])
 	{
 	    freeFileArgs (args);
@@ -112,7 +112,7 @@ copyArgs (char **args)
     for (a = args; *a; a++)
 	/* SUPPRESS 530 */
 	;
-    new = malloc ((a - args + 1) * sizeof (char *));
+    new = calloc ((a - args + 1), sizeof (*new));
     if (!new)
 	return NULL;
     n = new;

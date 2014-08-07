@@ -1088,7 +1088,7 @@ execute (char **argv, char **environ)
 	for (av = argv, argc = 0; *av; av++, argc++)
 	    /* SUPPRESS 530 */
 	    ;
-	newargv = malloc ((argc + (optarg ? 3 : 2)) * sizeof (char *));
+	newargv = calloc ((argc + (optarg ? 3 : 2)), sizeof (*newargv));
 	if (!newargv)
 	    return;
 	av = newargv;

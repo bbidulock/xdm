@@ -251,7 +251,7 @@ GetRemoteAddress (struct display *d, int fd)
     d->peerlen = 0;
     if (len)
     {
-	d->peer = malloc (len);
+	d->peer = calloc (len, sizeof (*d->peer));
 	if (d->peer)
 	{
 	    memmove( (char *) d->peer, buf, len);

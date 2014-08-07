@@ -56,7 +56,7 @@ Xauth *
 MitGetAuth (unsigned short namelen, char *name)
 {
     Xauth   *new;
-    new = malloc (sizeof (Xauth));
+    new = calloc (1, sizeof (Xauth));
 
     if (!new)
 	return (Xauth *) 0;
@@ -66,13 +66,13 @@ MitGetAuth (unsigned short namelen, char *name)
     new->number_length = 0;
     new->number = NULL;
 
-    new->data = malloc (AUTH_DATA_LEN);
+    new->data = calloc (AUTH_DATA_LEN, sizeof (*new->data));
     if (!new->data)
     {
 	free (new);
 	return (Xauth *) 0;
     }
-    new->name = malloc (namelen);
+    new->name = calloc (namelen, sizeof (*new->name));
     if (!new->name)
     {
 	free (new->data);

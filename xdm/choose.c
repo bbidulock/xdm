@@ -129,7 +129,7 @@ RememberIndirectClient (
 	if (XdmcpARRAY8Equal (clientAddress, &i->client) &&
 	    connectionType == i->connectionType)
 	    return 1;
-    i = malloc (sizeof (IndirectUsersRec));
+    i = calloc (1, sizeof (IndirectUsersRec));
     if (!i)
     {
 	LogOutOfMem ("RememberIndirectClient\n");
@@ -318,7 +318,7 @@ RegisterIndirectChoice (
     insert = 0;
     if (!c)
     {
-	c = malloc (sizeof (ChoiceRec));
+	c = calloc (1, sizeof (ChoiceRec));
 	insert = 1;
 	if (!c)
 	    return 0;

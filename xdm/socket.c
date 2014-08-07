@@ -269,7 +269,7 @@ FindInList(struct socklist *list, ARRAY8Ptr addr)
 static struct socklist *
 CreateSocklistEntry(ARRAY8Ptr addr)
 {
-    struct socklist *s = malloc (sizeof(struct socklist));
+    struct socklist *s = calloc (1, sizeof(struct socklist));
     if (s == NULL) {
 	LogOutOfMem("CreateSocklistEntry");
 	return NULL;
@@ -280,7 +280,7 @@ CreateSocklistEntry(ARRAY8Ptr addr)
     if (addr->length == 4) /* IPv4 */
     {
 	struct sockaddr_in *sin;
-	sin = malloc (sizeof(struct sockaddr_in));
+	sin = calloc (1, sizeof(struct sockaddr_in));
 	if (sin == NULL) {
 	    LogOutOfMem("CreateSocklistEntry");
 	    free(s);
@@ -302,7 +302,7 @@ CreateSocklistEntry(ARRAY8Ptr addr)
     else if (addr->length == 16) /* IPv6 */
     {
 	struct sockaddr_in6 *sin6;
-	sin6 = malloc (sizeof(struct sockaddr_in6));
+	sin6 = calloc (1, sizeof(struct sockaddr_in6));
 	if (sin6 == NULL) {
 	    LogOutOfMem("CreateSocklistEntry");
 	    free(s);

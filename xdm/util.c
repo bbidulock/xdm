@@ -70,7 +70,7 @@ Asprintf(char ** ret, const char *restrict format, ...)
     va_start(ap, format);
     len = vsnprintf(buf, sizeof(buf), format, ap);
     if (len >= 0) {
-	*ret = malloc(len + 1);
+	*ret = calloc(len + 1, sizeof (**ret));
 	if (*ret) {
 	    if (len < sizeof(buf)) {
 		memcpy(*ret, buf, len + 1);
@@ -154,7 +154,7 @@ setEnv (char **e, const char *name, const char *value)
 				(unsigned) ((envsize + 2) * sizeof (char *)));
 	} else {
 		envsize = 0;
-		new = malloc (2 * sizeof (char *));
+		new = calloc (2, sizeof (*new));
 	}
 	if (!new) {
 		LogOutOfMem ("setEnv");
@@ -177,7 +177,7 @@ putEnv(const char *string, char **env)
     v = b + 1;
 
     nl = b - string;
-    if ((n = malloc(nl + 1)) == NULL)
+    if ((n = calloc(nl + 1, sizeof (*n))) == NULL)
     {
 	LogOutOfMem ("putAllEnv");
 	return NULL;
@@ -218,7 +218,7 @@ parseArgs (char **argv, const char *string)
 	while (argv && argv[i])
 		++i;
 	if (!argv) {
-		argv = malloc (sizeof (char *));
+		argv = calloc (1, sizeof (*argv));
 		if (!argv) {
 			LogOutOfMem ("parseArgs");
 			return NULL;
@@ -230,7 +230,7 @@ parseArgs (char **argv, const char *string)
 			if (word != string) {
 				newargv = realloc ((char *) argv,
 					(unsigned) ((i + 2) * sizeof (char *)));
-				save = malloc ((unsigned) (string - word + 1));
+				save = calloc ((unsigned) (string - word + 1), sizeof (*save));
 				if (!newargv || !save) {
 					LogOutOfMem ("parseArgs");
 					free (argv);

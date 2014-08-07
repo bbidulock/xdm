@@ -333,7 +333,7 @@ MakeServerAuthFile (struct display *d, FILE ** file)
 
 	    len = strlen (authDir) + strlen (authdir1) + strlen (authdir2)
 		+ strlen (cleanname) + 14;
-	    d->authFile = malloc (len);
+	    d->authFile = calloc (len, sizeof(*d->authFile));
 	    if (!d->authFile)
 		return FALSE;
 
@@ -498,12 +498,12 @@ SetLocalAuthorization (struct display *d)
 	;
     d->authNameNum = i;
     free (d->authNameLens);
-    d->authNameLens = malloc (d->authNameNum * sizeof (unsigned short));
+    d->authNameLens = calloc (d->authNameNum, sizeof (unsigned short));
     if (!d->authNameLens)
 	return;
     for (i = 0; i < d->authNameNum; i++)
 	d->authNameLens[i] = strlen (d->authNames[i]);
-    auths = malloc (d->authNameNum * sizeof (Xauth *));
+    auths = calloc (d->authNameNum, sizeof (Xauth *));
     if (!auths)
 	return;
     j = 0;
@@ -669,13 +669,13 @@ saveEntry (Xauth *auth)
 {
 	struct addrList	*new;
 
-	new = malloc (sizeof (struct addrList));
+	new = calloc (1, sizeof (struct addrList));
 	if (!new) {
 		LogOutOfMem ("saveEntry");
 		return;
 	}
 	if ((new->address_length = auth->address_length) > 0) {
-		new->address = malloc (auth->address_length);
+		new->address = calloc (auth->address_length, sizeof(*new->address));
 		if (!new->address) {
 			LogOutOfMem ("saveEntry");
 			free (new);
@@ -685,7 +685,7 @@ saveEntry (Xauth *auth)
 	} else
 		new->address = NULL;
 	if ((new->number_length = auth->number_length) > 0) {
-		new->number = malloc (auth->number_length);
+		new->number = calloc (auth->number_length, sizeof(*new->number));
 		if (!new->number) {
 			LogOutOfMem ("saveEntry");
 			free (new->address);
@@ -696,7 +696,7 @@ saveEntry (Xauth *auth)
 	} else
 		new->number = NULL;
 	if ((new->name_length = auth->name_length) > 0) {
-		new->name = malloc (auth->name_length);
+		new->name = calloc (auth->name_length, sizeof(*new->name));
 		if (!new->name) {
 			LogOutOfMem ("saveEntry");
 			free (new->number);
@@ -931,7 +931,7 @@ DefineSelf (int fd, FILE *file, Xauth *auth)
 	LogError ("Failed getting interface count");
     if (buflen < (ifn.lifn_count * sizeof(struct lifreq))) {
 	buflen = ifn.lifn_count * sizeof(struct lifreq);
-	bufptr = malloc(buflen);
+	bufptr = calloc(buflen,1);
     }
 #  endif
 
@@ -1078,7 +1078,7 @@ setAuthNumber (Xauth *auth, char *name)
 	    auth->number_length = dot - colon;
 	else
 	    auth->number_length = strlen (colon);
-	number = malloc (auth->number_length + 1);
+	number = calloc (auth->number_length + 1, sizeof(*number));
 	if (number) {
 	    strncpy (number, colon, auth->number_length);
 	    number[auth->number_length] = '\0';
