@@ -267,8 +267,16 @@ sendForward (
     struct sockaddr	    *addr;
     int			    addrlen;
     struct sfclosure	    *sfc;
+    int			    ctype;
 
-    switch (connectionType)
+    if (address->length == 4)
+	ctype = FamilyInternet;
+    else if(address->length == 16)
+	ctype = FamilyInternet6;
+    else
+	return;
+
+    switch (ctype)
     {
 # ifdef AF_INET
     case FamilyInternet:
@@ -279,10 +287,8 @@ sendForward (
 #  endif
 	in_addr.sin_family = AF_INET;
 	in_addr.sin_port = htons ((short) XDM_UDP_PORT);
-	if (address->length != 4)
-	    return;
 	memmove( (char *) &in_addr.sin_addr, address->data, address->length);
-	addrlen = sizeof (struct sockaddr_in);
+	addrlen = sizeof (in_addr);
 	break;
 # endif
 # if defined(IPv6) && defined(AF_INET6)
@@ -294,10 +300,8 @@ sendForward (
 #  endif
 	in6_addr.sin6_family = AF_INET6;
 	in6_addr.sin6_port = htons ((short) XDM_UDP_PORT);
-	if (address->length != 16)
-	    return;
 	memmove( (char *) &in6_addr.sin6_addr, address->data, address->length);
-	addrlen = sizeof (struct sockaddr_in6);
+	addrlen = sizeof (in6_addr);
 	break;
 # endif
 # ifdef AF_DECnet
