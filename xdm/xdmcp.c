@@ -157,14 +157,30 @@ getClientAddress(
     int			*fromlen)
 {
     int			sock;
+# if defined(IPv6) && defined(AF_INET6)
+    struct sockaddr_storage connAddr;
+#else
     struct sockaddr	connAddr;
-    socklen_t		connAddrLen;
+#endif
+    struct sockaddr	*ca;
+    socklen_t		calen;
+# if defined(IPv6) && defined(AF_INET6)
+    struct sockaddr_storage sendAddr;
+#else
+    struct sockaddr	sendAddr;
+#endif
+    struct sockaddr	*sa;
     socklen_t		salen;
 
-    if ((sock = socket (to->sa_family, SOCK_DGRAM, 0)) == -1) {
-	LogError ("socket: %s\n", strerror(errno));
-	return False;
-    }
+    ca = (typeof(ca)) &connAddr;
+    sa = (typeof(sa)) &sendAddr;
+
+    memset(&connAddr, 0, sizeof(connAddr));
+    memset(&sendAddr, 0, sizeof(sendAddr));
+
+    calen = sizeof(connAddr);
+    salen = sizeof(sendAddr);
+
     switch (to->sa_family) {
     case AF_INET:
 	salen = sizeof(struct sockaddr_in);
@@ -179,58 +195,62 @@ getClientAddress(
 	LogError ("invalid family %d\n", (int) to->sa_family);
 	return False;
     }
+    memmove(sa, to, salen);
     if (tolen != salen)
 	LogError ("to length = %d != %d\n", tolen, salen);
-    if (connect (sock, to, tolen) == -1) {
+    if ((sock = socket (sa->sa_family, SOCK_DGRAM, 0)) == -1) {
+	LogError ("socket: %s\n", strerror(errno));
+	return False;
+    }
+    if (connect (sock, sa, salen) == -1) {
 	LogError ("connect: %s\n", strerror(errno));
-	switch (to->sa_family) {
+	switch (sa->sa_family) {
 	case AF_UNSPEC:
-	    LogInfo ("to family is AF_UNSPEC\n");
+	    LogInfo ("sendAddr family is AF_UNSPEC\n");
 	    break;
 	case AF_INET:
 	{
-	    struct sockaddr_in *sin = (typeof(sin)) to;
+	    struct sockaddr_in *sin = (typeof(sin)) sa;
 	    char addrbuf[INET_ADDRSTRLEN + 1] = { 0, };
 	    short port = ntohs(sin->sin_port);
 	    void *ipaddr = &sin->sin_addr;
 
 	    inet_ntop(AF_INET, ipaddr, addrbuf, sizeof(addrbuf));
-	    LogInfo ("to ipv4 address (len = %d) is %s port %hd\n", tolen, addrbuf, port);
+	    LogInfo ("sendAddr ipv4 address (len = %d) is %s port %hd\n", tolen, addrbuf, port);
 	    break;
 	}
 # if defined(IPv6) && defined(AF_INET6)
 	case AF_INET6:
 	{
-	    struct sockaddr_in6 *sin6 = (typeof(sin6)) to;
+	    struct sockaddr_in6 *sin6 = (typeof(sin6)) sa;
 	    char addrbuf[INET6_ADDRSTRLEN + 1] = { 0, };
 	    short port = ntohs(sin6->sin6_port);
 	    void *ipaddr = &sin6->sin6_addr;
 
 	    inet_ntop(AF_INET6, ipaddr, addrbuf, sizeof(addrbuf));
-	    LogInfo ("to ipv6 address (len = %d) is %s port %hd\n", tolen, addrbuf, port);
+	    LogInfo ("sendAddr ipv6 address (len = %d) is %s port %hd\n", tolen, addrbuf, port);
 	    break;
 	}
 # endif
 	default:
-	    LogError ("to family is %d\n", (int) to->sa_family);
+	    LogError ("sendAddr family is %d\n", (int) sa->sa_family);
 	    break;
 	}
 	close (sock);
 	return False;
     }
-    connAddrLen = sizeof(connAddr);
-    if (getsockname (sock, &connAddr, &connAddrLen) == -1) {
+    if (getsockname (sock, ca, &calen) == -1) {
 	LogError ("getsockname: %s\n", strerror(errno));
 	close (sock);
 	return False;
     }
     close (sock);
-    if (!connAddrLen) {
+    if (!calen) {
 	LogError ("could not get connection address\n");
 	return False;
     }
-    memcpy(from, &connAddr, connAddrLen);
-    *fromlen = connAddrLen;
+    memcpy(from, ca, calen);
+    *fromlen = calen;
     return True;
 }
 
@@ -274,12 +294,21 @@ adjustAddress (
     ARRAY8		clientPort = {0, NULL};
     CARD16		connectionType;
     ARRAY8Ptr		cAddr;
-    struct sockaddr	from;
+# if defined(IPv6) && defined(AF_INET6)
+    struct sockaddr_storage fromAddr;
+# else
+    struct sockaddr	fromAddr;
+# endif
+    struct sockaddr	*from;
     int			fromlen;
     int			i;
 
-    if (sfc->local && getClientAddress(addr, addrlen, &from, &fromlen)) {
-	ClientAddress (&from, &clientAddress, &clientPort, &connectionType);
+    fromlen = sizeof(fromAddr);
+    memset(&fromAddr, 0, fromlen);
+    from = (typeof(from)) &fromAddr;
+
+    if (sfc->local && getClientAddress(addr, addrlen, from, &fromlen)) {
+	ClientAddress (from, &clientAddress, &clientPort, &connectionType);
 	cAddr = &clientAddress;
     } else
 	cAddr = sfc->clientAddress;

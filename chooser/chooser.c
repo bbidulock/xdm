@@ -554,7 +554,11 @@ RegisterHostname (char *name)
     struct sockaddr_in	in_addr;
     struct ifconf	ifc;
     register struct ifreq *ifr;
+#if !defined(IPv6) || !defined(AF_INET6)
+    struct sockaddr_storage	broad_addr;
+#else
     struct sockaddr	broad_addr;
+#endif
     char		buf[2048], *cp, *cplim;
 
     if (!strcmp (name, BROADCAST_HOSTNAME))

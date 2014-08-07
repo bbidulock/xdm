@@ -1035,6 +1035,9 @@ DefineSelf (int fd, int file, int auth)
     union {
 	struct  sockaddr   sa;
 	struct  sockaddr_in  in;
+#if defined(IPv6) && defined(AF_INET6)
+	struct  sockaddr_storage _sas;
+#endif
     } saddr;
 
     struct	sockaddr_in	*inetaddr;
