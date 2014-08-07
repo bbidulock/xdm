@@ -214,9 +214,16 @@ getClientAddress(
 	    char addrbuf[INET_ADDRSTRLEN + 1] = { 0, };
 	    short port = ntohs(sin->sin_port);
 	    void *ipaddr = &sin->sin_addr;
+	    char rawbuf[2 * sizeof(struct sockaddr_in) + 1] = { 0, };
+	    int i;
+	    char *p, *e;
+	    unsigned char *b;
 
+	    for (i = 0, p = rawbuf, e = p + sizeof(rawbuf), b = (typeof(b)) sa;
+		    i < salen; i++, p+=2, b++)
+		snprintf(p, e - p, "%02x", *b);
 	    inet_ntop(AF_INET, ipaddr, addrbuf, sizeof(addrbuf));
-	    LogInfo ("sendAddr ipv4 address (len = %d) is %s port %hd\n", tolen, addrbuf, port);
+	    LogInfo ("sa ipv4 address (len = %d) is %s port %hd: %s\n", salen, addrbuf, port, rawbuf);
 	    break;
 	}
 # if defined(IPv6) && defined(AF_INET6)
@@ -226,9 +233,16 @@ getClientAddress(
 	    char addrbuf[INET6_ADDRSTRLEN + 1] = { 0, };
 	    short port = ntohs(sin6->sin6_port);
 	    void *ipaddr = &sin6->sin6_addr;
+	    char rawbuf[2 * sizeof(struct sockaddr_in6) + 1] = { 0, };
+	    int i;
+	    char *p, *e;
+	    unsigned char *b;
 
 	    inet_ntop(AF_INET6, ipaddr, addrbuf, sizeof(addrbuf));
-	    LogInfo ("sendAddr ipv6 address (len = %d) is %s port %hd\n", tolen, addrbuf, port);
+	    for (i = 0, p = rawbuf, e = p + sizeof(rawbuf), b = (typeof(b)) sa;
+		    i < salen; i++, p+=2, b++)
+		snprintf(p, e - p, "%02x", *b);
+	    LogInfo ("sa ipv6 address (len = %d) is %s port %hd: %s\n", salen, addrbuf, port, rawbuf);
 	    break;
 	}
 # endif
