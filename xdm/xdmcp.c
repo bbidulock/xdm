@@ -166,6 +166,38 @@ getClientAddress(
     }
     if (connect (sock, to, tolen) == -1) {
 	LogError ("connect: %s\n", strerror(errno));
+	switch (to->sa_family) {
+	case AF_UNSPEC:
+	    LogInfo ("to family is AF_UNSPEC\n");
+	    break;
+	case AF_INET:
+	{
+	    struct sockaddr_in *sin = (typeof(sin)) to;
+	    char addrbuf[INET_ADDRSTRLEN + 1] = { 0, };
+	    short port = ntohs(sin->sin_port);
+	    void *ipaddr = &sin->sin_addr;
+
+	    inet_ntop(AF_INET, ipaddr, addrbuf, sizeof(addrbuf));
+	    LogInfo ("to ipv4 address is %s port %hd\n", addrbuf, port);
+	    break;
+	}
+# if defined(IPv6) && defined(AF_INET6)
+	case AF_INET6:
+	{
+	    struct sockaddr_in6 *sin6 = (typeof(sin6)) to;
+	    char addrbuf[INET6_ADDRSTRLEN + 1] = { 0, };
+	    short port = ntohs(sin6->sin6_port);
+	    void *ipaddr = &sin6->sin6_addr;
+
+	    inet_ntop(AF_INET6, ipaddr, addrbuf, sizeof(addrbuf));
+	    LogInfo ("to ipv6 address is %s port %hd\n", addrbuf, port);
+	    break;
+	}
+# endif
+	default:
+	    LogError ("to family is %d\n", (int) to->sa_family);
+	    break;
+	}
 	close (sock);
 	return False;
     }
