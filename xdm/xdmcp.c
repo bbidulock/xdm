@@ -178,7 +178,7 @@ getClientAddress(
 	    void *ipaddr = &sin->sin_addr;
 
 	    inet_ntop(AF_INET, ipaddr, addrbuf, sizeof(addrbuf));
-	    LogInfo ("to ipv4 address is %s port %hd\n", addrbuf, port);
+	    LogInfo ("to ipv4 address (len = %d) is %s port %hd\n", tolen, addrbuf, port);
 	    break;
 	}
 # if defined(IPv6) && defined(AF_INET6)
@@ -190,7 +190,7 @@ getClientAddress(
 	    void *ipaddr = &sin6->sin6_addr;
 
 	    inet_ntop(AF_INET6, ipaddr, addrbuf, sizeof(addrbuf));
-	    LogInfo ("to ipv6 address is %s port %hd\n", addrbuf, port);
+	    LogInfo ("to ipv6 address (len = %d) is %s port %hd\n", tolen, addrbuf, port);
 	    break;
 	}
 # endif
