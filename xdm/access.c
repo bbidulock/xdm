@@ -660,11 +660,21 @@ isLocalAddress (
 	struct ifaddrs  *ifas = NULL, *ifa;
 	sa_family_t	family;
 
-	if (address->length == 4)
+	if (address->length == 4) {
+	    if (*(in_addr_t *)address->data == INADDR_LOOPBACK) {
+		ret = 1;
+		break;
+	    }
 	    family = AF_INET;
+	}
 #if defined(IPv6) && defined(AF_INET6)
-	else if (address->length == 16)
+	else if (address->length == 16) {
+	    if (IN6_IS_ADDR_LOOPBACK(address->data)) {
+		ret = 1;
+		break;
+	    }
 	    family = AF_INET6;
+	}
 #endif
 	else
 	    break;
@@ -687,7 +697,7 @@ isLocalAddress (
 	    case AF_INET:
 		sin = (struct sockaddr_in *) ifa_addr;
 		addr.length = 4;
-		addr.data = (CARD8Ptr) &sin->sin_addr.s_addr;
+		addr.data = (CARD8Ptr) &sin->sin_addr;
 		if (XdmcpARRAY8Equal (&addr, address))
 		    ret = 1;
 		break;
@@ -695,7 +705,7 @@ isLocalAddress (
 	    case AF_INET6:
 		sin6 = (struct sockaddr_in6 *) ifa_addr;
 		addr.length = 16;
-		addr.data = (CARD8Ptr) sin6->sin6_addr.s6_addr;
+		addr.data = (CARD8Ptr) &sin6->sin6_addr;
 		if (XdmcpARRAY8Equal (&addr, address))
 		    ret = 1;
 		break;
