@@ -43,6 +43,7 @@ from The Open Group.
 # include	<X11/Xfuncs.h>
 # include	<sys/types.h>
 # include	<ctype.h>
+# include	<errno.h>
 
 # include	"dm_socket.h"
 
@@ -134,6 +135,120 @@ AnyWellKnownSockets (void)
 
 static XdmcpBuffer	buffer;
 
+struct sfclosure {
+    ARRAYofARRAY8Ptr	queryAuthenticationNames;
+    ARRAY8Ptr		clientAddress;
+    ARRAY8Ptr		clientPort;
+    CARD16		connectionType;
+    int			fd;
+    Bool		local;
+};
+
+/*
+ * Uses the libdnet technique of opening and connecting a UDP socket
+ * to get the kernel to reveal which local address it will use to
+ * send to a remote address over UDP.
+ */
+static Bool
+getClientAddress(
+    struct sockaddr	*to,
+    int			tolen,
+    struct sockaddr	*from,
+    int			*fromlen)
+{
+    int			sock;
+    struct sockaddr	connAddr;
+    socklen_t		connAddrLen;
+
+    if ((sock = socket (to->sa_family, SOCK_DGRAM, 0)) == -1) {
+	LogError ("socket: %s\n", strerror(errno));
+	return False;
+    }
+    if (connect (sock, to, tolen) == -1) {
+	LogError ("connect: %s\n", strerror(errno));
+	close (sock);
+	return False;
+    }
+    connAddrLen = sizeof(connAddr);
+    if (getsockname (sock, &connAddr, &connAddrLen) == -1) {
+	LogError ("getsockname: %s\n", strerror(errno));
+	close (sock);
+	return False;
+    }
+    close (sock);
+    if (!connAddrLen) {
+	LogError ("could not get connection address\n");
+	return False;
+    }
+    memcpy(from, &connAddr, connAddrLen);
+    *fromlen = connAddrLen;
+    return True;
+}
+
+static void
+ClientAddress (
+    struct sockaddr *from,
+    ARRAY8Ptr	    addr,	/* return */
+    ARRAY8Ptr	    port,	/* return */
+    CARD16	    *type)	/* return */
+{
+    int length, family;
+    char *data;
+
+    data = NetaddrPort((XdmcpNetaddr) from, &length);
+    XdmcpAllocARRAY8 (port, length);
+    memmove( port->data, data, length);
+    port->length = length;
+
+    family = ConvertAddr((XdmcpNetaddr) from, &length, &data);
+    XdmcpAllocARRAY8 (addr, length);
+    memmove( addr->data, data, length);
+    addr->length = length;
+
+    *type = family;
+}
+
+/*
+ * When we send a ForwardQuery and the client address is a local address,
+ * adjust the message buffer for the ForwardQuery to contain the address
+ * that we would use to connect to the forwarded to host for UDP XDMCP so
+ * that the forwarded to host may respond to us.
+ */
+static void
+adjustAddress (
+    struct sfclosure	*sfc,
+    struct sockaddr	*addr,
+    int			addrlen)
+{
+    XdmcpHeader		header;
+    ARRAY8		clientAddress = {0, NULL};
+    ARRAY8		clientPort = {0, NULL};
+    CARD16		connectionType;
+    ARRAY8Ptr		cAddr;
+    struct sockaddr	from;
+    int			fromlen;
+    int			i;
+
+    if (sfc->local && getClientAddress(addr, addrlen, &from, &fromlen)) {
+	ClientAddress (&from, &clientAddress, &clientPort, &connectionType);
+	cAddr = &clientAddress;
+    } else
+	cAddr = sfc->clientAddress;
+
+    header.version = XDM_PROTOCOL_VERSION;
+    header.opcode = (CARD16) FORWARD_QUERY;
+    header.length = 0;
+    header.length += 2 + cAddr->length;
+    header.length += 2 + sfc->clientPort->length;
+    header.length += 1;
+    for (i = 0; i < (int)sfc->queryAuthenticationNames->length; i++)
+	header.length += 2 + sfc->queryAuthenticationNames->data[i].length;
+    XdmcpWriteHeader (&buffer, &header);
+    XdmcpWriteARRAY8 (&buffer, cAddr);
+    XdmcpWriteARRAY8 (&buffer, sfc->clientPort);
+    XdmcpWriteARRAYofARRAY8 (&buffer, sfc->queryAuthenticationNames);
+}
+
 /*ARGSUSED*/
 static void
 sendForward (
@@ -151,6 +266,7 @@ sendForward (
 # endif
     struct sockaddr	    *addr;
     int			    addrlen;
+    struct sfclosure	    *sfc;
 
     switch (connectionType)
     {
@@ -190,31 +306,10 @@ sendForward (
     default:
 	return;
     }
-    XdmcpFlush (*((int *) closure), &buffer, (XdmcpNetaddr) addr, addrlen);
+    sfc = (struct sfclosure *) closure;
+    adjustAddress(sfc, addr, addrlen);
+    XdmcpFlush (sfc->fd, &buffer, (XdmcpNetaddr) addr, addrlen);
     return;
-}
-
-static void
-ClientAddress (
-    struct sockaddr *from,
-    ARRAY8Ptr	    addr,	/* return */
-    ARRAY8Ptr	    port,	/* return */
-    CARD16	    *type)	/* return */
-{
-    int length, family;
-    char *data;
-
-    data = NetaddrPort((XdmcpNetaddr) from, &length);
-    XdmcpAllocARRAY8 (port, length);
-    memmove( port->data, data, length);
-    port->length = length;
-
-    family = ConvertAddr((XdmcpNetaddr) from, &length, &data);
-    XdmcpAllocARRAY8 (addr, length);
-    memmove( addr->data, data, length);
-    addr->length = length;
-
-    *type = family;
 }
 
 static void
@@ -289,6 +384,7 @@ indirect_respond (
     int		    i;
     XdmcpHeader	    header;
     int		    localHostAsWell;
+    struct sfclosure sfc;
 
     Debug ("Indirect respond %d\n", length);
     if (!XdmcpReadARRAYofARRAY8 (&buffer, &queryAuthenticationNames))
@@ -315,7 +411,14 @@ indirect_respond (
 	XdmcpWriteARRAY8 (&buffer, &clientPort);
 	XdmcpWriteARRAYofARRAY8 (&buffer, &queryAuthenticationNames);
 
-	localHostAsWell = ForEachMatchingIndirectHost (&clientAddress, connectionType, sendForward, (char *) &fd);
+	sfc.queryAuthenticationNames = &queryAuthenticationNames;
+	sfc.clientAddress = &clientAddress;
+	sfc.clientPort = &clientPort;
+	sfc.connectionType = connectionType;
+	sfc.fd = fd;
+	sfc.local = isLocalAddress (&clientAddress, connectionType);
+
+	localHostAsWell = ForEachMatchingIndirectHost (&clientAddress, connectionType, sendForward, (char *) &sfc);
 
 	XdmcpDisposeARRAY8 (&clientAddress);
 	XdmcpDisposeARRAY8 (&clientPort);
