@@ -153,6 +153,7 @@ static Bool
 getClientAddress(
     struct sockaddr	*to,
     int			tolen,
+    int			ifindex,
     struct sockaddr	*from,
     int			*fromlen)
 {
@@ -202,6 +203,8 @@ getClientAddress(
 	LogError ("socket: %s\n", strerror(errno));
 	return False;
     }
+    if (sa->sa_family == AF_INET6)
+	((struct sockaddr_in6 *) sa)->sin6_scope_id = ifindex;
     if (connect (sock, sa, salen) == -1) {
 	LogError ("connect: %s\n", strerror(errno));
 	switch (sa->sa_family) {
@@ -223,7 +226,7 @@ getClientAddress(
 		    i < salen; i++, p+=2, b++)
 		snprintf(p, e - p, "%02x", *b);
 	    inet_ntop(AF_INET, ipaddr, addrbuf, sizeof(addrbuf));
-	    LogInfo ("sa ipv4 address (len = %d) is %s port %hd: %s\n", salen, addrbuf, port, rawbuf);
+	    LogInfo ("sa ifindex %d ipv4 address (len = %d) is %s port %hd: %s\n", ifindex, salen, addrbuf, port, rawbuf);
 	    break;
 	}
 # if defined(IPv6) && defined(AF_INET6)
@@ -242,7 +245,7 @@ getClientAddress(
 	    for (i = 0, p = rawbuf, e = p + sizeof(rawbuf), b = (typeof(b)) sa;
 		    i < salen; i++, p+=2, b++)
 		snprintf(p, e - p, "%02x", *b);
-	    LogInfo ("sa ipv6 address (len = %d) is %s port %hd: %s\n", salen, addrbuf, port, rawbuf);
+	    LogInfo ("sa ifindex %d ipv6 address (len = %d) is %s port %hd: %s\n", ifindex, salen, addrbuf, port, rawbuf);
 	    break;
 	}
 # endif
@@ -301,7 +304,8 @@ static void
 adjustAddress (
     struct sfclosure	*sfc,
     struct sockaddr	*addr,
-    int			addrlen)
+    int			addrlen,
+    int			ifindex)
 {
     XdmcpHeader		header;
     ARRAY8		clientAddress = {0, NULL};
@@ -321,7 +325,7 @@ adjustAddress (
     memset(&fromAddr, 0, fromlen);
     from = (typeof(from)) &fromAddr;
 
-    if (sfc->local && getClientAddress(addr, addrlen, from, &fromlen)) {
+    if (sfc->local && getClientAddress(addr, addrlen, ifindex, from, &fromlen)) {
 	ClientAddress (from, &clientAddress, &clientPort, &connectionType);
 	cAddr = &clientAddress;
     } else
@@ -360,14 +364,20 @@ sendForward (
     int			    addrlen;
     struct sfclosure	    *sfc;
     int			    ctype;
+    int			    ifindex = 0;
 
-    if (address->length == 4)
+    switch (address->length) {
+    case 4:
+    case 8:
 	ctype = FamilyInternet;
-    else if(address->length == 16)
+	break;
+    case 16:
+    case 20:
 	ctype = FamilyInternet6;
-    else
+	break;
+    default:
 	return;
-
+    }
     switch (ctype)
     {
 # ifdef AF_INET
@@ -381,6 +391,8 @@ sendForward (
 	in_addr.sin_port = htons ((short) XDM_UDP_PORT);
 	memmove( (char *) &in_addr.sin_addr, address->data, address->length);
 	addrlen = sizeof (in_addr);
+	if (address->length == 8)
+	    memmove (&ifindex, address->data + 4, 4);
 	break;
 # endif
 # if defined(IPv6) && defined(AF_INET6)
@@ -394,6 +406,9 @@ sendForward (
 	in6_addr.sin6_port = htons ((short) XDM_UDP_PORT);
 	memmove( (char *) &in6_addr.sin6_addr, address->data, address->length);
 	addrlen = sizeof (in6_addr);
+	if (address->length == 20)
+	    memmove (&ifindex, address->data + 16, 4);
+	in6_addr.sin6_scope_id = ifindex;
 	break;
 # endif
 # ifdef AF_DECnet
@@ -403,7 +418,7 @@ sendForward (
 	return;
     }
     sfc = (struct sfclosure *) closure;
-    adjustAddress(sfc, addr, addrlen);
+    adjustAddress(sfc, addr, addrlen, ifindex);
     XdmcpFlush (sfc->fd, &buffer, (XdmcpNetaddr) addr, addrlen);
     return;
 }
