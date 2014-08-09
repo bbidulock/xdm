@@ -661,7 +661,7 @@ isLocalAddress (
 	sa_family_t	family;
 
 	if (address->length == 4) {
-	    if (*(in_addr_t *)address->data == INADDR_LOOPBACK) {
+	    if (ntohl(*(in_addr_t *)address->data) == INADDR_LOOPBACK) {
 		ret = 1;
 		break;
 	    }

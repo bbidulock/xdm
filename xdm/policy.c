@@ -206,7 +206,7 @@ SelectConnectionTypeIndex (
 
     /*
      * I suppose this was written when it was not usual to have more than one IP
-     * address or netowrk interface for a host.  I have a machine with 2 NICs
+     * address or network interface for a host.  I have a machine with 2 NICs
      * with an IPv4LL allocated address on one NIC that is disconnected, and a
      * regular IPv4 address on the other.  Both NICs have IPv6 link scope
      * addresses assigned.  Xorg servers are sending 4 addresses in the list
