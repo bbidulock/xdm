@@ -707,11 +707,26 @@ broadcast_respond (
 
 /* computes an X display name */
 
+/*
+ * Problem: This function uses gethostbyaddr() for IPv6 addresses; however,
+ * when the IPv6 address is a link-local address the scope-id must be taken
+ * into consideration and the display name should be
+ * ff80::wwww:xxxx:yyyy:zzzz%iface instead of just ff80::wwww:xxxx:yyyy:zzzz
+ * so that the X client's getaddrinfo() call will yield the correct address.
+ * Unfortunately the connection type and address do not have the scope-id
+ * because they are not sockaddr_in6 structures.  However, the originalAddress
+ * (the sender of the MANAGE message) will have a valid scope-id, so we just
+ * go with the original address instead of the connectionAddress when the
+ * connection address is a scoped address.  We also use getnameinfo() instead
+ * of inet_ntop() because inet_ntop() will not provide the scope-id.
+ */
+
 static char *
 NetworkAddressToName(
     CARD16	connectionType,
     ARRAY8Ptr   connectionAddress,
     struct sockaddr   *originalAddress,
+    int		originalAddressLen,
     CARD16	displayNumber)
 {
     /* Never prefix the display name with any local address or host name */
@@ -737,12 +752,15 @@ NetworkAddressToName(
 	    struct addrinfo	 hints, *ai = NULL, *nai;
 	    int 		 type;
 
-	    if (connectionType == FamilyInternet6)
+	    data = connectionAddress->data;
+
+	    if (connectionType == FamilyInternet6) {
 		type = AF_INET6;
-	    else
+		if (IN6_IS_ADDR_LINKLOCAL (data) || IN6_IS_ADDR_SITELOCAL (data))
+		    multiHomed = 1;
+	    } else
 		type = AF_INET;
 
-	    data = connectionAddress->data;
 	    hostent = gethostbyaddr ((char *)data,
 				     connectionAddress->length, type);
 	    if (hostent) {
@@ -848,12 +866,20 @@ NetworkAddressToName(
 			    name = NULL;
 			return (name);
 		    }
-		}
-		if (inet_ntop(type, data, name, INET6_ADDRSTRLEN) == NULL) {
-		    free(name);
-		    if (ai)
-			freeaddrinfo(ai);
-		    return NULL;
+		    if (getnameinfo(originalAddress, originalAddressLen,
+				name, INET6_ADDRSTRLEN, NULL, 0, NI_NUMERICHOST)) {
+			free(name);
+			if (ai)
+			    freeaddrinfo(ai);
+			return NULL;
+		    }
+		} else {
+		    if (inet_ntop(type, data, name, INET6_ADDRSTRLEN) == NULL) {
+			free(name);
+			if (ai)
+			    freeaddrinfo(ai);
+			return NULL;
+		    }
 		}
 		snprintf(name + strlen(name), 10, ":%d", displayNumber);
 	    }
@@ -1467,7 +1493,7 @@ manage (
 	{
 	    name = NetworkAddressToName (pdpy->connectionType,
 					 &pdpy->connectionAddress,
-					 from,
+					 from, fromlen,
 					 pdpy->displayNumber);
 	    Debug ("Computed display name: %s for: %s\n",
 		   name, (char *)pdpy->connectionAddress.data);

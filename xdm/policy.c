@@ -214,6 +214,17 @@ SelectConnectionTypeIndex (
      * the list.  This function would never let it connect.
      */
 
+    /*
+     * Problem #2: Xorg servers (1.16) are placing link-local IPv6 address in
+     * the connection addresses.  The problem is that they are missing the
+     * scope-id.  Another problem is that the Xorg servers (1.16) are placing
+     * *all* link-local IPv6 addresses in the list, which means that the
+     * correct scope-id is not necessarily the same as the interface on which
+     * the MANAGE packet was received.  What is worse, the Xorg servers (1.16)
+     * are placeing the link-local IPv6 addresses first in the list when
+     * executed as X :%d -indirect ::1.
+     */
+
     for (i = 0; i < connectionTypes->length; i++) {
 	switch (connectionTypes->data[i]) {
 	  case FamilyLocal:
