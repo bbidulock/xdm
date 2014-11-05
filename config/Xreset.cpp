@@ -1,5 +1,5 @@
 XCOMM!/bin/sh
 XCOMM Deregister a login. (Derived from TakeConsole as follows:)
 XCOMM
-BINDIR/sessreg -d -w WTMP_FILE -u UTMP_FILE \
+BINDIR/sessreg -d WTMP_FLAG UTMP_FLAG \
 	-x XDMCONFIGDIR/Xservers -l $DISPLAY -h "" $USER
