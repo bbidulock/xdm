@@ -294,44 +294,44 @@ AC_ARG_WITH(config-type,
 	[SERVERSTYPE="$withval"], [SERVERSTYPE="ws"])
 AC_SUBST(SERVERSTYPE)
 
-# Ideally we'd just pull out UTMP_FILE & WTMP_FILE from <utmp.h>
-# but that's not easy to do in autoconf
 AC_ARG_WITH(utmp_file,
 	AS_HELP_STRING([--with-utmp-file=<pathname>],
-	 [specify file to pass to sessreg -u for current logins]),
+	 [specify file to pass to sessreg -u for current logins])
+AS_HELP_STRING([--without-utmp-file],
+	 [specify passing "none" to sessreg -u to not record logins in utmp]),
 	[UTMP_FILE="$withval"])
 if test "x$UTMP_FILE" = "xyes" ; then
-	AC_MSG_ERROR([path was not specified to --with-utmp-file])
-fi
-if test "x$UTMP_FILE" = "x" ; then
-	for UTMP_FILE in /var/adm/utmpx /var/run/utmp /var/log/utmp /var/adm/utmp /usr/adm/utmp /etc/utmp ; do
-		AC_CHECK_FILE([$UTMP_FILE], [break], [UTMP_FILE=""])
-	done
-	if test "x$UTMP_FILE" = "x" ; then
-		UTMP_FILE="/var/run/utmp"
-	fi
+	UTMP_FILE=""
+elif test "x$UTMP_FILE" = "xno" ; then
+	UTMP_FILE="none"
 fi
 AC_MSG_CHECKING([for path to file listing current logins for sessreg])
-AC_MSG_RESULT([$UTMP_FILE])
+if test "x$UTMP_FILE" = "x" ; then
+	AC_MSG_RESULT([use sessreg default])
+else
+	AC_MSG_RESULT([$UTMP_FILE])
+fi
+AM_CONDITIONAL(SET_UTMP_FILE, test x$UTMP_FILE != x)
 AC_SUBST(UTMP_FILE)
 
 AC_ARG_WITH(wtmp_file,
 	AS_HELP_STRING([--with-wtmp-file=<pathname>],
-	 [specify file to pass to sessreg -w for login history]),
+	 [specify file to pass to sessreg -w for login history])
+AS_HELP_STRING([--without-wtmp-file],
+	 [specify passing "none" to sessreg -w to not record logins in wtmp]),
 	[WTMP_FILE="$withval"])
 if test "x$WTMP_FILE" = "xyes" ; then
-	AC_MSG_ERROR([path was not specified to --with-wtmp-file])
-fi
-if test "x$WTMP_FILE" = "x" ; then
-	for WTMP_FILE in /var/adm/wtmpx /var/log/wtmp /var/adm/wtmp /usr/adm/wtmp /etc/wtmp ; do
-		AC_CHECK_FILE([$WTMP_FILE], [break], [WTMP_FILE=""])
-	done
-	if test "x$WTMP_FILE" = "x" ; then
-		WTMP_FILE="/var/log/wtmp"
-	fi
+	WTMP_FILE=""
+elif test "x$WTMP_FILE" = "xno" ; then
+	WTMP_FILE="none"
 fi
 AC_MSG_CHECKING([for path to file listing login history for sessreg])
-AC_MSG_RESULT([$WTMP_FILE])
+if test "x$WTMP_FILE" = "x" ; then
+	AC_MSG_RESULT([use sessreg default])
+else
+	AC_MSG_RESULT([$WTMP_FILE])
+fi
+AM_CONDITIONAL(SET_WTMP_FILE, test x$WTMP_FILE != x)
 AC_SUBST(WTMP_FILE)
 
 case $host_os in

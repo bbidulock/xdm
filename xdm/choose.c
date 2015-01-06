@@ -219,6 +219,10 @@ FormatChooserArgument (char *buf, int len)
 # endif
 
 	    port = NetaddrPort((XdmcpNetaddr)addr_buf, &portlen);
+	    if (port == NULL) {
+		LogError ("Cannot get port for chooser socket\n");
+		return 0;
+	    }
 	    result_buf[0] = netfamily >> 8;
 	    result_buf[1] = netfamily & 0xFF;
 	    result_buf[2] = port[0];
