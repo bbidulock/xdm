@@ -328,7 +328,7 @@ AC_SUBST(SHELL_CMD)
 
 # Checks for pkg-config packages
 
-PKG_CHECK_MODULES(XDM, xmu x11 xau)
+PKG_CHECK_MODULES(XDM, [xmu x11 xau xproto >= 7.0.17])
 
 PKG_CHECK_EXISTS(xinerama, [
 	AC_DEFINE([USE_XINERAMA], 1,
