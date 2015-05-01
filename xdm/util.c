@@ -233,8 +233,8 @@ parseArgs (char **argv, const char *string)
 				save = calloc ((unsigned) (string - word + 1), sizeof (*save));
 				if (!newargv || !save) {
 					LogOutOfMem ("parseArgs");
-					free (argv);
-					free (newargv);
+					/* free whichever survived realloc() */
+					free (newargv ? newargv : argv);
 					free (save);
 					return NULL;
 				} else {
