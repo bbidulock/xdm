@@ -129,8 +129,13 @@ main (int argc, char **argv)
     if (((oldumask = umask(022)) & 002) == 002)
 	(void) umask (oldumask);
 #ifndef NOXDMTITLE
-    Title = argv[0];
-    TitleLen = (argv[argc - 1] + strlen(argv[argc - 1])) - Title;
+    if (argc > 0) {
+        Title = argv[0];
+        TitleLen = (argv[argc - 1] + strlen(argv[argc - 1])) - Title;
+    } else {
+        Title = NULL;
+        TitleLen = 0;
+    }
 #endif
 
 #ifdef USESECUREWARE
@@ -1074,25 +1079,27 @@ void SetTitle (char *name, ...)
     char	*s;
     va_list	args;
 
-    va_start(args,name);
-    *p++ = '-';
-    --left;
-    s = name;
-    while (s)
-    {
-	while (*s && left > 0)
-	{
-	    *p++ = *s++;
-	    left--;
-	}
-	s = va_arg (args, char *);
+    if (p != NULL && left > 0) {
+        va_start(args,name);
+        *p++ = '-';
+        --left;
+        s = name;
+        while (s)
+        {
+            while (*s && left > 0)
+            {
+                *p++ = *s++;
+                left--;
+            }
+            s = va_arg (args, char *);
+        }
+        while (left > 0)
+        {
+            *p++ = ' ';
+            --left;
+        }
+        va_end(args);
     }
-    while (left > 0)
-    {
-	*p++ = ' ';
-	--left;
-    }
-    va_end(args);
 # endif
 }
 #endif
