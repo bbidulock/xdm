@@ -412,7 +412,7 @@ RemoveHostname (HostName *host)
 {
     HostName	**prev, *hosts;
 
-    prev = &hostNamedb;;
+    prev = &hostNamedb;
     for (hosts = hostNamedb; hosts; hosts = hosts->next)
     {
 	if (hosts == host)
