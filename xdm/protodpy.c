@@ -45,7 +45,7 @@ in this Software without prior written authorization from The Open Group.
 static struct protoDisplay	*protoDisplays;
 
 # ifdef DEBUG
-static
+static void
 PrintProtoDisplay (struct protoDisplay *pdpy)
 {
     Debug ("ProtoDisplay 0x%x\n", pdpy);
