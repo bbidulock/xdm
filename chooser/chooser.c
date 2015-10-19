@@ -1057,6 +1057,7 @@ DoCheckWilling (Widget w, XEvent *event, String *params, Cardinal *num_params)
 }
 
 /* ARGSUSED */
+_X_NORETURN
 static void
 DoCancel (Widget w, XEvent *event, String *params, Cardinal *num_params)
 {

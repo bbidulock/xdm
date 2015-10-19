@@ -376,7 +376,7 @@ extern void ForgetIndirectClient ( ARRAY8Ptr clientAddress, CARD16 connectionTyp
 extern void ProcessChooserSocket (int fd);
 
 /* in chooser.c */
-extern void RunChooser (struct display *d);
+extern void RunChooser (struct display *d) _X_NORETURN;
 
 /* in daemon.c */
 extern void BecomeDaemon (void);
@@ -440,10 +440,10 @@ extern int source (char **environ, char *file);
 extern void ClearCloseOnFork (int fd);
 extern void DeleteXloginResources (struct display *d, Display *dpy);
 extern void LoadXloginResources (struct display *d);
-extern void ManageSession (struct display *d);
+extern void ManageSession (struct display *d) _X_NORETURN;
 extern void SecureDisplay (struct display *d, Display *dpy);
-extern void SessionExit (struct display *d, int status, int removeAuth);
-extern void SessionPingFailed (struct display *d);
+extern void SessionExit (struct display *d, int status, int removeAuth) _X_NORETURN;
+extern void SessionPingFailed (struct display *d) _X_NORETURN;
 extern void SetupDisplay (struct display *d);
 extern void UnsecureDisplay (struct display *d, Display *dpy);
 extern void execute(char **argv, char **environ);

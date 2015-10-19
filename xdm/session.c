@@ -226,6 +226,7 @@ static struct verify_info	verify;
 static Jmp_buf	abortSession;
 
 /* ARGSUSED */
+_X_NORETURN
 static void
 catchTerm (int n)
 {
@@ -235,6 +236,7 @@ catchTerm (int n)
 static Jmp_buf	pingTime;
 
 /* ARGSUSED */
+_X_NORETURN
 static void
 catchAlrm (int n)
 {
@@ -244,6 +246,7 @@ catchAlrm (int n)
 static Jmp_buf	tenaciousClient;
 
 /* ARGSUSED */
+_X_NORETURN
 static void
 waitAbort (int n)
 {
@@ -466,6 +469,7 @@ DeleteXloginResources (struct display *d, Display *dpy)
 static Jmp_buf syncJump;
 
 /* ARGSUSED */
+_X_NORETURN
 static void
 syncTimeout (int n)
 {

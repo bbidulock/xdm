@@ -149,6 +149,7 @@ static Jmp_buf	pauseAbort;
 static int	serverPauseRet;
 
 /* ARGSUSED */
+_X_NORETURN
 static void
 serverPauseAbort (int n)
 {
@@ -156,6 +157,7 @@ serverPauseAbort (int n)
 }
 
 /* ARGSUSED */
+_X_NORETURN
 static void
 serverPauseUsr1 (int n)
 {
@@ -231,6 +233,7 @@ serverPause (unsigned t, pid_t serverPid)
 static Jmp_buf	openAbort;
 
 /* ARGSUSED */
+_X_NORETURN
 static void
 abortOpen (int n)
 {
@@ -324,6 +327,7 @@ ResetServer (struct display *d)
 
 static Jmp_buf	pingTime;
 
+_X_NORETURN
 static void
 PingLost (void)
 {
@@ -339,6 +343,7 @@ PingLostIOErr (Display *dpy)
 }
 
 /* ARGSUSED */
+_X_NORETURN
 static void
 PingLostSig (int n)
 {
