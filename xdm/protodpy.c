@@ -35,6 +35,7 @@ in this Software without prior written authorization from The Open Group.
 
 #include "dm.h"
 #include "dm_error.h"
+#include "dm_socket.h"
 
 #ifdef XDMCP
 
