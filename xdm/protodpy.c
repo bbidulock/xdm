@@ -49,12 +49,12 @@ static struct protoDisplay	*protoDisplays;
 static void
 PrintProtoDisplay (struct protoDisplay *pdpy)
 {
-    Debug ("ProtoDisplay 0x%x\n", pdpy);
-    Debug ("\taddress: ");
-    PrintSockAddr (pdpy->address, pdpy->addrlen);
-    Debug ("\tdate %d (%d from now)\n", pdpy->date, time(0) - pdpy->date);
+    Debug ("ProtoDisplay %p\n", pdpy);
+    Debug ("\taddress: %s", pdpy->address);
+    //PrintSockAddr (pdpy->address, pdpy->addrlen);
+    Debug ("\tdate %lu (%lu from now)\n", pdpy->date, time(0) - pdpy->date);
     Debug ("\tdisplay Number %d\n", pdpy->displayNumber);
-    Debug ("\tsessionID %d\n", pdpy->sessionID);
+    Debug ("\tsessionID %lu\n", (unsigned long)pdpy->sessionID);
 }
 # endif
 
