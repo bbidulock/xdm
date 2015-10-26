@@ -42,10 +42,7 @@ in this Software without prior written authorization from The Open Group.
 
 # include "dm_socket.h"
 # include <arpa/inet.h>
-
-# ifndef X_NO_SYS_UN
-#  include <sys/un.h>
-# endif
+# include <sys/un.h>
 
 # include <ctype.h>
 # include <errno.h>

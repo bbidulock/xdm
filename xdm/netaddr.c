@@ -46,9 +46,7 @@ from The Open Group.
 # endif
 
 # ifdef UNIXCONN
-#  ifndef X_NO_SYS_UN
-#   include <sys/un.h>		/* struct sockaddr_un */
-#  endif
+#  include <sys/un.h>		/* struct sockaddr_un */
 # endif
 
 /* given an XdmcpNetaddr, returns the socket protocol family used,

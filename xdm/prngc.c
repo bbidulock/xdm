@@ -26,9 +26,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <X11/Xos.h>
-#ifndef X_NO_SYS_UN
-# include	<sys/un.h>
-#endif
+#include <sys/un.h>
 #include <netinet/in.h>
 #include <errno.h>
 #include <signal.h>
