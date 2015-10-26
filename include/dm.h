@@ -78,10 +78,6 @@ from The Open Group.
 #   include <sys/wait.h>
 #  else
 #   define _POSIX_SOURCE
-#   ifdef __SCO__
-#    include <sys/procset.h>
-#    include <sys/siginfo.h>
-#   endif
 #   include <sys/wait.h>
 #   undef _POSIX_SOURCE
 #  endif
@@ -498,8 +494,8 @@ extern void ProcessRequestSocket(int fd);
 
 # include <stdlib.h>
 
-# if defined(X_NOT_POSIX) || defined(__UNIXOS2__) || defined(__NetBSD__) && defined(__sparc__)
-#  if defined(SYSV) || defined(__UNIXOS2__)
+# if defined(X_NOT_POSIX) || defined(__NetBSD__) && defined(__sparc__)
+#  if defined(SYSV)
 #   define SIGNALS_RESET_WHEN_CAUGHT
 #   define UNRELIABLE_SIGNALS
 #  endif

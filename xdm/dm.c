@@ -54,9 +54,6 @@ from The Open Group.
 #ifdef __NetBSD__
 # include <sys/param.h>
 #endif
-#ifdef USESECUREWARE
-# include <prot.h>
-#endif
 
 #ifndef sigmask
 # define sigmask(m)  (1 << ((m - 1)))
@@ -136,10 +133,6 @@ main (int argc, char **argv)
         Title = NULL;
         TitleLen = 0;
     }
-#endif
-
-#ifdef USESECUREWARE
-    set_auth_parameters (argc, argv);
 #endif
 
     /*

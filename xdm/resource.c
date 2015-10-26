@@ -128,12 +128,8 @@ int	choiceTimeout;	/* chooser choice timeout */
 #ifndef DEF_RANDOM_FILE
 # define DEF_RANDOM_FILE "/dev/mem"
 #endif
-#ifdef __SCO__
-# define DEF_PRNGD_SOCKET "/etc/egd-pool"
-#else
-# ifndef DEF_PRNGD_SOCKET
-#  define DEF_PRNGD_SOCKET "/tmp/entropy"
-# endif
+#ifndef DEF_PRNGD_SOCKET
+# define DEF_PRNGD_SOCKET "/tmp/entropy"
 #endif
 #ifndef DEF_PRNGD_PORT
 # define DEF_PRNGD_PORT "0"
