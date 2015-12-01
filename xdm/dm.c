@@ -1045,31 +1045,6 @@ RemovePid (void)
 		      _SysErrorMsg (errno));
 }
 
-#if 0
-void
-UnlockPidFile (void)
-{
-    if (lockPidFile)
-# ifdef F_SETLK
-    {
-	struct flock lock_data;
-	lock_data.l_type = F_UNLCK;
-	lock_data.l_whence = SEEK_SET;
-	lock_data.l_start = lock_data.l_len = 0;
-	(void) fcntl(pidFd, F_SETLK, &lock_data);
-    }
-# else
-#  ifdef F_ULOCK
-	lockf (pidFd, F_ULOCK, 0);
-#  else
-	flock (pidFd, LOCK_UN);
-#  endif
-# endif
-    close (pidFd);
-    fclose (pidFilePtr);
-}
-#endif
-
 #ifndef HAVE_SETPROCTITLE
 void SetTitle (char *name, ...)
 {

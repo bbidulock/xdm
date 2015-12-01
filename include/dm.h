@@ -406,9 +406,6 @@ extern int NetaddrFamily (XdmcpNetaddr netaddrp);
 extern int addressEqual (XdmcpNetaddr a1, int len1, XdmcpNetaddr a2, int len2);
 
 /* in policy.c */
-# if 0
-extern ARRAY8Ptr Accept (/* struct sockaddr *from, int fromlen, CARD16 displayNumber */);
-# endif
 extern ARRAY8Ptr ChooseAuthentication (ARRAYofARRAY8Ptr authenticationNames);
 extern int CheckAuthentication (struct protoDisplay *pdpy, ARRAY8Ptr displayID, ARRAY8Ptr name, ARRAY8Ptr data);
 extern int SelectAuthorizationTypeIndex (ARRAY8Ptr authenticationName, ARRAYofARRAY8Ptr authorizationNames);
