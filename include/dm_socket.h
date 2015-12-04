@@ -44,4 +44,8 @@ authorization.
 extern ARRAY8Ptr Accept (struct sockaddr *from, int fromlen, CARD16 displayNumber);
 #endif
 
+# ifdef DEBUG
+extern void PrintSockAddr (struct sockaddr *a, int len);
+#endif
+
 #endif /* _DM_SOCKET_H_ */

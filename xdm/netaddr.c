@@ -41,6 +41,10 @@ from The Open Group.
 
 # include "dm_socket.h"
 
+# if defined(IPv6) && defined(AF_INET6)
+#  include        <arpa/inet.h>
+# endif
+
 # ifdef UNIXCONN
 #  ifndef X_NO_SYS_UN
 #   include <sys/un.h>		/* struct sockaddr_un */
