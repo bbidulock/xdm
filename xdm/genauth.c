@@ -412,15 +412,20 @@ GenerateAuthData (char *auth, int len)
     static int	    xdmcpAuthInited;
     long	    ldata[2];
 
-# ifdef ITIMER_REAL
+# ifndef HAVE_ARC4RANDOM
+#  ifdef ITIMER_REAL
     struct timeval  now;
 
     X_GETTIMEOFDAY (&now);
     ldata[0] = now.tv_usec;
     ldata[1] = now.tv_sec;
-# else
+#  else
     ldata[0] = time ((long *) 0);
     ldata[1] = getpid ();
+#  endif
+# else
+    ldata[0] = arc4random();
+    ldata[1] = arc4random();
 # endif
 
     longtochars (ldata[0], data+0);

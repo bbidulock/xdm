@@ -54,9 +54,6 @@ from The Open Group.
 #ifdef __NetBSD__
 # include <sys/param.h>
 #endif
-#ifdef USESECUREWARE
-# include <prot.h>
-#endif
 
 #ifndef sigmask
 # define sigmask(m)  (1 << ((m - 1)))
@@ -149,10 +146,6 @@ main (int argc, char **argv)
         Title = NULL;
         TitleLen = 0;
     }
-#endif
-
-#ifdef USESECUREWARE
-    set_auth_parameters (argc, argv);
 #endif
 
     /*
@@ -1092,31 +1085,6 @@ RemovePid (void)
 	    LogError ("cannot remove process ID file %s: %s\n", pidFile,
 		      _SysErrorMsg (errno));
 }
-
-#if 0
-void
-UnlockPidFile (void)
-{
-    if (lockPidFile)
-# ifdef F_SETLK
-    {
-	struct flock lock_data;
-	lock_data.l_type = F_UNLCK;
-	lock_data.l_whence = SEEK_SET;
-	lock_data.l_start = lock_data.l_len = 0;
-	(void) fcntl(pidFd, F_SETLK, &lock_data);
-    }
-# else
-#  ifdef F_ULOCK
-	lockf (pidFd, F_ULOCK, 0);
-#  else
-	flock (pidFd, LOCK_UN);
-#  endif
-# endif
-    close (pidFd);
-    fclose (pidFilePtr);
-}
-#endif
 
 #ifndef HAVE_SETPROCTITLE
 void SetTitle (char *name, ...)

@@ -42,10 +42,7 @@ in this Software without prior written authorization from The Open Group.
 
 # include "dm_socket.h"
 # include <arpa/inet.h>
-
-# ifndef X_NO_SYS_UN
-#  include <sys/un.h>
-# endif
+# include <sys/un.h>
 
 # include <ctype.h>
 # include <errno.h>
@@ -300,25 +297,14 @@ RegisterIndirectChoice (
 {
     ChoicePtr	c;
     int		insert;
-# if 0
-    int		found = 0;
-# endif
 
     Debug ("Got indirect choice back\n");
     for (c = choices; c; c = c->next) {
 	if (XdmcpARRAY8Equal (clientAddress, &c->client) &&
 	    connectionType == c->connectionType) {
-# if 0
-	    found = 1;
-# endif
 	    break;
 	}
     }
-# if 0
-    if (!found)
-	return 0;
-# endif
-
     insert = 0;
     if (!c)
     {

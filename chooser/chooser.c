@@ -406,28 +406,6 @@ DisposeHostname (HostName *host)
     free (host);
 }
 
-#if 0
-static void
-RemoveHostname (HostName *host)
-{
-    HostName	**prev, *hosts;
-
-    prev = &hostNamedb;
-    for (hosts = hostNamedb; hosts; hosts = hosts->next)
-    {
-	if (hosts == host)
-	    break;
-	prev = &hosts->next;
-    }
-    if (!hosts)
-	return;
-    *prev = host->next;
-    DisposeHostname (host);
-    NameTableSize--;
-    RebuildTable (NameTableSize);
-}
-#endif
-
 static void
 EmptyHostnames (void)
 {
@@ -677,21 +655,6 @@ RegisterHostname (char *name)
 }
 
 static ARRAYofARRAY8	AuthenticationNames;
-
-#if 0
-static void
-RegisterAuthenticationName (char *name, int namelen)
-{
-    ARRAY8Ptr	authName;
-    if (!XdmcpReallocARRAYofARRAY8 (&AuthenticationNames,
-				    AuthenticationNames.length + 1))
-	return;
-    authName = &AuthenticationNames.data[AuthenticationNames.length-1];
-    if (!XdmcpAllocARRAY8 (authName, namelen))
-	return;
-    memmove( authName->data, name, namelen);
-}
-#endif
 
 static int
 InitXDMCP (char **argv)

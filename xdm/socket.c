@@ -63,9 +63,7 @@ from the copyright holder.
 # include <errno.h>
 # include "dm_socket.h"
 
-# ifndef X_NO_SYS_UN
-#  include <sys/un.h>
-# endif
+# include <sys/un.h>
 # include <netdb.h>
 # include <arpa/inet.h>
 

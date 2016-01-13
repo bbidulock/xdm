@@ -50,9 +50,6 @@ from The Open Group.
 #include <stdio.h>
 #include <ctype.h>
 #include <grp.h>	/* for initgroups */
-#ifdef AIXV3
-# include <usersec.h>
-#endif
 
 #ifndef USE_PAM        /* PAM modules should handle these */
 # ifdef SECURE_RPC
@@ -66,10 +63,6 @@ extern int key_setnet(struct key_netstarg *arg);
 #  include <krb5/krb5.h>
 # endif
 #endif /* USE_PAM */
-
-#ifdef __SCO__
-# include <prot.h>
-#endif
 
 #ifdef USE_SELINUX
 #include <selinux/selinux.h>
@@ -142,7 +135,7 @@ extern	struct spwd	*getspnam(GETSPNAM_ARGS);
 extern	void	endspent(void);
 # endif
 #endif
-#if defined(CSRG_BASED) || defined(__GLIBC__) || defined(__UNIXWARE__) || defined(__SCO__)
+#if defined(CSRG_BASED) || defined(__GLIBC__)
 # include <pwd.h>
 # include <unistd.h>
 #else
@@ -685,11 +678,6 @@ StartClient (
     pam_handle_t *pamh = thepamh ();
     int	pam_error;
 #endif
-#ifdef USESECUREWARE
-    char *reason, **smpenv, *smpshell;
-    int ret;
-    extern struct smp_user_info *userp;
-#endif
 
     if (verify->argv) {
 	Debug ("StartSession %s: ", verify->argv[0]);
@@ -715,60 +703,29 @@ StartClient (
 
 	/* Do system-dependent login setup here */
 
-#ifdef USESECUREWARE
-        Debug ("set_identity: uid=%d\n", userp->pw.pw_uid);
-        ret = smp_set_identity (userp, &reason, &smpenv, &smpshell);
-        Debug ("smp_set_identity returns %d luid=%d\n", ret, getluid());
-        switch (ret) {
-          case SMP_FAIL:
-            LogError ("Unable to set identity\n");
-            smp_audit_fail (userp, 0);
-            return 0;
-          case SMP_EXTFAIL:
-            LogError ("Unable to set identity: %s\n", reason);
-            smp_audit_fail (userp, 0);
-            return 0;
-          case SMP_NOTAUTH:
-            LogError ("Authorization failed\n");
-            smp_audit_fail (userp, 0);
-            return 0;
-          case SMP_ACCTLOCK:
-            LogError ("Account is locked\n");
-            smp_audit_fail (userp, 0);
-            return 0;
-          case SMP_COMPLETE:
-            break;
-          default:
-            LogError ("Unhandled identity error %d\n", ret);
-            smp_audit_fail (userp, 0);
-            return 0;
-        }
-#endif
-
-#ifndef AIXV3
-# ifndef HAVE_SETUSERCONTEXT
+#ifndef HAVE_SETUSERCONTEXT
 	if (setgid (verify->gid) < 0) {
 	    LogError ("setgid %d (user \"%s\") failed: %s\n",
 		      verify->gid, name, _SysErrorMsg (errno));
 	    return (0);
 	}
-#  if defined(BSD) && (BSD >= 199103)
+# if defined(BSD) && (BSD >= 199103)
 	if (setlogin (name) < 0) {
 	    LogError ("setlogin for \"%s\" failed: %s\n",
 		      name, _SysErrorMsg (errno));
 	    return (0);
 	}
-#  endif
-#  ifndef QNX4
+# endif
+# ifndef QNX4
 	if (initgroups (name, verify->gid) < 0) {
 	    LogError ("initgroups for \"%s\" failed: %s\n",
 		      name, _SysErrorMsg (errno));
 	    return (0);
 	}
-#  endif   /* QNX4 doesn't support multi-groups, no initgroups() */
-# endif /* !HAVE_SETUSERCONTEXT */
+# endif   /* QNX4 doesn't support multi-groups, no initgroups() */
+#endif /* !HAVE_SETUSERCONTEXT */
 
-# ifdef USE_PAM
+#ifdef USE_PAM
 	if (pamh) {
 	    long i;
 	    char **pam_env;
@@ -787,15 +744,15 @@ StartClient (
 	    }
 
 	}
-# endif
+#endif
 
-# ifndef HAVE_SETUSERCONTEXT
+#ifndef HAVE_SETUSERCONTEXT
 	if (setuid(verify->uid) < 0) {
 	    LogError ("setuid %d (user \"%s\") failed: %s\n",
 		      verify->uid, name, _SysErrorMsg (errno));
 	    return (0);
 	}
-# else /* HAVE_SETUSERCONTEXT */
+#else /* HAVE_SETUSERCONTEXT */
 	/*
 	 * Set the user's credentials: uid, gid, groups,
 	 * environment variables, resource limits, and umask.
@@ -813,18 +770,7 @@ StartClient (
 		      name, _SysErrorMsg (errno));
 	    return (0);
 	}
-# endif /* HAVE_SETUSERCONTEXT */
-#else /* AIXV3 */
-	/*
-	 * Set the user's credentials: uid, gid, groups,
-	 * audit classes, user limits, and umask.
-	 */
-	if (setpcred(name, NULL) == -1) {
-	    LogError ("setpcred for \"%s\" failed: %s\n",
-		      name, _SysErrorMsg (errno));
-	    return (0);
-	}
-#endif /* AIXV3 */
+#endif /* HAVE_SETUSERCONTEXT */
 
 #ifndef USE_PAM		/* PAM modules should handle these */
 	/*
