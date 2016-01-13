@@ -59,24 +59,6 @@ else
 	if [ -r "$resources" ]; then
 		BINDIR/xrdb -load "$resources"
 	fi
-#if defined(__SCO__) || defined(__UNIXWARE__)
-        [ -r /etc/default/xdesktops ] && {
-                . /etc/default/xdesktops
-        }
-
-        [ -r /etc/default/xdm ] && {
-                . /etc/default/xdm
-        }
-
-        XCOMM Allow the user to over-ride the system default desktop
-        [ -r $HOME/.xdmdesktop ] && {
-                . $HOME/.xdmdesktop
-        }
-
-        [ -n "$XDESKTOP" ] && {
-                exec `eval $XDESKTOP`
-        }
-#endif
 	if [ -r "$xinitrc" ]; then
 		exec /bin/sh -ls -c "$xinitrc"
 	else
