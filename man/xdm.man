@@ -416,8 +416,6 @@ See the sections \fBXDMCP Access Control\fP and \fBChooser\fP.
 Specifies the program used to load the resources.  By default,
 .I xdm
 uses \fI BINDIR/xrdb\fP.
-.IP "\fBDisplayManager.\fP\fIDISPLAY\fP\fB.cpp\fP"
-This specifies the name of the C preprocessor which is used by \fIxrdb\fP.
 .IP "\fBDisplayManager.\fP\fIDISPLAY\fP\fB.setup\fP"
 This specifies a program which is run (as root) before offering the
 Login window.  This may be used to change the appearance of the screen
