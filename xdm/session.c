@@ -713,7 +713,7 @@ StartClient (
 	    if (len > 8)
 		bzero (passwd + 8, len - 8);
 	    keyret = getsecretkey(netname,secretkey,passwd);
-	    Debug ("getsecretkey returns %d, key length %d\n",
+	    Debug ("getsecretkey returns %d, key length %lu\n",
 		    keyret, strlen (secretkey));
 	    memcpy(&(netst.st_priv_key), secretkey, HEXKEYBYTES);
 	    netst.st_netname = strdup(netname);
