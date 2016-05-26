@@ -174,10 +174,10 @@ AC_ARG_WITH([systemd-daemon], AS_HELP_STRING([--with-systemd-daemon],
 	[Add support for systemd startup notification (default is autodetected)]),
 	[USE_SYSTEMD_DAEMON=$withval], [USE_SYSTEMD_DAEMON=auto])
 AS_IF([test "x$USE_SYSTEMD_DAEMON" != "xno"], [
-    PKG_CHECK_MODULES([SYSTEMD_DAEMON], [libsystemd-daemon],
+    PKG_CHECK_MODULES([SYSTEMD_DAEMON], [libsystemd],
 	[AC_DEFINE(USE_SYSTEMD_DAEMON,1,[Use systemd startup notification])],
 	[AS_IF([test "x$USE_SYSTEMD_DAEMON" = "xyes"],
-	    [AC_MSG_ERROR([systemd startup notification support requested, but libsystemd-daemon not found.])]
+	    [AC_MSG_ERROR([systemd startup notification support requested, but libsystemd not found.])]
 	)]
     )
 ])
@@ -189,10 +189,10 @@ AC_ARG_WITH([systemd-login], AS_HELP_STRING([--with-systemd-login],
 	[Add support for systemd login services (default is autodetected)]),
 	[USE_SYSTEMD_LOGIN=$withval], [USE_SYSTEMD_LOGIN=auto])
 AS_IF([test "x$USE_SYSTEMD_LOGIN" != "xno"], [
-    PKG_CHECK_MODULES([SYSTEMD_LOGIN], [libsystemd-login],
+    PKG_CHECK_MODULES([SYSTEMD_LOGIN], [libsystemd],
 	[AC_DEFINE(USE_SYSTEMD_LOGIN,1,[Use systemd login services])],
 	[AS_IF([test "x$USE_SYSTEMD_LOGIN" = "xyes"],
-	    [AC_MSG_ERROR([systemd login services support requested, but libsystemd-login not found.])]
+	    [AC_MSG_ERROR([systemd login services support requested, but libsystemd not found.])]
 	)]
     )
 ])
