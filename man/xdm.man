@@ -23,7 +23,7 @@
 .\" from The Open Group.
 .\"
 .\"
-.TH XDM 1 __xorgversion__
+.TH XDM __adminmansuffix__ __xorgversion__
 .SH NAME
 xdm \- X Display Manager with support for XDMCP, host chooser
 .SH SYNOPSIS
@@ -1465,7 +1465,7 @@ Kerberos credentials cache
 .IR sessreg (__appmansuffix__),
 .IR Xserver (__appmansuffix__),
 .\" .IR chooser (__appmansuffix__), \" except that there isn't a manual for it yet
-.IR xdmshell (__appmansuffix__),
+.IR xdmshell (__adminmansuffix__),
 .IR fonts.conf (__filemansuffix__).
 .br
 .I "X Display Manager Control Protocol"
