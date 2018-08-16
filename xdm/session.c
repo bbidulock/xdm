@@ -137,6 +137,9 @@ extern	void	endspent(void);
 #if defined(CSRG_BASED) || defined(__GLIBC__)
 # include <pwd.h>
 # include <unistd.h>
+# if defined(__GLIBC__) && !defined(_XOPEN_CRYPT)
+# include <crypt.h>
+# endif
 #else
 extern	struct passwd	*getpwnam(GETPWNAM_ARGS);
 # ifdef linux
