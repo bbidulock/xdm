@@ -48,6 +48,14 @@ in this Software without prior written authorization from The Open Group.
 # include <errno.h>
 
 
+# ifdef HAVE_SETPROCTITLE
+#  ifdef __linux__
+#   include <bsd/unistd.h>
+#  else
+#   include <unistd.h>
+#  endif
+# endif
+
 # include <time.h>
 # define Time_t time_t
 

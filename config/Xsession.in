@@ -8,8 +8,9 @@ if ( umask 077 && cp /dev/null "$errfile" 2> /dev/null )
 then
 	exec > "$errfile" 2>&1
 else
-#ifdef MKTEMP_COMMAND
-	mktemp=MKTEMP_COMMAND
+    mktemp="MKTEMP_COMMAND"
+    if [ "x$mktemp" != "x" -a -x "$mktemp" ]
+    then
 	for errfile in "${TMPDIR-/tmp}/xses-$USER" "/tmp/xses-$USER"
 	do
 		if ef="$( umask 077 && $mktemp "$errfile.XXXXXX" 2> /dev/null)"
@@ -19,7 +20,7 @@ else
 			break
 		fi
 	done
-#else
+    else
 XCOMM Since this system doesn't have a mktemp command to allow secure
 XCOMM creation of files in shared directories, no fallback error log
 XCOMM is being used.   See https://bugs.freedesktop.org/show_bug.cgi?id=5898
@@ -34,8 +35,7 @@ XCOMM		fi
 XCOMM	done
 
 	exec > /dev/null 2>&1
-
-#endif
+    fi
 fi
 
 case $# in

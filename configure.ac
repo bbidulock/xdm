@@ -22,8 +22,8 @@ dnl Process this file with autoconf to create configure.
 
 # Initialize Autoconf
 AC_PREREQ([2.60])
-AC_INIT([xdm], [1.1.11],
-        [https://bugs.freedesktop.org/enter_bug.cgi?product=xorg], [xdm])
+AC_INIT([xdm], [1.1.12],
+        [https://gitlab.freedesktop.org/xorg/app/xdm/issues], [xdm])
 AC_USE_SYSTEM_EXTENSIONS
 AC_CONFIG_SRCDIR([Makefile.am])
 AC_CONFIG_MACRO_DIR([m4])

@@ -1018,6 +1018,7 @@ StorePid (void)
 		     LogError ("process-id directory %s cannot be created\n",
 			       pidDir);
 		}
+		free(pidDir);
 	    }
 
 	    pidFd = open (pidFile, O_WRONLY|O_CREAT|O_EXCL, 0666);

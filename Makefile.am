@@ -52,7 +52,7 @@ endif !USE_SYSTEMD_DAEMON
 
 endif HAVE_SYSTEMD
 CLEANFILES = xdm.service
-EXTRA_DIST = xdm.service.in
+EXTRA_DIST = xdm.service.in README.md
 
 MAINTAINERCLEANFILES = ChangeLog INSTALL
 

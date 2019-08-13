@@ -51,6 +51,15 @@ from The Open Group.
 #include <ctype.h>
 #include <grp.h>	/* for initgroups */
 
+# ifdef HAVE_SETPROCTITLE
+#  include <sys/types.h>
+#  ifdef __linux__
+#   include <bsd/unistd.h>
+#  else
+#   include <unistd.h>
+#  endif
+# endif
+
 #ifndef USE_PAM        /* PAM modules should handle these */
 # ifdef SECURE_RPC
 #  include <rpc/rpc.h>
@@ -138,6 +147,9 @@ extern	void	endspent(void);
 #if defined(CSRG_BASED) || defined(__GLIBC__)
 # include <pwd.h>
 # include <unistd.h>
+# if defined(__GLIBC__) && !defined(_XOPEN_CRYPT)
+# include <crypt.h>
+# endif
 #else
 extern	struct passwd	*getpwnam(GETPWNAM_ARGS);
 # ifdef linux
@@ -792,7 +804,7 @@ StartClient (
 	    if (len > 8)
 		bzero (passwd + 8, len - 8);
 	    keyret = getsecretkey(netname,secretkey,passwd);
-	    Debug ("getsecretkey returns %d, key length %d\n",
+	    Debug ("getsecretkey returns %d, key length %lu\n",
 		    keyret, strlen (secretkey));
 	    memcpy(&(netst.st_priv_key), secretkey, HEXKEYBYTES);
 	    netst.st_netname = strdup(netname);

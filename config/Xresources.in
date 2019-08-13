@@ -1,7 +1,5 @@
 Xcursor.theme: whiteglass
 
-#define BS \ /* cpp can be trickier than m4 */
-#define NLBS \n\ /* don't remove these comments */
 xlogin*login.translations: #override BS
 	Ctrl<Key>R: abort-display()NLBS
 	<Key>F1: set-session-argument(failsafe) finish-field()NLBS
